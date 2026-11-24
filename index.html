@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AUREX VAULT — Algorithmic Crypto & VIP Yield Terminal</title>
+  <title>AUREX VAULT — High-Velocity Wealth & VIP Trading Terminal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,9 +19,8 @@
             mono: ['JetBrains Mono', 'monospace'],
           },
           colors: {
-            obsidian: '#070A10',
-            gold: { 400: '#FCD34D', 500: '#F59E0B', 600: '#D97706' },
-            neon: { green: '#10B981', cyan: '#06B6D4', purple: '#8B5CF6' }
+            obsidian: '#06080E',
+            gold: { 300: '#FDE047', 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706' }
           }
         }
       }
@@ -29,132 +28,121 @@
   </script>
   <style>
     body {
-      background: radial-gradient(circle at top, #11192C 0%, #05070B 70%);
-      color: #F3F4F6;
+      background: radial-gradient(circle at 50% -10%, #17233B 0%, #05070C 75%);
+      color: #F9FAFB;
       -webkit-tap-highlight-color: transparent;
       overflow-x: hidden;
     }
     .cyber-card {
-      background: linear-gradient(155deg, rgba(19, 27, 46, 0.92) 0%, rgba(10, 14, 24, 0.96) 100%);
-      border: 1px solid rgba(252, 211, 77, 0.16);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      background: linear-gradient(155deg, rgba(20, 29, 50, 0.92) 0%, rgba(9, 13, 23, 0.97) 100%);
+      border: 1px solid rgba(251, 191, 36, 0.22);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(16px);
     }
     .gold-gradient {
-      background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 48%, #B45309 100%);
+      background: linear-gradient(135deg, #FEF08A 0%, #F59E0B 50%, #B45309 100%);
     }
     .emerald-gradient {
       background: linear-gradient(135deg, #34D399 0%, #059669 100%);
     }
     .gold-text {
-      background: linear-gradient(135deg, #FEF08A 0%, #F59E0B 60%, #FBBF24 100%);
+      background: linear-gradient(135deg, #FEF08A 0%, #F59E0B 55%, #FBBF24 100%);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .animated-border {
+    .turbo-border {
       position: relative;
       overflow: hidden;
     }
-    .animated-border::before {
+    .turbo-border::before {
       content: '';
       position: absolute;
       inset: -2px;
-      background: conic-gradient(from 0deg, transparent 0%, #F59E0B 25%, #10B981 50%, #06B6D4 75%, transparent 100%);
-      animation: spinBorder 5s linear infinite;
+      background: conic-gradient(from 0deg, #10B981, #FBBF24, #06B6D4, #A855F7, #10B981);
+      animation: turboSpin 2.2s linear infinite;
       z-index: 0;
     }
-    .animated-border-inner {
+    .turbo-border-inner {
       position: relative;
       z-index: 1;
-      background: #0B101B;
+      background: #090E1A;
       border-radius: inherit;
     }
-    @keyframes spinBorder {
+    @keyframes turboSpin {
       100% { transform: rotate(360deg); }
     }
-    @keyframes floatPulse {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-4px); }
+    @keyframes fastFloat {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-5px) scale(1.02); }
     }
-    .float-anim { animation: floatPulse 3s ease-in-out infinite; }
+    .fast-float { animation: fastFloat 1.6s ease-in-out infinite; }
     .ticker-scroll {
       display: inline-block;
       white-space: nowrap;
-      animation: marquee 22s linear infinite;
+      animation: fastMarquee 11s linear infinite;
     }
-    @keyframes marquee {
+    @keyframes fastMarquee {
       0% { transform: translateX(0%); }
       100% { transform: translateX(-50%); }
     }
   </style>
 </head>
-<body class="min-h-screen flex justify-center items-start sm:py-4">
+<body class="min-h-screen flex justify-center items-start sm:py-3">
 
-  <!-- Toast Alerts -->
   <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[410px] pointer-events-none flex flex-col gap-2"></div>
 
   <!-- ========================================================= -->
-  <!-- 1. MANDATORY REGISTRATION / LOGIN GATE (FIRST SCREEN)     -->
+  <!-- 1. MANDATORY REGISTRATION / LOGIN SCREEN                  -->
   <!-- ========================================================= -->
-  <div id="auth-gate-screen" class="w-full max-w-[440px] min-h-screen sm:min-h-[850px] sm:rounded-[34px] bg-obsidian sm:border sm:border-amber-400/25 shadow-[0_25px_80px_rgba(0,0,0,0.95)] relative flex flex-col justify-between overflow-hidden">
+  <div id="auth-gate-screen" class="w-full max-w-[440px] min-h-screen sm:min-h-[850px] sm:rounded-[34px] bg-obsidian sm:border sm:border-amber-400/30 shadow-[0_25px_80px_rgba(0,0,0,0.95)] relative flex flex-col justify-between overflow-hidden">
+    <canvas id="auth-candles-canvas" class="absolute inset-0 w-full h-full opacity-55 pointer-events-none"></canvas>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#06080E]/50 via-[#06080E]/75 to-[#06080E] pointer-events-none"></div>
 
-    <!-- Animated Trading Candlesticks Background -->
-    <canvas id="auth-candles-canvas" class="absolute inset-0 w-full h-full opacity-35 pointer-events-none"></canvas>
-    <div class="absolute inset-0 bg-gradient-to-b from-[#070A10]/60 via-[#070A10]/85 to-[#070A10] pointer-events-none"></div>
-
-    <!-- Top Live Market Ticker -->
-    <div class="relative z-10 bg-black/60 border-b border-amber-400/20 py-2 overflow-hidden">
-      <div class="ticker-scroll font-mono text-[11px] text-amber-300/90 space-x-6">
-        <span>BTC/USDT <strong class="text-emerald-400">$96,420.50 (+4.12%)</strong></span>
-        <span>ETH/USDT <strong class="text-emerald-400">$3,685.10 (+3.45%)</strong></span>
-        <span>SOL/USDT <strong class="text-emerald-400">$238.90 (+6.80%)</strong></span>
-        <span>AUREX AI BOT <strong class="text-amber-400">99.4% WIN RATE</strong></span>
-        <span>BTC/USDT <strong class="text-emerald-400">$96,420.50 (+4.12%)</strong></span>
-        <span>ETH/USDT <strong class="text-emerald-400">$3,685.10 (+3.45%)</strong></span>
+    <div class="relative z-10 bg-black/70 border-b border-amber-400/25 py-2 overflow-hidden">
+      <div class="ticker-scroll font-mono text-[11px] text-amber-300 space-x-6">
+        <span>⚡ BTC/USDT <strong class="text-emerald-400">+5.84% SURGE</strong></span>
+        <span>⚡ ETH/USDT <strong class="text-emerald-400">+4.20% BREAKOUT</strong></span>
+        <span>⚡ QUANT ENGINE <strong class="text-cyan-300">LIVE EXECUTION</strong></span>
+        <span>⚡ VIP 1–9 <strong class="text-amber-400">$10 TO $5,000</strong></span>
+        <span>⚡ BTC/USDT <strong class="text-emerald-400">+5.84% SURGE</strong></span>
+        <span>⚡ ETH/USDT <strong class="text-emerald-400">+4.20% BREAKOUT</strong></span>
       </div>
     </div>
 
-    <!-- Main Auth Box -->
-    <div class="relative z-10 px-5 py-6 my-auto space-y-5">
-      <div class="text-center space-y-2">
-        <div class="w-16 h-16 mx-auto rounded-2xl gold-gradient p-[2px] shadow-[0_0_30px_rgba(245,158,11,0.45)] float-anim">
+    <div class="relative z-10 px-5 py-5 my-auto space-y-4">
+      <div class="text-center space-y-1.5">
+        <div class="w-16 h-16 mx-auto rounded-2xl gold-gradient p-[2px] shadow-[0_0_35px_rgba(245,158,11,0.6)] fast-float">
           <div class="w-full h-full bg-obsidian rounded-[14px] flex items-center justify-center">
             <svg class="w-9 h-9" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="#FCD34D" stroke-width="1.8"/>
-              <path d="M7 15L10 10L13 13L17 8" stroke="#10B981" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="#FDE047" stroke-width="2"/>
+              <path d="M6 16L10 11L13.5 14L18 7" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
             </svg>
           </div>
         </div>
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Institutional Quant Terminal
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-[10px] font-extrabold text-emerald-300 uppercase tracking-widest">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> High-Velocity Capital Engine
         </div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-white">AUREX <span class="gold-text">VAULT PRO</span></h1>
-        <p class="text-xs text-gray-400">Create your Investor ID to access Live Trading Yield & VIP Tiers</p>
+        <h1 class="text-2xl font-extrabold text-white">AUREX <span class="gold-text">VAULT PRO</span></h1>
+        <p class="text-xs text-gray-300">Step into high-tier wealth & daily growth</p>
       </div>
 
-      <!-- Switch Tabs: Create ID vs Sign In -->
-      <div class="animated-border rounded-3xl p-[1.5px]">
-        <div class="animated-border-inner p-5 space-y-4">
-          <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-black/60 border border-white/10">
-            <button type="button" id="tab-btn-register" onclick="toggleAuthMode('register')" class="py-2 rounded-lg gold-gradient text-obsidian font-extrabold text-xs uppercase tracking-wider transition">
-              Create New ID
-            </button>
-            <button type="button" id="tab-btn-login" onclick="toggleAuthMode('login')" class="py-2 rounded-lg text-gray-400 font-bold text-xs uppercase tracking-wider transition">
-              Sign In
-            </button>
+      <div class="turbo-border rounded-3xl p-[2px]">
+        <div class="turbo-border-inner p-4 space-y-3.5">
+          <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-black/70 border border-white/10">
+            <button type="button" id="tab-btn-register" onclick="toggleAuthMode('register')" class="py-2 rounded-lg gold-gradient text-obsidian font-extrabold text-xs uppercase">Create ID</button>
+            <button type="button" id="tab-btn-login" onclick="toggleAuthMode('login')" class="py-2 rounded-lg text-gray-400 font-bold text-xs uppercase">Sign In</button>
           </div>
 
-          <!-- REGISTER FORM -->
-          <form id="register-form" onsubmit="submitRegister(event)" class="space-y-3">
+          <form id="register-form" onsubmit="submitRegister(event)" class="space-y-2.5">
             <div>
-              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Full Name / Trader Alias</label>
-              <input id="reg-name" type="text" required placeholder="e.g. Ali Raza" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none" />
+              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Full Name</label>
+              <input id="reg-name" type="text" required placeholder="e.g. Ali Raza" class="w-full bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white outline-none" />
             </div>
             <div>
               <label class="text-[11px] font-semibold text-gray-300 block mb-1">Country & Mobile Number</label>
               <div class="flex gap-2">
-                <select id="reg-country" class="bg-black/70 border border-white/15 rounded-xl px-2.5 py-2.5 text-xs font-mono text-white outline-none">
+                <select id="reg-country" class="bg-black/75 border border-white/15 rounded-xl px-2 py-2 text-xs font-mono text-white outline-none">
                   <option value="PK|🇵🇰|+92">🇵🇰 +92</option>
                   <option value="US|🇺🇸|+1">🇺🇸 +1</option>
                   <option value="GB|🇬🇧|+44">🇬🇧 +44</option>
@@ -162,44 +150,43 @@
                   <option value="IN|🇮🇳|+91">🇮🇳 +91</option>
                   <option value="SA|🇸🇦|+966">🇸🇦 +966</option>
                 </select>
-                <input id="reg-phone" type="tel" required placeholder="300-1234567" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
-              </div>
-            </div>
-            <div>
-              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Security Password</label>
-              <input id="reg-pass" type="password" required minlength="4" placeholder="Create password (min 4 chars)" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
-            </div>
-            <div>
-              <label class="text-[11px] font-semibold text-amber-400 block mb-1">Referral Invite Code (Optional)</label>
-              <input id="reg-invite" type="text" placeholder="Enter sponsor code (e.g. AVX8829)" class="w-full bg-black/60 border border-amber-400/25 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs font-mono text-amber-300 uppercase outline-none" />
-            </div>
-            <button type="submit" class="w-full py-3.5 rounded-xl gold-gradient text-obsidian font-extrabold text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(245,158,11,0.4)]">
-              Create ID & Enter Trading Vault →
-            </button>
-          </form>
-
-          <!-- LOGIN FORM -->
-          <form id="login-form" onsubmit="submitLogin(event)" class="hidden space-y-3">
-            <div>
-              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Registered Country & Number</label>
-              <div class="flex gap-2">
-                <select id="log-country" class="bg-black/70 border border-white/15 rounded-xl px-2.5 py-2.5 text-xs font-mono text-white outline-none">
-                  <option value="PK|🇵🇰|+92">🇵🇰 +92</option>
-                  <option value="US|🇺🇸|+1">🇺🇸 +1</option>
-                  <option value="GB|🇬🇧|+44">🇬🇧 +44</option>
-                  <option value="AE|🇦🇪|+971">🇦🇪 +971</option>
-                  <option value="IN|🇮🇳|+91">🇮🇳 +91</option>
-                  <option value="SA|🇸🇦|+966">🇸🇦 +966</option>
-                </select>
-                <input id="log-phone" type="tel" required placeholder="300-1234567" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
+                <input id="reg-phone" type="tel" required placeholder="300-1234567" class="w-full bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2 text-xs font-mono text-white outline-none" />
               </div>
             </div>
             <div>
               <label class="text-[11px] font-semibold text-gray-300 block mb-1">Password</label>
-              <input id="log-pass" type="password" required placeholder="Enter your password" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
+              <input id="reg-pass" type="password" required minlength="4" placeholder="Create password (min 4 chars)" class="w-full bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2 text-xs font-mono text-white outline-none" />
             </div>
-            <button type="submit" class="w-full py-3.5 rounded-xl emerald-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(16,185,129,0.35)]">
-              Unlock My Vault →
+            <div>
+              <label class="text-[11px] font-semibold text-amber-300 block mb-1">Sponsor ID / Code (Optional)</label>
+              <input id="reg-invite" type="text" placeholder="Enter sponsor code" class="w-full bg-black/65 border border-amber-400/30 focus:border-amber-400 rounded-xl px-3 py-2 text-xs font-mono text-amber-200 outline-none" />
+            </div>
+            <button type="submit" class="w-full py-3 rounded-xl gold-gradient text-obsidian font-extrabold text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(245,158,11,0.45)]">
+              Unlock My Future Vault →
+            </button>
+          </form>
+
+          <form id="login-form" onsubmit="submitLogin(event)" class="hidden space-y-3">
+            <div>
+              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Country & Mobile Number</label>
+              <div class="flex gap-2">
+                <select id="log-country" class="bg-black/75 border border-white/15 rounded-xl px-2 py-2.5 text-xs font-mono text-white outline-none">
+                  <option value="PK|🇵🇰|+92">🇵🇰 +92</option>
+                  <option value="US|🇺🇸|+1">🇺🇸 +1</option>
+                  <option value="GB|🇬🇧|+44">🇬🇧 +44</option>
+                  <option value="AE|🇦🇪|+971">🇦🇪 +971</option>
+                  <option value="IN|🇮🇳|+91">🇮🇳 +91</option>
+                  <option value="SA|🇸🇦|+966">🇸🇦 +966</option>
+                </select>
+                <input id="log-phone" type="tel" required placeholder="300-1234567" class="w-full bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2.5 text-xs font-mono text-white outline-none" />
+              </div>
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Password</label>
+              <input id="log-pass" type="password" required placeholder="Your password" class="w-full bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2.5 text-xs font-mono text-white outline-none" />
+            </div>
+            <button type="submit" class="w-full py-3 rounded-xl emerald-gradient text-black font-extrabold text-xs uppercase tracking-wider">
+              Enter Vault Terminal →
             </button>
           </form>
         </div>
@@ -207,369 +194,378 @@
 
       <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
         <div class="cyber-card rounded-xl p-2">
-          <p class="font-mono font-bold text-amber-400">$10 MIN</p>
-          <p class="text-gray-400">Entry & Payout</p>
+          <p class="font-mono font-bold text-amber-300">$10 MIN</p>
+          <p class="text-gray-300">Start & Payout</p>
         </div>
         <div class="cyber-card rounded-xl p-2">
-          <p class="font-mono font-bold text-emerald-400">20–30 DAYS</p>
-          <p class="text-gray-400">VIP Contracts</p>
+          <p class="font-mono font-bold text-emerald-400">20 / 30 DAYS</p>
+          <p class="text-gray-300">VIP Cycles</p>
         </div>
         <div class="cyber-card rounded-xl p-2">
-          <p class="font-mono font-bold text-cyan-400">24/7 LIVE</p>
-          <p class="text-gray-400">Desk Support</p>
+          <p class="font-mono font-bold text-purple-300">3 INVITES</p>
+          <p class="text-gray-300">Unlock VIP 6–9</p>
         </div>
       </div>
     </div>
 
-    <div class="relative z-10 text-center pb-4 text-[10px] text-gray-500">
-      256-Bit SSL Encrypted • Real-Time Order Ledger
+    <div class="relative z-10 text-center pb-3 text-[10px] text-gray-400">
+      Live Market Feed • Photo & Video Support Desk
     </div>
   </div>
 
   <!-- ========================================================= -->
-  <!-- 2. MAIN TRADING DASHBOARD (SHOWN AFTER ID IS CREATED)     -->
+  <!-- 2. MAIN TRADING DASHBOARD (FRONT PAGE + ALL FEATURES)     -->
   <!-- ========================================================= -->
-  <div id="main-app-shell" class="hidden w-full max-w-[440px] min-h-screen sm:min-h-[850px] sm:rounded-[34px] bg-obsidian sm:border sm:border-amber-400/20 sm:shadow-[0_25px_80px_rgba(0,0,0,0.9)] relative flex flex-col overflow-hidden">
+  <div id="main-app-shell" class="hidden w-full max-w-[440px] min-h-screen sm:min-h-[850px] sm:rounded-[34px] bg-obsidian sm:border sm:border-amber-400/25 shadow-[0_25px_80px_rgba(0,0,0,0.92)] relative flex flex-col overflow-hidden">
 
-    <!-- Header -->
-    <header class="sticky top-0 z-30 bg-obsidian/90 backdrop-blur-xl border-b border-amber-400/15 px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl gold-gradient p-[1.5px] shadow-[0_0_15px_rgba(245,158,11,0.35)]">
-          <div class="w-full h-full bg-obsidian rounded-[10.5px] flex items-center justify-center font-extrabold text-xs text-amber-400">AV</div>
+    <header class="sticky top-0 z-30 bg-obsidian/95 backdrop-blur-xl border-b border-amber-400/20 px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl gold-gradient p-[1.5px] shadow-[0_0_18px_rgba(245,158,11,0.5)]">
+          <div class="w-full h-full bg-obsidian rounded-[10.5px] flex items-center justify-center font-extrabold text-xs text-amber-300">AV</div>
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <span class="font-extrabold text-sm tracking-wider text-white">AUREX <span class="gold-text">VAULT</span></span>
-            <span id="header-vip-badge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-amber-400/15 text-amber-300 border border-amber-400/35">FREE TIER</span>
+            <span class="font-extrabold text-sm text-white">AUREX <span class="gold-text">VAULT</span></span>
+            <span class="px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-400/40 font-mono text-[10px] font-extrabold text-cyan-300">
+              ID: <span id="header-uid">0000000</span>
+            </span>
           </div>
-          <p class="text-[10px] text-gray-400 flex items-center gap-1">
+          <p class="text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-            <span id="header-user-label">Trader • Active</span>
+            <span id="header-user-label">Member Active</span>
           </p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <button onclick="switchTab('deposit')" class="px-2.5 py-1.5 rounded-xl bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/30 flex items-center gap-1.5">
+      <div class="flex items-center gap-1.5">
+        <button onclick="switchTab('deposit')" class="px-2.5 py-1.5 rounded-xl bg-amber-400/15 border border-amber-400/40 flex items-center gap-1">
           <span class="text-xs font-extrabold font-mono text-amber-300" id="header-balance">$0.00</span>
           <span class="w-4 h-4 rounded-md gold-gradient text-obsidian font-extrabold text-xs flex items-center justify-center">+</span>
         </button>
-        <button onclick="logoutUser()" title="Sign Out" class="w-8 h-8 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center justify-center">
-          ⏻
-        </button>
+        <button onclick="logoutUser()" title="Sign Out" class="w-8 h-8 rounded-xl bg-red-500/15 border border-red-500/35 text-red-400 text-xs flex items-center justify-center">⏻</button>
       </div>
     </header>
 
-    <!-- Live Market Ticker -->
-    <div class="bg-gradient-to-r from-amber-500/15 via-emerald-500/15 to-cyan-500/15 border-b border-white/10 py-1.5 overflow-hidden">
+    <div class="bg-gradient-to-r from-emerald-500/15 via-amber-500/20 to-purple-500/15 border-b border-white/10 py-1.5 overflow-hidden">
       <div class="ticker-scroll font-mono text-[10px] text-amber-200 space-x-6">
-        <span>● BTC/USDT <strong class="text-emerald-400">$96,420 (+4.1%)</strong></span>
-        <span>● XAU/GOLD <strong class="text-amber-300">$2,794 (+1.8%)</strong></span>
-        <span>● MIN WITHDRAW <strong class="text-cyan-300">$10.00 INSTANT</strong></span>
-        <span>● TIER 1–4 <strong class="text-emerald-400">20 DAYS VALID</strong></span>
-        <span>● TIER 6–9 <strong class="text-purple-300">30 DAYS (3 INVITES)</strong></span>
+        <span>● BTC/USDT <strong class="text-emerald-400">$96,840 (+5.4%)</strong></span>
+        <span>● VIP 1–4 <strong class="text-emerald-400">20 DAYS OPEN</strong></span>
+        <span>● VIP 6–9 <strong class="text-purple-300">30 DAYS • 3 INVITES</strong></span>
+        <span>● SPIN REWARD <strong class="text-amber-300">UP TO $1.00</strong></span>
+        <span>● MIN PAYOUT <strong class="text-cyan-300">$10.00</strong></span>
       </div>
     </div>
 
-    <!-- Scrollable Main Area -->
     <main class="flex-1 overflow-y-auto pb-24 px-4 pt-3 space-y-4">
 
-      <!-- HOME TAB -->
       <section id="tab-home" class="space-y-4">
+        <div class="turbo-border rounded-3xl p-[2px] shadow-[0_18px_45px_rgba(0,0,0,0.75)]">
+          <div class="turbo-border-inner p-4 relative overflow-hidden">
+            <canvas id="hero-candles-canvas" class="absolute inset-0 w-full h-full opacity-55 pointer-events-none"></canvas>
+            <div class="relative z-10 space-y-3">
+              <div class="flex items-start justify-between">
+                <div>
+                  <span class="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-bold">● Live Quant Equity Stream</span>
+                  <h1 id="hero-balance" class="text-3xl font-extrabold font-mono text-white mt-0.5">$0.00</h1>
+                </div>
+                <div class="text-right">
+                  <span id="hero-vip-badge" class="px-2.5 py-1 rounded-xl bg-amber-400/20 border border-amber-400/40 text-[10px] font-mono font-extrabold text-amber-300">
+                    NO VIP ACTIVE
+                  </span>
+                  <p id="hero-plan-days" class="text-[10px] text-cyan-300 font-mono mt-1">Min Withdraw: $10.00</p>
+                </div>
+              </div>
 
-        <!-- Hero Card with Live Animated Trading Candlesticks -->
-        <div class="relative rounded-3xl p-4 border border-amber-400/30 overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.65)] bg-[#0C1220]">
-          <canvas id="hero-candles-canvas" class="absolute inset-0 w-full h-full opacity-45 pointer-events-none"></canvas>
-          <div class="relative z-10">
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="text-[10px] uppercase tracking-widest text-amber-300/80 font-bold">Total Trading Equity (USD)</p>
-                <h1 id="hero-balance" class="text-3xl font-extrabold font-mono text-white tracking-tight mt-0.5">$0.00</h1>
+              <div class="grid grid-cols-3 gap-2 pt-2 border-t border-white/15">
+                <div class="bg-black/55 rounded-xl p-2 border border-white/10">
+                  <p class="text-[9px] text-gray-400">Profit Earned</p>
+                  <p id="today-yield" class="text-xs font-extrabold font-mono text-emerald-400">+$0.00</p>
+                </div>
+                <div class="bg-black/55 rounded-xl p-2 border border-white/10">
+                  <p class="text-[9px] text-gray-400">Invite Bonus</p>
+                  <p id="team-rebate" class="text-xs font-extrabold font-mono text-amber-300">$0.00</p>
+                </div>
+                <div class="bg-black/55 rounded-xl p-2 border border-white/10">
+                  <p class="text-[9px] text-gray-400">Active Invites</p>
+                  <p id="hero-active-invites" class="text-xs font-extrabold font-mono text-purple-300">0 / 3</p>
+                </div>
               </div>
-              <span id="hero-plan-days" class="px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/35 text-[10px] font-mono font-bold text-emerald-300">
-                No Active Plan
-              </span>
-            </div>
 
-            <div class="grid grid-cols-3 gap-2 my-3.5 pt-3 border-t border-white/10">
-              <div class="bg-black/45 backdrop-blur rounded-xl p-2 border border-white/10">
-                <p class="text-[9px] text-gray-400">Earned Yield</p>
-                <p id="today-yield" class="text-xs font-extrabold font-mono text-emerald-400 mt-0.5">+$0.00</p>
+              <div class="grid grid-cols-4 gap-2 pt-1">
+                <button onclick="switchTab('deposit')" class="flex flex-col items-center gap-1 p-2 rounded-xl gold-gradient text-obsidian font-extrabold shadow-lg">
+                  <span class="text-sm">+</span>
+                  <span class="text-[10px]">Deposit</span>
+                </button>
+                <button onclick="openWithdrawModal()" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/65 border border-cyan-400/35 text-cyan-200">
+                  <span class="text-sm">↗</span>
+                  <span class="text-[10px] font-bold">Withdraw</span>
+                </button>
+                <button onclick="claimDailyYield()" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/65 border border-emerald-400/35 text-emerald-300">
+                  <span class="text-sm">⚡</span>
+                  <span class="text-[10px] font-bold">Harvest</span>
+                </button>
+                <button onclick="switchTab('team')" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/65 border border-purple-400/35 text-purple-200">
+                  <span class="text-sm">🎁</span>
+                  <span class="text-[10px] font-bold">Surprises</span>
+                </button>
               </div>
-              <div class="bg-black/45 backdrop-blur rounded-xl p-2 border border-white/10">
-                <p class="text-[9px] text-gray-400">Team Rebate</p>
-                <p id="team-rebate" class="text-xs font-extrabold font-mono text-amber-300 mt-0.5">$0.00</p>
-              </div>
-              <div class="bg-black/45 backdrop-blur rounded-xl p-2 border border-white/10">
-                <p class="text-[9px] text-gray-400">Active Invites</p>
-                <p id="hero-active-invites" class="text-xs font-extrabold font-mono text-cyan-300 mt-0.5">0 / 3</p>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-2">
-              <button onclick="switchTab('deposit')" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-amber-400/20 border border-amber-400/40">
-                <div class="w-8 h-8 rounded-lg gold-gradient text-obsidian flex items-center justify-center font-extrabold">+</div>
-                <span class="text-[10px] font-bold text-amber-300">Deposit</span>
-              </button>
-              <button onclick="openWithdrawModal()" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/50 border border-white/15">
-                <div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold">↗</div>
-                <span class="text-[10px] font-semibold text-gray-200">Withdraw</span>
-              </button>
-              <button onclick="claimDailyYield()" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/50 border border-white/15">
-                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">⚡</div>
-                <span class="text-[10px] font-semibold text-gray-200">Harvest</span>
-              </button>
-              <button onclick="switchTab('vip')" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/50 border border-white/15">
-                <div class="w-8 h-8 rounded-lg bg-purple-500/25 text-purple-300 flex items-center justify-center font-bold">👑</div>
-                <span class="text-[10px] font-semibold text-gray-200">9 VIPs</span>
-              </button>
             </div>
           </div>
         </div>
 
-        <!-- Daily Trading Bot Yield Bar -->
-        <div class="cyber-card rounded-2xl p-4 flex items-center justify-between gap-3">
+        <div class="cyber-card rounded-2xl p-3.5 border-amber-400/35 flex items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-sm font-extrabold text-white">AI Quant Yield Harvest</h2>
-              <span id="countdown-timer" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-400/15 text-amber-300 border border-amber-400/30">23:59:59</span>
+              <span class="text-sm">🎡</span>
+              <h2 class="text-xs font-extrabold text-white uppercase tracking-wider">Lucky Wealth Spin</h2>
+              <span class="px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 font-mono text-[10px] font-bold">
+                Spins: <span id="spin-count-badge">2</span>
+              </span>
             </div>
-            <p id="daily-payout-desc" class="text-[11px] text-gray-400 mt-0.5">Activate any VIP Plan ($10–$5000) to harvest daily profit</p>
+            <p class="text-[11px] text-gray-300 mt-0.5">Win up to <strong class="text-emerald-400">$1.00</strong> instant balance per spin!</p>
           </div>
-          <button onclick="claimDailyYield()" class="px-3.5 py-2.5 rounded-xl emerald-gradient text-black font-extrabold text-xs shrink-0 shadow-[0_0_20px_rgba(16,185,129,0.35)]">
-            Harvest
+          <button onclick="playLuckySpin()" id="spin-now-btn" class="px-3.5 py-2.5 rounded-xl gold-gradient text-obsidian font-extrabold text-xs shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.45)]">
+            SPIN NOW
           </button>
         </div>
 
-        <!-- Quick Preview of VIP Tiers -->
-        <div class="cyber-card rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-extrabold uppercase tracking-wider text-amber-300">VIP Investment Tiers ($10 – $5,000)</h3>
-            <button onclick="switchTab('vip')" class="text-[11px] text-cyan-300 font-bold">View All 9 →</button>
-          </div>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="bg-black/40 border border-emerald-500/25 rounded-xl p-2.5">
-              <span class="text-[10px] font-bold text-emerald-400">● OPEN TO ALL (20 DAYS)</span>
-              <p class="font-extrabold text-white mt-0.5">$10 • $25 • $50 • $100</p>
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between px-1">
+            <div>
+              <h2 class="text-sm font-extrabold text-white flex items-center gap-1.5">
+                <span>👑</span> VIP Wealth Tiers ($10 – $5,000)
+              </h2>
+              <p class="text-[10px] text-gray-400">First 4 = 20 Days Open • Last 4 = 30 Days (3 Invites)</p>
             </div>
-            <div class="bg-black/40 border border-purple-500/30 rounded-xl p-2.5">
-              <span class="text-[10px] font-bold text-purple-300">🔒 3 INVITES (30 DAYS)</span>
-              <p class="font-extrabold text-white mt-0.5">$500 – $5,000 VIP</p>
-            </div>
+            <span class="text-[10px] font-mono font-bold text-purple-300">Invites: <span id="front-invites-count">0</span>/3</span>
           </div>
+
+          <div id="front-vip-tiers-list" class="space-y-2.5"></div>
         </div>
 
-        <!-- Customer Order History -->
         <div class="cyber-card rounded-2xl p-4">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-xs font-extrabold uppercase tracking-wider text-gray-300">Live Order & Receipt Ledger</h3>
-            <button onclick="syncSessionWithServer()" class="text-[11px] text-amber-400 font-bold">↻ Sync</button>
+          <div class="flex items-center justify-between mb-2.5">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-gray-200">Recent Order Receipts</h3>
+            <button onclick="syncSessionWithServer()" class="text-[11px] text-amber-300 font-bold">↻ Refresh</button>
           </div>
-          <div id="home-orders-list" class="space-y-2.5"></div>
+          <div id="home-orders-list" class="space-y-2"></div>
         </div>
       </section>
 
-      <!-- VIP TIERS TAB (ALL 9 PLANS) -->
       <section id="tab-vip" class="hidden space-y-3">
-        <div class="cyber-card rounded-2xl p-4 border-amber-400/35 space-y-1.5">
-          <div class="flex items-center justify-between">
-            <h2 class="text-base font-extrabold text-white">9 VIP Trading Contracts</h2>
-            <span class="px-2.5 py-1 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-[10px] font-mono font-bold text-cyan-300">
-              Active Invites: <span id="vip-invites-counter">0</span>/3
-            </span>
-          </div>
-          <p class="text-[11px] text-gray-400">
-            • <strong class="text-emerald-400">Plans 1–4 ($10–$100):</strong> Valid 20 Days • Open for everyone.<br/>
-            • <strong class="text-purple-300">Plans 6–9 ($500–$5,000):</strong> Valid 30 Days • Unlocks after <strong>3 invited friends deposit</strong>.
+        <div class="cyber-card rounded-2xl p-4 border-amber-400/40">
+          <h2 class="text-base font-extrabold text-white">All 9 VIP Wealth Plans</h2>
+          <p class="text-xs text-gray-300 mt-1">
+            Plans 1–4 ($10, $25, $50, $100) run for <strong>20 Days</strong> for everyone. Plans 6–9 ($500–$5,000) run for <strong>30 Days</strong> and unlock once <strong>3 invited friends deposit</strong>.
           </p>
         </div>
-        <div id="vip-tiers-container" class="space-y-3"></div>
+        <div id="full-vip-tiers-list" class="space-y-2.5"></div>
       </section>
 
-      <!-- DEPOSIT TAB -->
       <section id="tab-deposit" class="hidden space-y-4">
         <div class="cyber-card rounded-2xl p-4 space-y-4">
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-base font-extrabold text-white">Deposit USDT (Min $10)</h2>
-              <p class="text-[11px] text-gray-400">Scan QR & submit TxID to generate Order ID</p>
+              <p class="text-[11px] text-gray-300">Send USDT & upload payment screenshot only</p>
             </div>
-            <span class="px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 text-[10px] font-bold">INSTANT ID</span>
+            <span class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">PROOF ONLY</span>
           </div>
 
           <div class="grid grid-cols-2 gap-2.5">
-            <button onclick="selectNetwork('TRC20')" id="net-TRC20" class="net-btn py-2.5 px-3 rounded-xl text-xs font-extrabold border border-amber-400 bg-amber-400/15 text-amber-300">
-              USDT (TRC20)
-            </button>
-            <button onclick="selectNetwork('BEP20')" id="net-BEP20" class="net-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-white/10 bg-white/5 text-gray-300">
-              USDT (BEP20)
-            </button>
+            <button onclick="selectNetwork('TRC20')" id="net-TRC20" class="net-btn py-2.5 px-3 rounded-xl text-xs font-extrabold border border-amber-400 bg-amber-400/20 text-amber-300">USDT (TRC20)</button>
+            <button onclick="selectNetwork('BEP20')" id="net-BEP20" class="net-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-white/10 bg-white/5 text-gray-300">USDT (BEP20)</button>
           </div>
 
-          <div class="bg-[#060911] rounded-2xl p-4 border border-amber-400/20 flex flex-col items-center text-center">
-            <div class="bg-white p-3 rounded-2xl mb-3 relative inline-flex items-center justify-center shadow-[0_0_25px_rgba(245,158,11,0.25)]">
-              <div id="real-qr-container" class="w-[168px] h-[168px] flex items-center justify-center"></div>
-              <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div class="w-8 h-8 rounded-xl bg-[#26A17B] border-2 border-white flex items-center justify-center text-white font-extrabold text-xs">₮</div>
-              </div>
+          <div class="bg-[#060911] rounded-2xl p-4 border border-amber-400/25 flex flex-col items-center text-center">
+            <div class="bg-white p-2.5 rounded-2xl mb-2.5 relative inline-flex items-center justify-center">
+              <div id="real-qr-container" class="w-[156px] h-[156px] flex items-center justify-center"></div>
             </div>
-            <p id="network-label" class="text-[11px] font-bold text-amber-300 mb-1.5">Deposit Address • TRC20</p>
-            <div class="w-full flex items-center justify-between gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+            <p id="network-label" class="text-[11px] font-bold text-amber-300 mb-1">Receiving Wallet • TRC20</p>
+            <div class="w-full flex items-center justify-between gap-2 bg-white/5 border border-white/15 rounded-xl px-3 py-2">
               <span id="deposit-address-text" class="font-mono text-[11px] text-gray-100 break-all text-left">TER4vxuCgwKT4cymyC2NRZgVYnvWn6dFC9</span>
-              <button onclick="copyDepositAddress()" class="px-3 py-1.5 rounded-lg gold-gradient text-obsidian font-extrabold text-[11px] shrink-0">Copy</button>
+              <button type="button" onclick="copyDepositAddress()" class="px-3 py-1.5 rounded-lg gold-gradient text-obsidian font-extrabold text-[11px] shrink-0">Copy</button>
             </div>
           </div>
 
           <form onsubmit="submitDepositOrder(event)" class="space-y-3">
             <div>
-              <label class="text-[11px] text-gray-300 block mb-1">Amount (USD — Minimum $10)</label>
-              <input id="deposit-amount-input" type="number" step="0.01" min="10" required placeholder="10.00" class="w-full bg-black/50 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white outline-none" />
+              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Deposit Amount (USD — Minimum $10)</label>
+              <input id="deposit-amount-input" type="number" step="0.01" min="10" required placeholder="10.00" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white outline-none" />
             </div>
+
             <div>
-              <label class="text-[11px] text-gray-300 block mb-1">Transaction Hash / TxID</label>
-              <input id="deposit-txid-input" type="text" required placeholder="Paste Binance / Wallet TxID here..." class="w-full bg-black/50 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
+              <label class="text-[11px] font-semibold text-amber-300 block mb-1">Upload Payment Screenshot (Required)</label>
+              <input id="deposit-proof-file" type="file" accept="image/*" required onchange="previewDepositProof(event)" class="w-full bg-black/60 border border-amber-400/30 rounded-xl p-2 text-xs text-gray-200 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:gold-gradient file:text-obsidian file:font-bold" />
+              <img id="deposit-proof-preview" class="hidden mt-2 w-full max-h-44 object-contain rounded-xl border border-white/15 bg-black/60" />
             </div>
-            <button type="submit" class="w-full py-3.5 rounded-xl gold-gradient text-obsidian font-extrabold text-xs uppercase tracking-wider">
-              Submit Deposit & Generate Order ID
+
+            <button type="submit" class="w-full py-3.5 rounded-xl gold-gradient text-obsidian font-extrabold text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(245,158,11,0.4)]">
+              Submit Screenshot & Generate Order ID
             </button>
           </form>
 
-          <div id="latest-order-slip" class="hidden bg-emerald-500/10 border border-emerald-500/35 rounded-2xl p-3.5 space-y-1.5 text-xs">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-emerald-400">✓ Deposit Order Created</span>
-              <span class="px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 font-mono text-[10px]">Pending Review</span>
-            </div>
-            <p class="text-gray-300">Order ID: <strong id="slip-order-id" class="font-mono text-white">ORD-0000</strong></p>
-            <p class="text-gray-300">Date & Time: <strong id="slip-order-time" class="font-mono text-gray-200">--</strong></p>
-            <p class="text-gray-300">Amount: <strong id="slip-order-amount" class="font-mono text-amber-300">$10.00</strong></p>
+          <div id="latest-order-slip" class="hidden bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-3.5 space-y-1 text-xs">
+            <p class="font-extrabold text-emerald-300">✓ Deposit Order Submitted</p>
+            <p class="text-gray-200">Order ID: <strong id="slip-order-id" class="font-mono text-amber-300"></strong></p>
+            <p class="text-gray-200">Date & Time: <strong id="slip-order-time" class="font-mono"></strong></p>
+            <p class="text-gray-200">Amount: <strong id="slip-order-amount" class="font-mono text-emerald-300"></strong></p>
           </div>
-        </div>
-
-        <div class="cyber-card rounded-2xl p-4">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-xs font-extrabold uppercase tracking-wider text-gray-300">All Orders & Payout History</h3>
-            <button onclick="syncSessionWithServer()" class="text-[11px] text-amber-400">↻ Sync</button>
-          </div>
-          <div id="deposit-orders-list" class="space-y-2.5"></div>
         </div>
       </section>
 
-      <!-- TEAM TAB -->
       <section id="tab-team" class="hidden space-y-4">
-        <div class="cyber-card rounded-2xl p-4 border-amber-400/30 space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-base font-extrabold text-white">Invite Friends & Unlock VIP 6–9</h2>
-            <span class="px-2.5 py-1 rounded-lg bg-purple-500/20 border border-purple-500/40 text-xs font-mono font-bold text-purple-300">
-              <span id="team-active-count">0</span> / 3 Qualified
-            </span>
-          </div>
-          <p class="text-xs text-gray-400">
-            Share your unique invite code below. When <strong class="text-amber-300">3 invited members register & make a deposit</strong>, high-yield <strong class="text-emerald-400">30-Day VIP Plans ($500 to $5,000)</strong> unlock automatically + you earn <strong class="text-amber-300">12% instant rebate</strong>!
-          </p>
-          <div class="bg-black/50 border border-amber-400/30 rounded-xl p-3 flex items-center justify-between">
-            <div>
-              <p class="text-[10px] text-gray-400">Your Personal Invite Code</p>
-              <p id="my-ref-code" class="font-mono font-extrabold text-base text-amber-300">AVX8829</p>
+        <div class="turbo-border rounded-3xl p-[2px]">
+          <div class="turbo-border-inner p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-full bg-amber-400/20 border border-amber-400/40 text-[10px] font-extrabold text-amber-300 uppercase">
+                🔥 High-Reward Invite Vault
+              </span>
+              <span class="font-mono text-xs font-extrabold text-purple-300">
+                <span id="team-active-count">0</span> / 3 Invites
+              </span>
             </div>
-            <button onclick="copyReferralCode()" class="px-4 py-2 rounded-xl gold-gradient text-obsidian font-extrabold text-xs">Copy Code</button>
+
+            <h2 class="text-base font-extrabold text-white leading-snug">
+              Bring 3 Depositing Friends & Unlock <span class="gold-text">30-Day VIP 6–9 ($500–$5,000)</span> + Bonus Spins!
+            </h2>
+            <p class="text-xs text-gray-300">
+              Every friend who joins with your <strong>7-Digit ID</strong> and deposits gives you:
+              <strong class="text-emerald-400">12% Instant Rebate</strong> + <strong class="text-amber-300">+1 Extra Lucky Spin</strong> + progress toward <strong class="text-purple-300">VIP 6–9 Unlock</strong>!
+            </p>
+
+            <div class="bg-black/65 border border-amber-400/35 rounded-2xl p-3 space-y-2">
+              <p class="text-[10px] text-gray-400 uppercase font-bold">Your Invite Link & 7-Digit Code</p>
+              <p id="my-invite-link" class="font-mono text-[11px] text-cyan-300 break-all bg-white/5 p-2 rounded-lg"></p>
+              <div class="flex gap-2">
+                <button type="button" onclick="copyInviteLink()" class="flex-1 py-2.5 rounded-xl gold-gradient text-obsidian font-extrabold text-xs">
+                  Copy Invite Link
+                </button>
+                <button type="button" onclick="shareInviteLink()" class="flex-1 py-2.5 rounded-xl emerald-gradient text-black font-extrabold text-xs">
+                  Share Now 🚀
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cyber-card rounded-2xl p-4 space-y-2.5">
+          <h3 class="text-xs font-extrabold uppercase tracking-wider text-amber-300">🎁 Invite Milestone Surprises</h3>
+          <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="bg-black/50 border border-white/10 rounded-xl p-2.5">
+              <p class="text-lg">🎁</p>
+              <p class="font-bold text-white text-[11px] mt-1">1st Invite</p>
+              <p class="text-[10px] text-emerald-400">+12% & +1 Spin</p>
+            </div>
+            <div class="bg-black/50 border border-white/10 rounded-xl p-2.5">
+              <p class="text-lg">💎</p>
+              <p class="font-bold text-white text-[11px] mt-1">2nd Invite</p>
+              <p class="text-[10px] text-amber-300">+12% & +1 Spin</p>
+            </div>
+            <div class="bg-black/50 border border-purple-400/40 rounded-xl p-2.5">
+              <p class="text-lg">👑</p>
+              <p class="font-bold text-purple-200 text-[11px] mt-1">3rd Invite</p>
+              <p class="text-[10px] text-purple-300">VIP 6–9 UNLOCKED</p>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- ACCOUNT TAB -->
       <section id="tab-account" class="hidden space-y-4">
-        <div class="cyber-card rounded-2xl p-4 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-2xl gold-gradient text-obsidian font-extrabold text-lg flex items-center justify-center">AV</div>
+        <div class="cyber-card rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
             <div>
-              <h3 id="profile-name-display" class="font-extrabold text-sm text-white">Global Trader</h3>
-              <p id="profile-phone-display" class="font-mono text-xs text-amber-300">+92 300-1234567</p>
-              <p class="text-[10px] text-emerald-400">● Verified Investor ID</p>
+              <p class="text-[10px] text-gray-400 uppercase font-bold">Unique 7-Digit Trader ID</p>
+              <p id="profile-uid-display" class="font-mono text-2xl font-extrabold text-amber-300">0000000</p>
             </div>
+            <button onclick="logoutUser()" class="px-3 py-1.5 rounded-xl bg-red-500/15 border border-red-500/35 text-xs font-bold text-red-400">Log Out</button>
           </div>
-          <button onclick="logoutUser()" class="px-3 py-1.5 rounded-xl bg-red-500/15 border border-red-500/30 text-xs font-bold text-red-400">
-            Log Out
-          </button>
-        </div>
-
-        <div class="cyber-card rounded-2xl p-4 space-y-2.5 text-xs">
-          <p class="font-bold text-white">24/7 Live Desk Support</p>
-          <p class="text-gray-400">Need deposit verification or VIP tier assistance? Message our support desk directly inside the app.</p>
-          <button onclick="openSupportModal()" class="w-full py-3 rounded-xl gold-gradient text-obsidian font-extrabold text-xs uppercase tracking-wider">
-            💬 Open Live Customer Support
+          <div class="pt-2 border-t border-white/10 text-xs text-gray-300 space-y-1">
+            <p>Name: <strong id="profile-name-display" class="text-white"></strong></p>
+            <p>Mobile: <strong id="profile-phone-display" class="font-mono text-cyan-300"></strong></p>
+            <p>Minimum Withdrawal: <strong class="font-mono text-emerald-400">$10.00 USD</strong></p>
+          </div>
+          <button onclick="openSupportModal()" class="w-full py-3 rounded-xl gold-gradient text-obsidian font-extrabold text-xs uppercase">
+            💬 Open Photo / Video Live Support
           </button>
         </div>
       </section>
 
     </main>
 
-    <!-- Floating Live Support Button -->
-    <button onclick="openSupportModal()" class="fixed sm:absolute bottom-20 right-4 z-40 px-3.5 py-2.5 rounded-full gold-gradient text-obsidian font-extrabold text-xs shadow-[0_10px_28px_rgba(245,158,11,0.5)] flex items-center gap-1.5">
+    <button onclick="openSupportModal()" class="fixed sm:absolute bottom-20 right-4 z-40 px-3.5 py-2.5 rounded-full gold-gradient text-obsidian font-extrabold text-xs shadow-[0_10px_28px_rgba(245,158,11,0.55)] flex items-center gap-1.5">
       <span>💬</span>
-      <span>Live Support</span>
+      <span>Live Chat</span>
     </button>
 
-    <!-- Bottom Navigation -->
-    <nav class="sticky bottom-0 z-30 bg-obsidian/95 backdrop-blur-xl border-t border-amber-400/15 px-2 py-2 grid grid-cols-5 gap-1">
+    <nav class="sticky bottom-0 z-30 bg-obsidian/95 backdrop-blur-xl border-t border-amber-400/20 px-2 py-2 grid grid-cols-5 gap-1">
       <button onclick="switchTab('home')" id="nav-home" class="nav-item flex flex-col items-center py-1 text-amber-300">
-        <span class="text-sm">📊</span>
+        <span class="text-sm">📈</span>
         <span class="text-[10px] font-bold mt-0.5">Terminal</span>
       </button>
       <button onclick="switchTab('vip')" id="nav-vip" class="nav-item flex flex-col items-center py-1 text-gray-400">
         <span class="text-sm">👑</span>
-        <span class="text-[10px] font-semibold mt-0.5">VIP Plans</span>
+        <span class="text-[10px] font-semibold mt-0.5">9 VIPs</span>
       </button>
       <button onclick="switchTab('deposit')" id="nav-deposit" class="nav-item flex flex-col items-center py-1 text-amber-300">
         <div class="w-8 h-8 -mt-3 rounded-xl gold-gradient text-obsidian flex items-center justify-center font-extrabold shadow">+</div>
         <span class="text-[10px] font-bold mt-0.5">Deposit</span>
       </button>
       <button onclick="switchTab('team')" id="nav-team" class="nav-item flex flex-col items-center py-1 text-gray-400">
-        <span class="text-sm">🤝</span>
+        <span class="text-sm">🎁</span>
         <span class="text-[10px] font-semibold mt-0.5">Invite (3)</span>
       </button>
       <button onclick="switchTab('account')" id="nav-account" class="nav-item flex flex-col items-center py-1 text-gray-400">
-        <span class="text-sm">🛡️</span>
-        <span class="text-[10px] font-semibold mt-0.5">ID Profile</span>
+        <span class="text-sm">🆔</span>
+        <span class="text-[10px] font-semibold mt-0.5">My ID</span>
       </button>
     </nav>
 
-    <!-- WITHDRAW MODAL (MIN $10) -->
     <div id="withdraw-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div class="w-full max-w-[390px] cyber-card rounded-3xl p-5 border border-amber-400/35 space-y-4 relative">
-        <button onclick="closeWithdrawModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 text-gray-400 flex items-center justify-center">✕</button>
+      <div class="w-full max-w-[390px] cyber-card rounded-3xl p-5 border border-amber-400/40 space-y-4 relative">
+        <button onclick="closeWithdrawModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 text-gray-300 flex items-center justify-center">✕</button>
         <div>
           <h3 class="text-base font-extrabold text-white">Withdraw USDT (Min $10.00)</h3>
-          <p class="text-[11px] text-gray-400">Available Equity: <span id="withdraw-avail-balance" class="font-mono text-emerald-400 font-bold">$0.00</span></p>
+          <p class="text-[11px] text-gray-300">Available Balance: <span id="withdraw-avail-balance" class="font-mono text-emerald-400 font-bold">$0.00</span></p>
         </div>
         <form onsubmit="handleWithdrawSubmit(event)" class="space-y-3">
-          <input id="withdraw-address" type="text" required placeholder="Destination USDT (TRC20) Address" class="w-full bg-black/60 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
-          <input id="withdraw-amount" type="number" min="10" step="0.01" required placeholder="Minimum $10.00 USD" class="w-full bg-black/60 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
-          <button type="submit" class="w-full py-3 rounded-xl emerald-gradient text-black font-extrabold text-xs uppercase">Submit Payout Order</button>
+          <input id="withdraw-address" type="text" required placeholder="Destination USDT (TRC20) Address" class="w-full bg-black/65 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
+          <input id="withdraw-amount" type="number" min="10" step="0.01" required placeholder="Minimum $10.00 USD" class="w-full bg-black/65 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
+          <button type="submit" class="w-full py-3 rounded-xl emerald-gradient text-black font-extrabold text-xs uppercase">Submit Payout Request</button>
         </form>
       </div>
     </div>
 
-    <!-- LIVE CUSTOMER SUPPORT CHAT MODAL -->
-    <div id="support-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div class="w-full max-w-[400px] cyber-card rounded-3xl p-4 border border-amber-400/35 flex flex-col h-[520px] relative">
-        <div class="flex items-center justify-between pb-3 border-b border-white/10">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-xl gold-gradient text-obsidian font-extrabold text-xs flex items-center justify-center">💬</div>
-            <div>
-              <h3 class="text-sm font-extrabold text-white">AUREX Live Support</h3>
-              <p class="text-[10px] text-emerald-400 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Online • Direct Desk
-              </p>
-            </div>
+    <div id="support-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3">
+      <div class="w-full max-w-[410px] cyber-card rounded-3xl p-4 border border-amber-400/40 flex flex-col h-[560px] relative">
+        <div class="flex items-center justify-between pb-2.5 border-b border-white/10">
+          <div>
+            <h3 class="text-sm font-extrabold text-white">💬 AUREX Live Support</h3>
+            <p class="text-[10px] text-emerald-400 font-semibold">Send Text, Photo & Video • Instant Sound</p>
           </div>
-          <button onclick="closeSupportModal()" class="w-8 h-8 rounded-full bg-white/5 text-gray-400 flex items-center justify-center">✕</button>
+          <button onclick="closeSupportModal()" class="w-8 h-8 rounded-full bg-white/10 text-gray-300 flex items-center justify-center">✕</button>
         </div>
 
         <div id="support-chat-box" class="flex-1 overflow-y-auto py-3 space-y-2.5 text-xs"></div>
 
-        <form onsubmit="sendSupportMessage(event)" class="pt-2 border-t border-white/10 flex gap-2">
-          <input id="support-msg-input" type="text" required placeholder="Type message or Order ID..." class="flex-1 bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2.5 text-xs text-white outline-none" />
-          <button type="submit" class="px-4 py-2.5 rounded-xl gold-gradient text-obsidian font-extrabold text-xs">Send</button>
+        <div id="user-media-preview-bar" class="hidden bg-black/70 border border-amber-400/30 rounded-xl p-2 mb-2 flex items-center justify-between gap-2">
+          <span id="user-media-label" class="text-[11px] text-amber-300 font-mono truncate">Media attached</span>
+          <button type="button" onclick="clearUserMedia()" class="text-xs text-red-400 font-bold px-2">✕</button>
+        </div>
+
+        <form onsubmit="sendSupportMessage(event)" class="pt-2 border-t border-white/10 space-y-2">
+          <div class="flex items-center gap-1.5">
+            <label class="px-2.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs cursor-pointer" title="Send Photo">
+              📷
+              <input type="file" accept="image/*" class="hidden" onchange="handleSupportMediaSelect(event, 'image')" />
+            </label>
+            <label class="px-2.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs cursor-pointer" title="Send Video">
+              🎥
+              <input type="file" accept="video/*" class="hidden" onchange="handleSupportMediaSelect(event, 'video')" />
+            </label>
+            <input id="support-msg-input" type="text" placeholder="Type message..." class="flex-1 bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+            <button type="submit" class="px-4 py-2 rounded-xl gold-gradient text-obsidian font-extrabold text-xs">Send</button>
+          </div>
         </form>
       </div>
     </div>
@@ -591,13 +587,15 @@
 
     const state = {
       loggedIn: false,
+      userUid: '0000000',
       fullName: '',
       countryCode: 'PK',
       countryFlag: '🇵🇰',
       dialCode: '+92',
       phone: '',
-      refCode: 'AVX8829',
+      refCode: '0000000',
       activeInvites: 0,
+      spinsLeft: 2,
       balance: 0,
       todayYield: 0,
       teamRebate: 0,
@@ -610,6 +608,28 @@
       },
       orders: []
     };
+
+    let depositProofBase64 = '';
+    let userSupportMedia = { type: 'none', data: '', name: '' };
+    let lastSupportCount = 0;
+
+    function playChimeSound(freq = 740) {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.19);
+      } catch (e) {}
+    }
 
     function showToast(msg, type = 'success') {
       const container = document.getElementById('toast-container');
@@ -633,26 +653,28 @@
       if (mode === 'register') {
         regForm.classList.remove('hidden');
         logForm.classList.add('hidden');
-        btnReg.className = 'py-2 rounded-lg gold-gradient text-obsidian font-extrabold text-xs uppercase tracking-wider transition';
-        btnLog.className = 'py-2 rounded-lg text-gray-400 font-bold text-xs uppercase tracking-wider transition';
+        btnReg.className = 'py-2 rounded-lg gold-gradient text-obsidian font-extrabold text-xs uppercase';
+        btnLog.className = 'py-2 rounded-lg text-gray-400 font-bold text-xs uppercase';
       } else {
         regForm.classList.add('hidden');
         logForm.classList.remove('hidden');
-        btnLog.className = 'py-2 rounded-lg emerald-gradient text-black font-extrabold text-xs uppercase tracking-wider transition';
-        btnReg.className = 'py-2 rounded-lg text-gray-400 font-bold text-xs uppercase tracking-wider transition';
+        btnLog.className = 'py-2 rounded-lg emerald-gradient text-black font-extrabold text-xs uppercase';
+        btnReg.className = 'py-2 rounded-lg text-gray-400 font-bold text-xs uppercase';
       }
     }
 
     function applyServerSnapshot(data) {
       if (data.user) {
         state.loggedIn = true;
-        state.fullName = data.user.full_name || 'Trader';
+        state.userUid = data.user.user_uid || data.user.ref_code || '0000000';
+        state.fullName = data.user.full_name || 'Member';
         state.countryCode = data.user.country_code || 'PK';
         state.countryFlag = data.user.country_flag || '🇵🇰';
         state.dialCode = data.user.dial_code;
         state.phone = data.user.phone;
-        state.refCode = data.user.ref_code || 'AVX8829';
+        state.refCode = data.user.ref_code || state.userUid;
         state.activeInvites = Number(data.user.active_invites || 0);
+        state.spinsLeft = Number(data.user.spins_left ?? 2);
         state.balance = Number(data.user.balance || 0);
         state.todayYield = Number(data.user.today_yield || 0);
         state.teamRebate = Number(data.user.team_rebate || 0);
@@ -695,8 +717,9 @@
         showToast(data.error || 'Registration failed', 'info');
         return;
       }
+      playChimeSound(880);
       applyServerSnapshot(data);
-      showToast(`Welcome ${fullName}! Your Trading ID is active.`);
+      showToast(`Welcome ${fullName}! Vault active.`);
     }
 
     async function submitLogin(e) {
@@ -715,8 +738,9 @@
         showToast(data.error || 'Login failed', 'info');
         return;
       }
+      playChimeSound(820);
       applyServerSnapshot(data);
-      showToast('Vault unlocked successfully!');
+      showToast('Vault unlocked!');
     }
 
     async function syncSessionWithServer() {
@@ -734,63 +758,67 @@
     }
 
     function updateUI() {
+      document.getElementById('header-uid').textContent = state.userUid;
       document.getElementById('header-balance').textContent = formatUSD(state.balance);
       document.getElementById('hero-balance').textContent = formatUSD(state.balance);
       document.getElementById('today-yield').textContent = '+' + formatUSD(state.todayYield);
       document.getElementById('team-rebate').textContent = formatUSD(state.teamRebate);
       document.getElementById('withdraw-avail-balance').textContent = formatUSD(state.balance);
 
-      document.getElementById('header-vip-badge').textContent = state.vipLevel > 0 ? `VIP ${state.vipLevel}` : 'NO PLAN';
       document.getElementById('header-user-label').textContent = `${state.fullName} • ${state.countryFlag} ${state.dialCode} ${state.phone}`;
-      document.getElementById('hero-plan-days').textContent = state.vipLevel > 0 ? `VIP ${state.vipLevel} • ${state.planDaysLeft} Days Valid` : 'Select VIP Plan ($10+)';
+      document.getElementById('hero-vip-badge').textContent = state.vipLevel > 0 ? `VIP ${state.vipLevel} ACTIVE` : 'NO VIP ACTIVE';
+      document.getElementById('hero-plan-days').textContent = state.vipLevel > 0 ? `${state.planDaysLeft} Days Left` : 'Min Withdraw: $10.00';
       document.getElementById('hero-active-invites').textContent = `${state.activeInvites} / 3`;
-      document.getElementById('vip-invites-counter').textContent = state.activeInvites;
+      document.getElementById('front-invites-count').textContent = state.activeInvites;
       document.getElementById('team-active-count').textContent = state.activeInvites;
-      document.getElementById('my-ref-code').textContent = state.refCode;
+      document.getElementById('spin-count-badge').textContent = state.spinsLeft;
+
+      const inviteUrl = `${window.location.origin}/?ref=${state.userUid}`;
+      document.getElementById('my-invite-link').textContent = `${inviteUrl} (Code: ${state.userUid})`;
+
+      document.getElementById('profile-uid-display').textContent = state.userUid;
       document.getElementById('profile-name-display').textContent = state.fullName;
       document.getElementById('profile-phone-display').textContent = `${state.countryFlag} ${state.dialCode} ${state.phone}`;
       document.getElementById('deposit-address-text').textContent = state.networks[state.selectedNetwork] || '';
 
-      const activePlan = VIP_PLANS.find(p => p.level === state.vipLevel);
-      document.getElementById('daily-payout-desc').textContent = activePlan
-        ? `Active ${activePlan.name}: Harvest +${formatUSD(activePlan.daily)}/day (${activePlan.days}D Contract)`
-        : 'Activate any VIP Plan ($10–$5,000) to harvest daily profit';
-
-      renderVipTiers();
+      renderVipCards('front-vip-tiers-list');
+      renderVipCards('full-vip-tiers-list');
       renderOrders();
     }
 
-    function renderVipTiers() {
-      const container = document.getElementById('vip-tiers-container');
-      container.innerHTML = VIP_PLANS.map(plan => {
+    function renderVipCards(targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      el.innerHTML = VIP_PLANS.map(plan => {
         const isCurrent = state.vipLevel === plan.level;
         const isLocked = plan.requiresInvites > 0 && state.activeInvites < plan.requiresInvites;
-        const totalReturn = (plan.daily * plan.days).toFixed(2);
+        const totalEst = (plan.daily * plan.days).toFixed(2);
 
         return `
-          <div class="cyber-card rounded-2xl p-4 ${isLocked ? 'border-purple-500/35 opacity-95' : 'border-amber-400/25'} space-y-2.5">
-            <div class="flex items-start justify-between">
+          <div class="cyber-card rounded-2xl p-3.5 ${isLocked ? 'border-purple-500/40' : 'border-amber-400/30'} space-y-2">
+            <div class="flex items-center justify-between">
               <div>
-                <div class="flex items-center gap-2">
-                  <h3 class="text-sm font-extrabold text-white">${plan.name}</h3>
-                  <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 font-mono text-[10px] font-bold">${plan.days} DAYS</span>
+                <div class="flex items-center gap-1.5">
+                  <h3 class="text-xs font-extrabold text-white">${plan.name}</h3>
+                  <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono text-[10px] font-bold">${plan.days} Days</span>
                 </div>
-                <p class="text-xs text-emerald-400 font-mono font-bold mt-1">Daily Profit: +${formatUSD(plan.daily)} • Total: $${totalReturn}</p>
+                <p class="text-[11px] font-mono text-emerald-400 font-bold mt-0.5">
+                  Daily: +${formatUSD(plan.daily)} • Cycle Est: $${totalEst}
+                </p>
               </div>
               <div class="text-right">
-                <span class="font-mono font-extrabold text-base text-amber-300">${formatUSD(plan.price)}</span>
-                <p class="text-[9px] text-gray-400">${plan.requiresInvites > 0 ? '🔒 3 Invites Req' : '● Open Access'}</p>
+                <p class="font-mono font-extrabold text-sm text-amber-300">${formatUSD(plan.price)}</p>
+                <p class="text-[9px] ${isLocked ? 'text-purple-300' : 'text-emerald-300'}">${isLocked ? '🔒 3 Invites Req' : '● Open'}</p>
               </div>
             </div>
-
             ${
               isCurrent
-                ? `<div class="w-full py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-center text-xs font-extrabold text-emerald-300">✓ Active Contract (${plan.days} Days)</div>`
+                ? `<div class="w-full py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-center text-[11px] font-extrabold text-emerald-300">✓ Active (${plan.days} Days)</div>`
                 : isLocked
-                ? `<button onclick="switchTab('team')" class="w-full py-2.5 rounded-xl bg-purple-500/20 border border-purple-500/40 text-xs font-bold text-purple-200">
-                     🔒 Locked — Invite ${3 - state.activeInvites} More Depositing Friends to Unlock
+                ? `<button onclick="switchTab('team')" class="w-full py-2 rounded-xl bg-purple-500/20 border border-purple-500/40 text-[11px] font-bold text-purple-200">
+                     🔒 Invite ${3 - state.activeInvites} More Depositing Friends to Unlock
                    </button>`
-                : `<button onclick="activatePlan(${plan.level})" class="w-full py-2.5 rounded-xl gold-gradient text-obsidian font-extrabold text-xs uppercase tracking-wider">
+                : `<button onclick="activatePlan(${plan.level})" class="w-full py-2 rounded-xl gold-gradient text-obsidian font-extrabold text-[11px] uppercase">
                      Activate ${plan.name} (${formatUSD(plan.price)})
                    </button>`
             }
@@ -811,6 +839,7 @@
         if (data.error && data.error.includes('deposit')) switchTab('deposit');
         return;
       }
+      playChimeSound(920);
       applyServerSnapshot(data);
       showToast(`Activated ${data.plan.name} for ${data.plan.days} Days!`);
     }
@@ -826,40 +855,67 @@
         showToast(data.error || 'Activate a VIP plan first!', 'info');
         return;
       }
+      playChimeSound(850);
       applyServerSnapshot(data);
-      showToast(`Harvested +${formatUSD(data.claimedAmount)} Daily Yield!`);
+      showToast(`Harvested +${formatUSD(data.claimedAmount)}!`);
+    }
+
+    async function playLuckySpin() {
+      if (state.spinsLeft <= 0) {
+        showToast('Invite friends to get more spins!', 'info');
+        switchTab('team');
+        return;
+      }
+      const btn = document.getElementById('spin-now-btn');
+      btn.disabled = true;
+      btn.textContent = 'SPINNING...';
+
+      const res = await fetch('/api/spin/play', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dialCode: state.dialCode, phone: state.phone })
+      });
+      const data = await res.json();
+      btn.disabled = false;
+      btn.textContent = 'SPIN NOW';
+
+      if (!res.ok) {
+        showToast(data.error || 'Spin failed', 'info');
+        return;
+      }
+      playChimeSound(990);
+      applyServerSnapshot(data);
+      showToast(`🎉 Won +${formatUSD(data.reward)} (${data.label})!`);
     }
 
     function renderOrders() {
-      const html = state.orders.length === 0
-        ? `<p class="text-xs text-gray-500">No orders yet. Deposit $10+ to generate your first Order ID.</p>`
-        : state.orders.map(o => {
-            const badge = o.status === 'Approved'
-              ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-              : o.status === 'Rejected'
-              ? 'bg-red-500/15 text-red-400 border-red-500/30'
-              : 'bg-amber-400/15 text-amber-300 border-amber-400/30';
-            const sign = (o.order_type === 'Withdraw' || o.network === 'PLAN') ? '-' : '+';
-            return `
-              <div class="bg-black/45 border border-white/10 rounded-xl p-3 space-y-1 text-xs">
-                <div class="flex items-center justify-between">
-                  <span class="font-mono font-bold text-amber-300 text-[11px]">${o.order_id}</span>
-                  <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badge}">${o.status}</span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span class="font-semibold text-white">${o.order_type} (${o.network})</span>
-                  <span class="font-mono font-bold ${sign === '-' ? 'text-gray-300' : 'text-emerald-400'}">${sign}${formatUSD(o.amount)}</span>
-                </div>
-                <div class="flex items-center justify-between text-[10px] text-gray-400 pt-1 border-t border-white/5">
-                  <span>🕒 ${o.created_at}</span>
-                  <span class="font-mono truncate max-w-[130px]">Ref: ${o.txid}</span>
-                </div>
-              </div>
-            `;
-          }).join('');
-
-      document.getElementById('home-orders-list').innerHTML = html;
-      document.getElementById('deposit-orders-list').innerHTML = html;
+      const el = document.getElementById('home-orders-list');
+      if (!el) return;
+      if (!state.orders.length) {
+        el.innerHTML = `<p class="text-xs text-gray-400">No orders yet. Deposit $10+ with screenshot to begin.</p>`;
+        return;
+      }
+      el.innerHTML = state.orders.map(o => {
+        const badge = o.status === 'Approved'
+          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+          : o.status === 'Rejected'
+          ? 'bg-red-500/20 text-red-300 border-red-500/40'
+          : 'bg-amber-400/20 text-amber-300 border-amber-400/40';
+        const sign = (o.order_type === 'Withdraw' || o.network === 'PLAN') ? '-' : '+';
+        return `
+          <div class="bg-black/50 border border-white/10 rounded-xl p-2.5 space-y-1 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-mono font-bold text-amber-300 text-[11px]">${o.order_id}</span>
+              <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badge}">${o.status}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-semibold text-white">${o.order_type} (${o.network})</span>
+              <span class="font-mono font-bold ${sign === '-' ? 'text-gray-300' : 'text-emerald-400'}">${sign}${formatUSD(o.amount)}</span>
+            </div>
+            <p class="font-mono text-[10px] text-gray-400">🕒 ${o.created_at}</p>
+          </div>
+        `;
+      }).join('');
     }
 
     function switchTab(tabName) {
@@ -872,9 +928,7 @@
       if (tabName !== 'deposit') {
         document.getElementById(`nav-${tabName}`).classList.replace('text-gray-400', 'text-amber-300');
       }
-      if (tabName === 'deposit') {
-        renderRealQRCode(state.networks[state.selectedNetwork]);
-      }
+      if (tabName === 'deposit') renderRealQRCode(state.networks[state.selectedNetwork]);
     }
 
     function selectNetwork(net) {
@@ -882,8 +936,8 @@
       document.querySelectorAll('.net-btn').forEach(b => {
         b.className = 'net-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-white/10 bg-white/5 text-gray-300';
       });
-      document.getElementById(`net-${net}`).className = 'net-btn py-2.5 px-3 rounded-xl text-xs font-extrabold border border-amber-400 bg-amber-400/15 text-amber-300';
-      document.getElementById('network-label').textContent = `Deposit Address • ${net}`;
+      document.getElementById(`net-${net}`).className = 'net-btn py-2.5 px-3 rounded-xl text-xs font-extrabold border border-amber-400 bg-amber-400/20 text-amber-300';
+      document.getElementById('network-label').textContent = `Receiving Wallet • ${net}`;
       document.getElementById('deposit-address-text').textContent = state.networks[net];
       renderRealQRCode(state.networks[net]);
     }
@@ -893,25 +947,56 @@
       if (!box || !addr) return;
       box.innerHTML = '';
       if (typeof QRCode !== 'undefined') {
-        new QRCode(box, { text: addr, width: 168, height: 168, colorDark: '#070A10', colorLight: '#FFFFFF' });
+        new QRCode(box, { text: addr, width: 156, height: 156, colorDark: '#06080E', colorLight: '#FFFFFF' });
       }
     }
 
     function copyDepositAddress() {
       navigator.clipboard?.writeText(state.networks[state.selectedNetwork]);
-      showToast(`${state.selectedNetwork} wallet copied!`);
+      showToast(`${state.selectedNetwork} address copied!`);
     }
 
-    function copyReferralCode() {
-      navigator.clipboard?.writeText(state.refCode);
-      showToast(`Invite Code ${state.refCode} copied!`);
+    function copyInviteLink() {
+      const text = document.getElementById('my-invite-link').textContent;
+      navigator.clipboard?.writeText(text);
+      showToast('Invite link & ID copied!');
+    }
+
+    async function shareInviteLink() {
+      const text = document.getElementById('my-invite-link').textContent;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'AUREX VAULT VIP', text });
+          return;
+        } catch (e) {}
+      }
+      copyInviteLink();
+    }
+
+    function previewDepositProof(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        depositProofBase64 = reader.result;
+        const img = document.getElementById('deposit-proof-preview');
+        img.src = depositProofBase64;
+        img.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
     }
 
     async function submitDepositOrder(e) {
       e.preventDefault();
       const amount = parseFloat(document.getElementById('deposit-amount-input').value);
-      const txid = document.getElementById('deposit-txid-input').value.trim();
-      if (!amount || amount < 10 || !txid) return;
+      if (!amount || amount < 10) {
+        showToast('Minimum deposit is $10.00!', 'info');
+        return;
+      }
+      if (!depositProofBase64) {
+        showToast('Please upload a payment screenshot!', 'info');
+        return;
+      }
 
       const res = await fetch('/api/orders/deposit', {
         method: 'POST',
@@ -922,7 +1007,7 @@
           phone: state.phone,
           network: state.selectedNetwork,
           amount,
-          txid
+          proofData: depositProofBase64
         })
       });
       const data = await res.json();
@@ -931,14 +1016,17 @@
         return;
       }
 
+      playChimeSound(880);
       applyServerSnapshot(data);
       document.getElementById('slip-order-id').textContent = data.orderId;
       document.getElementById('slip-order-time').textContent = data.createdAt;
       document.getElementById('slip-order-amount').textContent = `${formatUSD(amount)} (${state.selectedNetwork})`;
       document.getElementById('latest-order-slip').classList.remove('hidden');
 
+      depositProofBase64 = '';
       document.getElementById('deposit-amount-input').value = '';
-      document.getElementById('deposit-txid-input').value = '';
+      document.getElementById('deposit-proof-file').value = '';
+      document.getElementById('deposit-proof-preview').classList.add('hidden');
       showToast(`Order ${data.orderId} submitted!`);
     }
 
@@ -963,143 +1051,177 @@
         showToast(data.error || 'Withdraw failed', 'info');
         return;
       }
+      playChimeSound(800);
       applyServerSnapshot(data);
       closeWithdrawModal();
       showToast(`Payout Order ${data.orderId} submitted!`);
     }
 
-    /* Live Support Chat */
     let supportPollTimer = null;
     function openSupportModal() {
       document.getElementById('support-modal').classList.remove('hidden');
-      loadSupportMessages();
-      supportPollTimer = setInterval(loadSupportMessages, 5000);
+      loadSupportMessages(false);
+      supportPollTimer = setInterval(() => loadSupportMessages(true), 4000);
     }
     function closeSupportModal() {
       document.getElementById('support-modal').classList.add('hidden');
       if (supportPollTimer) clearInterval(supportPollTimer);
     }
-    async function loadSupportMessages() {
+
+    function handleSupportMediaSelect(e, type) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        userSupportMedia = { type, data: reader.result, name: file.name };
+        document.getElementById('user-media-label').textContent = `${type === 'video' ? '🎥' : '📷'} ${file.name}`;
+        document.getElementById('user-media-preview-bar').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearUserMedia() {
+      userSupportMedia = { type: 'none', data: '', name: '' };
+      document.getElementById('user-media-preview-bar').classList.add('hidden');
+    }
+
+    async function loadSupportMessages(playSoundOnNew = false) {
       try {
         const q = `?dialCode=${encodeURIComponent(state.dialCode)}&phone=${encodeURIComponent(state.phone)}`;
         const res = await fetch('/api/support/messages' + q);
         if (!res.ok) return;
         const data = await res.json();
-        renderSupportChat(data.messages || []);
+        const msgs = data.messages || [];
+        if (playSoundOnNew && msgs.length > lastSupportCount) {
+          const last = msgs[msgs.length - 1];
+          if (last.sender === 'admin') playChimeSound(960);
+        }
+        lastSupportCount = msgs.length;
+        renderSupportChat(msgs);
       } catch (err) {}
     }
+
     function renderSupportChat(messages) {
       const box = document.getElementById('support-chat-box');
       if (!box) return;
-      const welcome = `<div class="bg-white/5 border border-white/10 rounded-2xl p-3 text-gray-300">👋 Welcome <strong>${state.fullName}</strong>! Share your question or <strong>Order ID</strong> below and our team will reply live.</div>`;
+      const intro = `<div class="bg-white/5 border border-white/10 rounded-2xl p-2.5 text-gray-300">👋 Member <strong>#${state.userUid}</strong> — send text, photo, or video to support.</div>`;
       const items = messages.map(m => {
         const isUser = m.sender === 'user';
+        let mediaHtml = '';
+        if (m.media_type === 'image' && m.media_data) {
+          mediaHtml = `<img src="${m.media_data}" class="mt-1.5 rounded-xl max-h-44 w-full object-contain border border-white/15" />`;
+        } else if (m.media_type === 'video' && m.media_data) {
+          mediaHtml = `<video src="${m.media_data}" controls class="mt-1.5 rounded-xl max-h-44 w-full border border-white/15"></video>`;
+        }
         return `
           <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'}">
-            <div class="${isUser ? 'bg-amber-400/20 border border-amber-400/40 text-white' : 'bg-emerald-500/15 border border-emerald-500/35 text-emerald-100'} rounded-2xl px-3 py-2 max-w-[82%]">
-              <p class="text-[10px] font-bold ${isUser ? 'text-amber-300' : 'text-emerald-400'} mb-0.5">${isUser ? 'You' : '🛡️ AUREX Desk'}</p>
-              <p>${m.message}</p>
+            <div class="${isUser ? 'bg-amber-400/20 border border-amber-400/40 text-white' : 'bg-emerald-500/15 border border-emerald-500/35 text-emerald-100'} rounded-2xl px-3 py-2 max-w-[85%]">
+              <p class="text-[10px] font-bold ${isUser ? 'text-amber-300' : 'text-emerald-400'}">${isUser ? 'You (#' + state.userUid + ')' : '🛡️ Support Desk'}</p>
+              ${m.message ? `<p class="mt-0.5">${m.message}</p>` : ''}
+              ${mediaHtml}
             </div>
             <span class="text-[9px] text-gray-500 mt-0.5 px-1">${m.created_at}</span>
           </div>
         `;
       }).join('');
-      box.innerHTML = welcome + items;
+      box.innerHTML = intro + items;
       box.scrollTop = box.scrollHeight;
     }
+
     async function sendSupportMessage(e) {
       e.preventDefault();
       const input = document.getElementById('support-msg-input');
       const message = input.value.trim();
-      if (!message) return;
+      if (!message && !userSupportMedia.data) return;
+
+      const payload = {
+        countryFlag: state.countryFlag,
+        dialCode: state.dialCode,
+        phone: state.phone,
+        message,
+        mediaType: userSupportMedia.type,
+        mediaData: userSupportMedia.data
+      };
+
       input.value = '';
+      clearUserMedia();
+      playChimeSound(720);
+
       const res = await fetch('/api/support/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          countryFlag: state.countryFlag,
-          dialCode: state.dialCode,
-          phone: state.phone,
-          message
-        })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
-      if (res.ok) renderSupportChat(data.messages || []);
+      if (res.ok) {
+        lastSupportCount = (data.messages || []).length;
+        renderSupportChat(data.messages || []);
+      }
     }
 
-    /* Animated Live Trading Candlesticks Renderer */
     function startCandlestickCanvas(canvasId) {
       const canvas = document.getElementById(canvasId);
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       let width = (canvas.width = canvas.offsetWidth || 420);
-      let height = (canvas.height = canvas.offsetHeight || 260);
+      let height = (canvas.height = canvas.offsetHeight || 240);
 
-      const candleCount = 26;
+      const count = 28;
       const candles = [];
-      let lastClose = height * 0.55;
+      let price = height * 0.52;
 
-      for (let i = 0; i < candleCount; i++) {
-        const open = lastClose;
-        const delta = (Math.random() - 0.46) * 34;
-        const close = Math.max(25, Math.min(height - 25, open + delta));
-        const high = Math.min(open, close) - Math.random() * 14;
-        const low = Math.max(open, close) + Math.random() * 14;
-        candles.push({ open, close, high, low });
-        lastClose = close;
+      for (let i = 0; i < count; i++) {
+        const open = price;
+        const close = Math.max(20, Math.min(height - 20, open + (Math.random() - 0.45) * 38));
+        candles.push({
+          open,
+          close,
+          high: Math.min(open, close) - Math.random() * 16,
+          low: Math.max(open, close) + Math.random() * 16
+        });
+        price = close;
       }
 
       setInterval(() => {
         const last = candles[candles.length - 1];
-        const wobble = (Math.random() - 0.48) * 10;
-        last.close = Math.max(25, Math.min(height - 25, last.close + wobble));
-        last.high = Math.min(last.high, last.close - 4);
-        last.low = Math.max(last.low, last.close + 4);
-      }, 450);
+        last.close = Math.max(20, Math.min(height - 20, last.close + (Math.random() - 0.47) * 16));
+        last.high = Math.min(last.high, last.close - 5);
+        last.low = Math.max(last.low, last.close + 5);
+      }, 180);
 
       setInterval(() => {
         const prev = candles[candles.length - 1];
         const open = prev.close;
-        const close = Math.max(25, Math.min(height - 25, open + (Math.random() - 0.46) * 30));
+        const close = Math.max(20, Math.min(height - 20, open + (Math.random() - 0.45) * 34));
         candles.shift();
         candles.push({
           open,
           close,
-          high: Math.min(open, close) - Math.random() * 12,
-          low: Math.max(open, close) + Math.random() * 12
+          high: Math.min(open, close) - Math.random() * 14,
+          low: Math.max(open, close) + Math.random() * 14
         });
-      }, 2400);
+      }, 900);
 
       function draw() {
         ctx.clearRect(0, 0, width, height);
-        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-        ctx.lineWidth = 1;
-        for (let y = 30; y < height; y += 40) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(width, y);
-          ctx.stroke();
-        }
+        const slot = width / count;
+        candles.forEach((c, i) => {
+          const x = i * slot + slot * 0.5;
+          const bull = c.close <= c.open;
+          const col = bull ? '#10B981' : '#FBBF24';
 
-        const slot = width / candleCount;
-        candles.forEach((c, idx) => {
-          const x = idx * slot + slot * 0.5;
-          const isBull = c.close <= c.open;
-          const color = isBull ? '#10B981' : '#F59E0B';
-
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = col;
+          ctx.lineWidth = 1.6;
           ctx.beginPath();
           ctx.moveTo(x, c.high);
           ctx.lineTo(x, c.low);
           ctx.stroke();
 
-          ctx.fillStyle = isBull ? 'rgba(16, 185, 129, 0.78)' : 'rgba(245, 158, 11, 0.78)';
+          ctx.fillStyle = bull ? 'rgba(16, 185, 129, 0.88)' : 'rgba(251, 191, 36, 0.88)';
           const top = Math.min(c.open, c.close);
-          const bodyH = Math.max(4, Math.abs(c.close - c.open));
-          ctx.fillRect(x - slot * 0.28, top, slot * 0.56, bodyH);
+          const h = Math.max(5, Math.abs(c.close - c.open));
+          ctx.fillRect(x - slot * 0.3, top, slot * 0.6, h);
         });
-
         requestAnimationFrame(draw);
       }
       draw();
@@ -1107,6 +1229,10 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       startCandlestickCanvas('auth-candles-canvas');
+
+      const params = new URLSearchParams(window.location.search);
+      const refParam = params.get('ref');
+      if (refParam) document.getElementById('reg-invite').value = refParam;
 
       const saved = localStorage.getItem('aurex_user_session');
       if (saved) {
@@ -1122,7 +1248,7 @@
 
       setInterval(() => {
         if (state.loggedIn) syncSessionWithServer();
-      }, 10000);
+      }, 8000);
     });
   </script>
 </body>

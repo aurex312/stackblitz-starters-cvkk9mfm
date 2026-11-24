@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
@@ -14,109 +14,85 @@
 </head>
 <body class="min-h-screen p-4 sm:p-8">
 
-  <!-- Admin Login Gate -->
   <div id="admin-login-screen" class="max-w-md mx-auto mt-16 panel-card rounded-3xl p-6 space-y-4 shadow-2xl">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-amber-400 text-black font-extrabold flex items-center justify-center">AV</div>
       <div>
         <h1 class="text-lg font-extrabold text-white">AUREX Owner Admin Panel</h1>
-        <p class="text-xs text-gray-400">Deposit Orders, 3-Invite Unlocks & Live Support</p>
+        <p class="text-xs text-gray-400">Deposit Screenshots, 7-Digit IDs & Media Chat</p>
       </div>
     </div>
     <form onsubmit="loginAdmin(event)" class="space-y-3">
-      <div>
-        <label class="text-xs text-gray-400 block mb-1">Admin Security Key</label>
-        <input id="admin-secret-input" type="password" required placeholder="Enter Admin Key (default: AUREX-ADMIN-2026)" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm mono text-white outline-none" />
-      </div>
-      <button type="submit" class="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider">
+      <input id="admin-secret-input" type="password" required placeholder="Admin Key (default: AUREX-ADMIN-2026)" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm mono text-white outline-none" />
+      <button type="submit" class="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase">
         Unlock Admin Dashboard
       </button>
       <p id="admin-login-error" class="hidden text-xs text-red-400 font-semibold"></p>
     </form>
   </div>
 
-  <!-- Main Admin Dashboard -->
   <div id="admin-dashboard" class="hidden max-w-6xl mx-auto space-y-6">
-
-    <!-- Top Bar -->
     <div class="panel-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
       <div>
         <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">● Live Production Control</span>
         <h1 class="text-xl font-extrabold text-white">AUREX VAULT — Admin Command Center</h1>
       </div>
       <div class="flex items-center gap-2.5">
-        <button onclick="loadAdminData(); loadAdminSupport();" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-amber-400">
-          ↻ Refresh All
-        </button>
-        <a href="/" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs font-semibold text-emerald-400">
-          Open Customer App ↗
-        </a>
-        <button onclick="logoutAdmin()" class="px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400">
-          Logout
-        </button>
+        <button onclick="loadAdminData(); loadAdminSupport();" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-amber-400">↻ Refresh</button>
+        <a href="/" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs font-semibold text-emerald-400">Customer App ↗</a>
+        <button onclick="logoutAdmin()" class="px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400">Logout</button>
       </div>
     </div>
 
-    <!-- Stats Summary -->
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
       <div class="panel-card rounded-2xl p-4">
-        <p class="text-xs text-gray-400">Pending Deposit Orders</p>
+        <p class="text-xs text-gray-400">Pending Deposits</p>
         <p id="stat-pending-count" class="text-2xl font-extrabold mono text-amber-400 mt-1">0</p>
       </div>
       <div class="panel-card rounded-2xl p-4">
-        <p class="text-xs text-gray-400">Approved Deposits (USD)</p>
+        <p class="text-xs text-gray-400">Approved Deposits</p>
         <p id="stat-approved-volume" class="text-2xl font-extrabold mono text-emerald-400 mt-1">$0.00</p>
       </div>
       <div class="panel-card rounded-2xl p-4">
-        <p class="text-xs text-gray-400">Registered Trader IDs</p>
-        <p id="stat-users-count" class="text-2xl font-extrabold mono text-white mt-1">0</p>
+        <p class="text-xs text-gray-400">7-Digit User IDs</p>
+        <p id="stat-users-count" class="text-2xl font-extrabold mono text-cyan-300 mt-1">0</p>
       </div>
       <div class="panel-card rounded-2xl p-4">
-        <p class="text-xs text-gray-400">Total Orders Logged</p>
+        <p class="text-xs text-gray-400">Total Orders</p>
         <p id="stat-total-orders" class="text-2xl font-extrabold mono text-purple-300 mt-1">0</p>
       </div>
     </div>
 
-    <!-- Wallet QR Settings -->
     <div class="panel-card rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">Receiving USDT Wallet Addresses (Live QR Sync)</h2>
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">Receiving USDT Wallets</h2>
         <span id="wallet-save-status" class="text-xs text-emerald-400"></span>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="space-y-1.5">
-          <label class="text-xs text-gray-400">USDT TRC20 (TRX Network)</label>
-          <div class="flex gap-2">
-            <input id="wallet-trc20" type="text" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
-            <button onclick="saveWallet('TRC20')" class="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs">Save</button>
-          </div>
+        <div class="flex gap-2">
+          <input id="wallet-trc20" type="text" placeholder="TRC20 Address" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
+          <button onclick="saveWallet('TRC20')" class="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs">Save TRC20</button>
         </div>
-        <div class="space-y-1.5">
-          <label class="text-xs text-gray-400">USDT BEP20 (BSC Network)</label>
-          <div class="flex gap-2">
-            <input id="wallet-bep20" type="text" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
-            <button onclick="saveWallet('BEP20')" class="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs">Save</button>
-          </div>
+        <div class="flex gap-2">
+          <input id="wallet-bep20" type="text" placeholder="BEP20 Address" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
+          <button onclick="saveWallet('BEP20')" class="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs">Save BEP20</button>
         </div>
       </div>
     </div>
 
-    <!-- All Customer Deposit & Payout Orders Table -->
+    <!-- Orders Table with Screenshot Proof Viewer -->
     <div class="panel-card rounded-2xl p-5 space-y-4 overflow-x-auto">
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-extrabold uppercase tracking-wider text-white">Customer Deposit & Payout Orders</h2>
-        <span class="text-xs text-gray-400">Approving a referred user's 1st deposit auto-credits +1 Invite to sponsor</span>
-      </div>
-
+      <h2 class="text-sm font-extrabold uppercase tracking-wider text-white">Customer Deposit & Payout Orders</h2>
       <table class="w-full text-left border-collapse text-xs">
         <thead>
           <tr class="border-b border-white/10 text-gray-400 uppercase text-[10px]">
             <th class="py-3 px-2">Order ID</th>
+            <th class="py-3 px-2">User ID</th>
             <th class="py-3 px-2">Date & Time</th>
             <th class="py-3 px-2">Customer</th>
-            <th class="py-3 px-2">Type / Network</th>
-            <th class="py-3 px-2">Amount (USD)</th>
-            <th class="py-3 px-2">TxID / Wallet</th>
+            <th class="py-3 px-2">Type / Net</th>
+            <th class="py-3 px-2">Amount</th>
+            <th class="py-3 px-2">Proof / Info</th>
             <th class="py-3 px-2">Status</th>
             <th class="py-3 px-2 text-right">Action</th>
           </tr>
@@ -125,19 +101,51 @@
       </table>
     </div>
 
-    <!-- Customer Live Support Inbox -->
+    <!-- Live Support Inbox with Photo + Video + Sound -->
     <div class="panel-card rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">💬 Customer Live Support Inbox</h2>
-        <span class="text-xs text-gray-400">Reply directly to customers on website</span>
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">💬 Customer Support Inbox (Text + Photo + Video)</h2>
+        <span class="text-xs text-gray-400">Instant chime on new message</span>
       </div>
-      <div id="admin-support-list" class="space-y-3 max-h-[380px] overflow-y-auto"></div>
+      <div id="admin-support-list" class="space-y-3 max-h-[450px] overflow-y-auto"></div>
     </div>
+  </div>
 
+  <!-- Proof Modal -->
+  <div id="proof-modal" class="hidden fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+    <div class="max-w-md w-full panel-card rounded-2xl p-4 space-y-3 relative">
+      <button onclick="document.getElementById('proof-modal').classList.add('hidden')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 text-white">✕</button>
+      <h3 class="text-sm font-extrabold text-amber-300">Payment Screenshot Proof</h3>
+      <img id="proof-modal-img" class="w-full max-h-[70vh] object-contain rounded-xl border border-white/15 bg-black" />
+    </div>
   </div>
 
   <script>
     let adminSecret = localStorage.getItem('aurex_admin_secret') || '';
+    let lastAdminMsgCount = 0;
+    const adminMediaDrafts = {};
+
+    function playAdminChime(freq = 880) {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.19);
+      } catch (e) {}
+    }
+
+    function openProofModal(src) {
+      document.getElementById('proof-modal-img').src = src;
+      document.getElementById('proof-modal').classList.remove('hidden');
+    }
 
     async function loginAdmin(e) {
       e.preventDefault();
@@ -149,9 +157,9 @@
         localStorage.setItem('aurex_admin_secret', adminSecret);
         document.getElementById('admin-login-screen').classList.add('hidden');
         document.getElementById('admin-dashboard').classList.remove('hidden');
-        loadAdminSupport();
+        loadAdminSupport(false);
       } else {
-        errBox.textContent = 'Invalid Admin Security Key! Default is AUREX-ADMIN-2026';
+        errBox.textContent = 'Invalid Admin Key! Default is AUREX-ADMIN-2026';
         errBox.classList.remove('hidden');
       }
     }
@@ -175,7 +183,6 @@
 
         const orders = data.orders || [];
         const users = data.users || [];
-
         const pendingDeposits = orders.filter(o => o.order_type === 'Deposit' && o.status === 'Pending');
         const approvedVolume = orders
           .filter(o => o.order_type === 'Deposit' && o.status === 'Approved')
@@ -195,14 +202,19 @@
             ? 'bg-red-500/15 text-red-400 border-red-500/30'
             : 'bg-amber-500/15 text-amber-300 border-amber-500/30';
 
+          const proofCell = o.proof_data
+            ? `<button onclick="openProofModal('${o.proof_data}')" class="px-2 py-1 rounded bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-bold text-[10px]">View Screenshot</button>`
+            : `<span class="mono text-gray-400 truncate max-w-[140px] inline-block">${o.txid}</span>`;
+
           return `
             <tr class="hover:bg-white/[0.02]">
               <td class="py-3 px-2 mono font-bold text-amber-400">${o.order_id}</td>
+              <td class="py-3 px-2 mono font-bold text-cyan-300">#${o.user_uid || '0000000'}</td>
               <td class="py-3 px-2 mono text-gray-300">${o.created_at}</td>
               <td class="py-3 px-2 mono text-white">${o.country_flag} ${o.dial_code} ${o.phone}</td>
               <td class="py-3 px-2 text-gray-300">${o.order_type} • <span class="mono text-amber-300">${o.network}</span></td>
               <td class="py-3 px-2 mono font-bold text-emerald-400">$${Number(o.amount).toFixed(2)}</td>
-              <td class="py-3 px-2 mono text-gray-400 max-w-[160px] truncate" title="${o.txid}">${o.txid}</td>
+              <td class="py-3 px-2">${proofCell}</td>
               <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badge}">${o.status}</span></td>
               <td class="py-3 px-2 text-right space-x-1.5">
                 ${
@@ -215,14 +227,28 @@
             </tr>
           `;
         }).join('');
-
         return true;
       } catch (err) {
         return false;
       }
     }
 
-    async function loadAdminSupport() {
+    function handleAdminMediaPick(e, msgId, type) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        adminMediaDrafts[msgId] = { type, data: reader.result, name: file.name };
+        const tag = document.getElementById(`admin-media-tag-${msgId}`);
+        if (tag) {
+          tag.textContent = `${type === 'video' ? '🎥' : '📷'} ${file.name}`;
+          tag.classList.remove('hidden');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function loadAdminSupport(playSoundOnNew = false) {
       if (!adminSecret) return;
       try {
         const res = await fetch('/api/admin/support', {
@@ -231,46 +257,84 @@
         if (!res.ok) return;
         const data = await res.json();
         const msgs = data.messages || [];
+
+        if (playSoundOnNew && msgs.length > lastAdminMsgCount) {
+          const newest = msgs[0];
+          if (newest && newest.sender === 'user') playAdminChime(940);
+        }
+        lastAdminMsgCount = msgs.length;
+
         const list = document.getElementById('admin-support-list');
         if (!msgs.length) {
-          list.innerHTML = `<p class="text-xs text-gray-500">No customer support messages yet.</p>`;
+          list.innerHTML = `<p class="text-xs text-gray-500">No support messages yet.</p>`;
           return;
         }
-        list.innerHTML = msgs.map(m => `
-          <div class="bg-black/40 border border-white/10 rounded-xl p-3 space-y-2 text-xs">
-            <div class="flex items-center justify-between">
-              <span class="mono font-bold ${m.sender === 'admin' ? 'text-emerald-400' : 'text-amber-400'}">
-                ${m.sender === 'admin' ? '🛡️ Admin Reply → ' + m.user_key : m.country_flag + ' ' + m.dial_code + ' ' + m.phone}
-              </span>
-              <span class="mono text-[10px] text-gray-400">${m.created_at}</span>
-            </div>
-            <p class="text-gray-200">${m.message}</p>
-            ${m.sender === 'user' ? `
-              <div class="flex gap-2 pt-1">
-                <input id="reply-input-${m.id}" type="text" placeholder="Type reply to ${m.phone}..." class="flex-1 bg-black/60 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none" />
-                <button onclick="sendAdminReply('${m.user_key}', ${m.id})" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs">Reply</button>
+
+        list.innerHTML = msgs.map(m => {
+          let mediaBlock = '';
+          if (m.media_type === 'image' && m.media_data) {
+            mediaBlock = `<img src="${m.media_data}" class="mt-2 rounded-xl max-h-48 object-contain border border-white/15 bg-black" />`;
+          } else if (m.media_type === 'video' && m.media_data) {
+            mediaBlock = `<video src="${m.media_data}" controls class="mt-2 rounded-xl max-h-48 border border-white/15 bg-black"></video>`;
+          }
+
+          return `
+            <div class="bg-black/45 border border-white/10 rounded-xl p-3 space-y-2 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="mono font-bold ${m.sender === 'admin' ? 'text-emerald-400' : 'text-amber-400'}">
+                  ${m.sender === 'admin' ? '🛡️ Admin → #' + (m.user_uid || m.user_key) : `${m.country_flag} ID #${m.user_uid || '0000000'} (${m.dial_code} ${m.phone})`}
+                </span>
+                <span class="mono text-[10px] text-gray-400">${m.created_at}</span>
               </div>
-            ` : ''}
-          </div>
-        `).join('');
+              ${m.message ? `<p class="text-gray-200">${m.message}</p>` : ''}
+              ${mediaBlock}
+              ${m.sender === 'user' ? `
+                <div class="space-y-1.5 pt-1">
+                  <span id="admin-media-tag-${m.id}" class="hidden inline-block text-[10px] font-mono text-cyan-300 bg-cyan-500/15 px-2 py-0.5 rounded"></span>
+                  <div class="flex items-center gap-2">
+                    <label class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 cursor-pointer text-xs" title="Attach Photo">
+                      📷
+                      <input type="file" accept="image/*" class="hidden" onchange="handleAdminMediaPick(event, ${m.id}, 'image')" />
+                    </label>
+                    <label class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 cursor-pointer text-xs" title="Attach Video">
+                      🎥
+                      <input type="file" accept="video/*" class="hidden" onchange="handleAdminMediaPick(event, ${m.id}, 'video')" />
+                    </label>
+                    <input id="reply-input-${m.id}" type="text" placeholder="Reply to #${m.user_uid || m.phone}..." class="flex-1 bg-black/65 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none" />
+                    <button onclick="sendAdminReply('${m.user_key}', ${m.id})" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs">Send</button>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
       } catch (err) {}
     }
 
     async function sendAdminReply(userKey, msgId) {
       const input = document.getElementById(`reply-input-${msgId}`);
-      const message = input?.value.trim();
-      if (!message) return;
+      const message = input?.value.trim() || '';
+      const draft = adminMediaDrafts[msgId] || { type: 'none', data: '' };
+      if (!message && !draft.data) return;
+
+      playAdminChime(740);
       const res = await fetch('/api/admin/support/reply', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-admin-secret': adminSecret
         },
-        body: JSON.stringify({ userKey, message })
+        body: JSON.stringify({
+          userKey,
+          message,
+          mediaType: draft.type,
+          mediaData: draft.data
+        })
       });
       if (res.ok) {
-        input.value = '';
-        loadAdminSupport();
+        if (input) input.value = '';
+        delete adminMediaDrafts[msgId];
+        loadAdminSupport(false);
       }
     }
 
@@ -283,9 +347,7 @@
         },
         body: JSON.stringify({ action })
       });
-      if (res.ok) {
-        loadAdminData();
-      }
+      if (res.ok) loadAdminData();
     }
 
     async function saveWallet(network) {
@@ -300,8 +362,8 @@
       });
       if (res.ok) {
         const st = document.getElementById('wallet-save-status');
-        st.textContent = `✓ ${network} wallet updated`;
-        setTimeout(() => (st.textContent = ''), 3000);
+        st.textContent = `✓ ${network} updated`;
+        setTimeout(() => (st.textContent = ''), 2500);
       }
     }
 
@@ -311,15 +373,15 @@
         if (ok) {
           document.getElementById('admin-login-screen').classList.add('hidden');
           document.getElementById('admin-dashboard').classList.remove('hidden');
-          loadAdminSupport();
+          loadAdminSupport(false);
         }
       }
       setInterval(() => {
         if (!document.getElementById('admin-dashboard').classList.contains('hidden')) {
           loadAdminData();
-          loadAdminSupport();
+          loadAdminSupport(true);
         }
-      }, 10000);
+      }, 5000);
     });
   </script>
 </body>
