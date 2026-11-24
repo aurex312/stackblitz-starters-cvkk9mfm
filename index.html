@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AUREX VAULT — High-Velocity Wealth & VIP Trading Terminal</title>
+  <title>AUREX VAULT — Billionaire Golden Capital Terminal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,8 +19,8 @@
             mono: ['JetBrains Mono', 'monospace'],
           },
           colors: {
-            obsidian: '#06080E',
-            gold: { 300: '#FDE047', 400: '#FBBF24', 500: '#F59E0B', 600: '#D97706' }
+            obsidian: '#06070B',
+            gold: { 300: '#FEF08A', 400: '#FACC15', 500: '#EAB308', 600: '#CA8A04' }
           }
         }
       }
@@ -28,59 +28,95 @@
   </script>
   <style>
     body {
-      background: radial-gradient(circle at 50% -10%, #17233B 0%, #05070C 75%);
-      color: #F9FAFB;
+      background: radial-gradient(circle at 50% 0%, #241A06 0%, #090806 55%, #040508 100%);
+      color: #FFFBEB;
       -webkit-tap-highlight-color: transparent;
       overflow-x: hidden;
     }
-    .cyber-card {
-      background: linear-gradient(155deg, rgba(20, 29, 50, 0.92) 0%, rgba(9, 13, 23, 0.97) 100%);
-      border: 1px solid rgba(251, 191, 36, 0.22);
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
+
+    /* Full-screen golden candles canvas fixed behind everything */
+    #global-golden-candles {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
     }
+
+    .billionaire-glass {
+      background: linear-gradient(155deg, rgba(28, 22, 10, 0.56) 0%, rgba(10, 9, 7, 0.68) 100%);
+      border: 1px solid rgba(250, 204, 21, 0.28);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(254, 240, 138, 0.16);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
     .gold-gradient {
-      background: linear-gradient(135deg, #FEF08A 0%, #F59E0B 50%, #B45309 100%);
+      background: linear-gradient(135deg, #FEF9C3 0%, #FACC15 48%, #B45309 100%);
     }
+
     .emerald-gradient {
-      background: linear-gradient(135deg, #34D399 0%, #059669 100%);
+      background: linear-gradient(135deg, #6EE7B7 0%, #10B981 55%, #047857 100%);
     }
+
     .gold-text {
-      background: linear-gradient(135deg, #FEF08A 0%, #F59E0B 55%, #FBBF24 100%);
+      background: linear-gradient(135deg, #FEF9C3 0%, #FACC15 50%, #F59E0B 100%);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 14px rgba(250, 204, 21, 0.35));
     }
-    .turbo-border {
+
+    .shining-frame {
       position: relative;
       overflow: hidden;
     }
-    .turbo-border::before {
+    .shining-frame::before {
       content: '';
       position: absolute;
       inset: -2px;
-      background: conic-gradient(from 0deg, #10B981, #FBBF24, #06B6D4, #A855F7, #10B981);
-      animation: turboSpin 2.2s linear infinite;
+      background: conic-gradient(from 0deg, #FACC15, #FEF08A, #D97706, #FDE047, #FACC15);
+      animation: goldRingSpin 3.2s linear infinite;
       z-index: 0;
     }
-    .turbo-border-inner {
+    .shining-frame-inner {
       position: relative;
       z-index: 1;
-      background: #090E1A;
+      background: rgba(12, 10, 6, 0.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-radius: inherit;
     }
-    @keyframes turboSpin {
+    @keyframes goldRingSpin {
       100% { transform: rotate(360deg); }
     }
-    @keyframes fastFloat {
-      0%, 100% { transform: translateY(0px) scale(1); }
-      50% { transform: translateY(-5px) scale(1.02); }
+
+    .shine-sweep {
+      position: relative;
+      overflow: hidden;
     }
-    .fast-float { animation: fastFloat 1.6s ease-in-out infinite; }
+    .shine-sweep::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -120%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(90deg, transparent, rgba(255, 251, 235, 0.45), transparent);
+      transform: rotate(22deg);
+      animation: lightSweep 3.4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes lightSweep {
+      0% { left: -120%; }
+      55%, 100% { left: 160%; }
+    }
+
     .ticker-scroll {
       display: inline-block;
       white-space: nowrap;
-      animation: fastMarquee 11s linear infinite;
+      animation: fastMarquee 12s linear infinite;
     }
     @keyframes fastMarquee {
       0% { transform: translateX(0%); }
@@ -88,61 +124,62 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex justify-center items-start sm:py-3">
+<body class="min-h-screen flex justify-center items-start sm:py-3 relative">
+
+  <!-- Full-Website Shining Golden Candles Background -->
+  <canvas id="global-golden-candles"></canvas>
 
   <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[410px] pointer-events-none flex flex-col gap-2"></div>
 
   <!-- ========================================================= -->
   <!-- 1. MANDATORY REGISTRATION / LOGIN SCREEN                  -->
   <!-- ========================================================= -->
-  <div id="auth-gate-screen" class="w-full max-w-[440px] min-h-screen sm:min-h-[850px] sm:rounded-[34px] bg-obsidian sm:border sm:border-amber-400/30 shadow-[0_25px_80px_rgba(0,0,0,0.95)] relative flex flex-col justify-between overflow-hidden">
-    <canvas id="auth-candles-canvas" class="absolute inset-0 w-full h-full opacity-55 pointer-events-none"></canvas>
-    <div class="absolute inset-0 bg-gradient-to-b from-[#06080E]/50 via-[#06080E]/75 to-[#06080E] pointer-events-none"></div>
+  <div id="auth-gate-screen" class="relative z-10 w-full max-w-[440px] min-h-screen sm:min-h-[850px] sm:rounded-[34px] bg-black/35 sm:border sm:border-yellow-400/35 shadow-[0_25px_80px_rgba(0,0,0,0.85)] backdrop-blur-[6px] flex flex-col justify-between overflow-hidden">
 
-    <div class="relative z-10 bg-black/70 border-b border-amber-400/25 py-2 overflow-hidden">
-      <div class="ticker-scroll font-mono text-[11px] text-amber-300 space-x-6">
-        <span>⚡ BTC/USDT <strong class="text-emerald-400">+5.84% SURGE</strong></span>
-        <span>⚡ ETH/USDT <strong class="text-emerald-400">+4.20% BREAKOUT</strong></span>
-        <span>⚡ QUANT ENGINE <strong class="text-cyan-300">LIVE EXECUTION</strong></span>
-        <span>⚡ VIP 1–9 <strong class="text-amber-400">$10 TO $5,000</strong></span>
-        <span>⚡ BTC/USDT <strong class="text-emerald-400">+5.84% SURGE</strong></span>
-        <span>⚡ ETH/USDT <strong class="text-emerald-400">+4.20% BREAKOUT</strong></span>
+    <div class="relative z-10 bg-black/50 border-b border-yellow-400/25 py-2 overflow-hidden backdrop-blur-md">
+      <div class="ticker-scroll font-mono text-[11px] text-yellow-200 space-x-6">
+        <span>✦ XAU/USD GOLD <strong class="text-yellow-300">$2,940.80 ▲</strong></span>
+        <span>✦ BTC/USDT <strong class="text-yellow-300">$96,840 ▲</strong></span>
+        <span>✦ SOVEREIGN LIQUIDITY <strong class="text-amber-300">LIVE GOLDEN FLOW</strong></span>
+        <span>✦ VIP 1–9 <strong class="text-yellow-300">$10 TO $5,000</strong></span>
+        <span>✦ XAU/USD GOLD <strong class="text-yellow-300">$2,940.80 ▲</strong></span>
+        <span>✦ BTC/USDT <strong class="text-yellow-300">$96,840 ▲</strong></span>
       </div>
     </div>
 
     <div class="relative z-10 px-5 py-5 my-auto space-y-4">
       <div class="text-center space-y-1.5">
-        <div class="w-16 h-16 mx-auto rounded-2xl gold-gradient p-[2px] shadow-[0_0_35px_rgba(245,158,11,0.6)] fast-float">
-          <div class="w-full h-full bg-obsidian rounded-[14px] flex items-center justify-center">
+        <div class="w-16 h-16 mx-auto rounded-2xl gold-gradient p-[2px] shadow-[0_0_35px_rgba(250,204,21,0.65)] shine-sweep">
+          <div class="w-full h-full bg-black/80 rounded-[14px] flex items-center justify-center">
             <svg class="w-9 h-9" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="#FDE047" stroke-width="2"/>
-              <path d="M6 16L10 11L13.5 14L18 7" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="#FEF08A" stroke-width="2"/>
+              <path d="M7 15L11 10L14 13L18 7" stroke="#FACC15" stroke-width="2.5" stroke-linecap="round"/>
             </svg>
           </div>
         </div>
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-[10px] font-extrabold text-emerald-300 uppercase tracking-widest">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> High-Velocity Capital Engine
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400/15 border border-yellow-400/40 text-[10px] font-extrabold text-yellow-200 uppercase tracking-widest">
+          <span class="w-2 h-2 rounded-full bg-yellow-300 animate-ping"></span> Billionaire Capital Vault
         </div>
         <h1 class="text-2xl font-extrabold text-white">AUREX <span class="gold-text">VAULT PRO</span></h1>
-        <p class="text-xs text-gray-300">Step into high-tier wealth & daily growth</p>
+        <p class="text-xs text-yellow-100/90">Step into high-tier wealth & daily growth</p>
       </div>
 
-      <div class="turbo-border rounded-3xl p-[2px]">
-        <div class="turbo-border-inner p-4 space-y-3.5">
-          <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-black/70 border border-white/10">
-            <button type="button" id="tab-btn-register" onclick="toggleAuthMode('register')" class="py-2 rounded-lg gold-gradient text-obsidian font-extrabold text-xs uppercase">Create ID</button>
-            <button type="button" id="tab-btn-login" onclick="toggleAuthMode('login')" class="py-2 rounded-lg text-gray-400 font-bold text-xs uppercase">Sign In</button>
+      <div class="shining-frame rounded-3xl p-[2px]">
+        <div class="shining-frame-inner p-4 space-y-3.5">
+          <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-black/55 border border-yellow-400/20">
+            <button type="button" id="tab-btn-register" onclick="toggleAuthMode('register')" class="py-2 rounded-lg gold-gradient text-black font-extrabold text-xs uppercase shine-sweep">Create ID</button>
+            <button type="button" id="tab-btn-login" onclick="toggleAuthMode('login')" class="py-2 rounded-lg text-yellow-100/70 font-bold text-xs uppercase">Sign In</button>
           </div>
 
           <form id="register-form" onsubmit="submitRegister(event)" class="space-y-2.5">
             <div>
-              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Full Name</label>
-              <input id="reg-name" type="text" required placeholder="e.g. Ali Raza" class="w-full bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Full Name</label>
+              <input id="reg-name" type="text" required placeholder="e.g. Ali Raza" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2 text-xs text-white outline-none" />
             </div>
             <div>
-              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Country & Mobile Number</label>
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Country & Mobile Number</label>
               <div class="flex gap-2">
-                <select id="reg-country" class="bg-black/75 border border-white/15 rounded-xl px-2 py-2 text-xs font-mono text-white outline-none">
+                <select id="reg-country" class="bg-black/65 border border-yellow-400/25 rounded-xl px-2 py-2 text-xs font-mono text-white outline-none">
                   <option value="PK|🇵🇰|+92">🇵🇰 +92</option>
                   <option value="US|🇺🇸|+1">🇺🇸 +1</option>
                   <option value="GB|🇬🇧|+44">🇬🇧 +44</option>
@@ -150,27 +187,27 @@
                   <option value="IN|🇮🇳|+91">🇮🇳 +91</option>
                   <option value="SA|🇸🇦|+966">🇸🇦 +966</option>
                 </select>
-                <input id="reg-phone" type="tel" required placeholder="300-1234567" class="w-full bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2 text-xs font-mono text-white outline-none" />
+                <input id="reg-phone" type="tel" required placeholder="300-1234567" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2 text-xs font-mono text-white outline-none" />
               </div>
             </div>
             <div>
-              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Password</label>
-              <input id="reg-pass" type="password" required minlength="4" placeholder="Create password (min 4 chars)" class="w-full bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2 text-xs font-mono text-white outline-none" />
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Password</label>
+              <input id="reg-pass" type="password" required minlength="4" placeholder="Create password (min 4 chars)" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2 text-xs font-mono text-white outline-none" />
             </div>
             <div>
-              <label class="text-[11px] font-semibold text-amber-300 block mb-1">Sponsor ID / Code (Optional)</label>
-              <input id="reg-invite" type="text" placeholder="Enter sponsor code" class="w-full bg-black/65 border border-amber-400/30 focus:border-amber-400 rounded-xl px-3 py-2 text-xs font-mono text-amber-200 outline-none" />
+              <label class="text-[11px] font-semibold text-yellow-300 block mb-1">Sponsor ID / Code (Optional)</label>
+              <input id="reg-invite" type="text" placeholder="Enter sponsor code" class="w-full bg-black/55 border border-yellow-400/35 focus:border-yellow-300 rounded-xl px-3 py-2 text-xs font-mono text-yellow-200 outline-none" />
             </div>
-            <button type="submit" class="w-full py-3 rounded-xl gold-gradient text-obsidian font-extrabold text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(245,158,11,0.45)]">
+            <button type="submit" class="w-full py-3 rounded-xl gold-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-[0_8px_28px_rgba(250,204,21,0.45)] shine-sweep">
               Unlock My Future Vault →
             </button>
           </form>
 
           <form id="login-form" onsubmit="submitLogin(event)" class="hidden space-y-3">
             <div>
-              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Country & Mobile Number</label>
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Country & Mobile Number</label>
               <div class="flex gap-2">
-                <select id="log-country" class="bg-black/75 border border-white/15 rounded-xl px-2 py-2.5 text-xs font-mono text-white outline-none">
+                <select id="log-country" class="bg-black/65 border border-yellow-400/25 rounded-xl px-2 py-2.5 text-xs font-mono text-white outline-none">
                   <option value="PK|🇵🇰|+92">🇵🇰 +92</option>
                   <option value="US|🇺🇸|+1">🇺🇸 +1</option>
                   <option value="GB|🇬🇧|+44">🇬🇧 +44</option>
@@ -178,14 +215,14 @@
                   <option value="IN|🇮🇳|+91">🇮🇳 +91</option>
                   <option value="SA|🇸🇦|+966">🇸🇦 +966</option>
                 </select>
-                <input id="log-phone" type="tel" required placeholder="300-1234567" class="w-full bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2.5 text-xs font-mono text-white outline-none" />
+                <input id="log-phone" type="tel" required placeholder="300-1234567" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2.5 text-xs font-mono text-white outline-none" />
               </div>
             </div>
             <div>
-              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Password</label>
-              <input id="log-pass" type="password" required placeholder="Your password" class="w-full bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2.5 text-xs font-mono text-white outline-none" />
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Password</label>
+              <input id="log-pass" type="password" required placeholder="Your password" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2.5 text-xs font-mono text-white outline-none" />
             </div>
-            <button type="submit" class="w-full py-3 rounded-xl emerald-gradient text-black font-extrabold text-xs uppercase tracking-wider">
+            <button type="submit" class="w-full py-3 rounded-xl gold-gradient text-black font-extrabold text-xs uppercase tracking-wider shine-sweep">
               Enter Vault Terminal →
             </button>
           </form>
@@ -193,138 +230,135 @@
       </div>
 
       <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
-        <div class="cyber-card rounded-xl p-2">
-          <p class="font-mono font-bold text-amber-300">$10 MIN</p>
-          <p class="text-gray-300">Start & Payout</p>
+        <div class="billionaire-glass rounded-xl p-2">
+          <p class="font-mono font-bold text-yellow-300">$10 MIN</p>
+          <p class="text-yellow-100/75">Start & Payout</p>
         </div>
-        <div class="cyber-card rounded-xl p-2">
-          <p class="font-mono font-bold text-emerald-400">20 / 30 DAYS</p>
-          <p class="text-gray-300">VIP Cycles</p>
+        <div class="billionaire-glass rounded-xl p-2">
+          <p class="font-mono font-bold text-yellow-300">20 / 30 DAYS</p>
+          <p class="text-yellow-100/75">VIP Cycles</p>
         </div>
-        <div class="cyber-card rounded-xl p-2">
-          <p class="font-mono font-bold text-purple-300">3 INVITES</p>
-          <p class="text-gray-300">Unlock VIP 6–9</p>
+        <div class="billionaire-glass rounded-xl p-2">
+          <p class="font-mono font-bold text-yellow-300">3 INVITES</p>
+          <p class="text-yellow-100/75">Unlock VIP 6–9</p>
         </div>
       </div>
     </div>
 
-    <div class="relative z-10 text-center pb-3 text-[10px] text-gray-400">
-      Live Market Feed • Photo & Video Support Desk
+    <div class="relative z-10 text-center pb-3 text-[10px] text-yellow-200/65">
+      Golden Candle Flow • Photo & Video Support Desk
     </div>
   </div>
 
   <!-- ========================================================= -->
-  <!-- 2. MAIN TRADING DASHBOARD (FRONT PAGE + ALL FEATURES)     -->
+  <!-- 2. MAIN TRADING DASHBOARD (TRANSPARENT BILLIONAIRE UI)    -->
   <!-- ========================================================= -->
-  <div id="main-app-shell" class="hidden w-full max-w-[440px] min-h-screen sm:min-h-[850px] sm:rounded-[34px] bg-obsidian sm:border sm:border-amber-400/25 shadow-[0_25px_80px_rgba(0,0,0,0.92)] relative flex flex-col overflow-hidden">
+  <div id="main-app-shell" class="hidden relative z-10 w-full max-w-[440px] min-h-screen sm:min-h-[850px] sm:rounded-[34px] bg-black/30 sm:border sm:border-yellow-400/35 shadow-[0_25px_80px_rgba(0,0,0,0.88)] backdrop-blur-[5px] flex flex-col overflow-hidden">
 
-    <header class="sticky top-0 z-30 bg-obsidian/95 backdrop-blur-xl border-b border-amber-400/20 px-4 py-2.5 flex items-center justify-between">
+    <header class="sticky top-0 z-30 bg-black/55 backdrop-blur-xl border-b border-yellow-400/25 px-4 py-2.5 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-xl gold-gradient p-[1.5px] shadow-[0_0_18px_rgba(245,158,11,0.5)]">
-          <div class="w-full h-full bg-obsidian rounded-[10.5px] flex items-center justify-center font-extrabold text-xs text-amber-300">AV</div>
+        <div class="w-9 h-9 rounded-xl gold-gradient p-[1.5px] shadow-[0_0_20px_rgba(250,204,21,0.55)] shine-sweep">
+          <div class="w-full h-full bg-black/80 rounded-[10.5px] flex items-center justify-center font-extrabold text-xs text-yellow-300">AV</div>
         </div>
         <div>
           <div class="flex items-center gap-1.5">
             <span class="font-extrabold text-sm text-white">AUREX <span class="gold-text">VAULT</span></span>
-            <span class="px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-400/40 font-mono text-[10px] font-extrabold text-cyan-300">
+            <span class="px-2 py-0.5 rounded bg-yellow-400/15 border border-yellow-400/40 font-mono text-[10px] font-extrabold text-yellow-200">
               ID: <span id="header-uid">0000000</span>
             </span>
           </div>
-          <p class="text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+          <p class="text-[10px] text-yellow-300/90 flex items-center gap-1 font-semibold">
+            <span class="w-1.5 h-1.5 rounded-full bg-yellow-300 animate-ping"></span>
             <span id="header-user-label">Member Active</span>
           </p>
         </div>
       </div>
 
       <div class="flex items-center gap-1.5">
-        <button onclick="switchTab('deposit')" class="px-2.5 py-1.5 rounded-xl bg-amber-400/15 border border-amber-400/40 flex items-center gap-1">
-          <span class="text-xs font-extrabold font-mono text-amber-300" id="header-balance">$0.00</span>
-          <span class="w-4 h-4 rounded-md gold-gradient text-obsidian font-extrabold text-xs flex items-center justify-center">+</span>
+        <button onclick="switchTab('deposit')" class="px-2.5 py-1.5 rounded-xl bg-yellow-400/15 border border-yellow-400/45 flex items-center gap-1 shine-sweep">
+          <span class="text-xs font-extrabold font-mono text-yellow-300" id="header-balance">$0.00</span>
+          <span class="w-4 h-4 rounded-md gold-gradient text-black font-extrabold text-xs flex items-center justify-center">+</span>
         </button>
-        <button onclick="logoutUser()" title="Sign Out" class="w-8 h-8 rounded-xl bg-red-500/15 border border-red-500/35 text-red-400 text-xs flex items-center justify-center">⏻</button>
+        <button onclick="logoutUser()" title="Sign Out" class="w-8 h-8 rounded-xl bg-red-500/15 border border-red-500/35 text-red-300 text-xs flex items-center justify-center">⏻</button>
       </div>
     </header>
 
-    <div class="bg-gradient-to-r from-emerald-500/15 via-amber-500/20 to-purple-500/15 border-b border-white/10 py-1.5 overflow-hidden">
-      <div class="ticker-scroll font-mono text-[10px] text-amber-200 space-x-6">
-        <span>● BTC/USDT <strong class="text-emerald-400">$96,840 (+5.4%)</strong></span>
-        <span>● VIP 1–4 <strong class="text-emerald-400">20 DAYS OPEN</strong></span>
-        <span>● VIP 6–9 <strong class="text-purple-300">30 DAYS • 3 INVITES</strong></span>
-        <span>● SPIN REWARD <strong class="text-amber-300">UP TO $1.00</strong></span>
-        <span>● MIN PAYOUT <strong class="text-cyan-300">$10.00</strong></span>
+    <div class="bg-yellow-500/10 border-b border-yellow-400/20 py-1.5 overflow-hidden backdrop-blur-md">
+      <div class="ticker-scroll font-mono text-[10px] text-yellow-200 space-x-6">
+        <span>✦ GOLD CANDLES <strong class="text-yellow-300">BULLISH GOLDEN WAVE ▲</strong></span>
+        <span>✦ VIP 1–4 <strong class="text-yellow-300">20 DAYS OPEN</strong></span>
+        <span>✦ VIP 6–9 <strong class="text-amber-300">30 DAYS • 3 INVITES</strong></span>
+        <span>✦ SPIN REWARD <strong class="text-yellow-300">UP TO $1.00</strong></span>
+        <span>✦ MIN PAYOUT <strong class="text-yellow-200">$10.00</strong></span>
       </div>
     </div>
 
     <main class="flex-1 overflow-y-auto pb-24 px-4 pt-3 space-y-4">
 
       <section id="tab-home" class="space-y-4">
-        <div class="turbo-border rounded-3xl p-[2px] shadow-[0_18px_45px_rgba(0,0,0,0.75)]">
-          <div class="turbo-border-inner p-4 relative overflow-hidden">
-            <canvas id="hero-candles-canvas" class="absolute inset-0 w-full h-full opacity-55 pointer-events-none"></canvas>
-            <div class="relative z-10 space-y-3">
-              <div class="flex items-start justify-between">
-                <div>
-                  <span class="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-bold">● Live Quant Equity Stream</span>
-                  <h1 id="hero-balance" class="text-3xl font-extrabold font-mono text-white mt-0.5">$0.00</h1>
-                </div>
-                <div class="text-right">
-                  <span id="hero-vip-badge" class="px-2.5 py-1 rounded-xl bg-amber-400/20 border border-amber-400/40 text-[10px] font-mono font-extrabold text-amber-300">
-                    NO VIP ACTIVE
-                  </span>
-                  <p id="hero-plan-days" class="text-[10px] text-cyan-300 font-mono mt-1">Min Withdraw: $10.00</p>
-                </div>
+        <div class="shining-frame rounded-3xl p-[2px] shadow-[0_18px_45px_rgba(0,0,0,0.65)]">
+          <div class="shining-frame-inner p-4 relative overflow-hidden space-y-3">
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-yellow-300 font-bold">✦ Sovereign Equity Balance</span>
+                <h1 id="hero-balance" class="text-3xl font-extrabold font-mono gold-text mt-0.5">$0.00</h1>
               </div>
+              <div class="text-right">
+                <span id="hero-vip-badge" class="px-2.5 py-1 rounded-xl bg-yellow-400/20 border border-yellow-400/45 text-[10px] font-mono font-extrabold text-yellow-200">
+                  NO VIP ACTIVE
+                </span>
+                <p id="hero-plan-days" class="text-[10px] text-yellow-200/80 font-mono mt-1">Min Withdraw: $10.00</p>
+              </div>
+            </div>
 
-              <div class="grid grid-cols-3 gap-2 pt-2 border-t border-white/15">
-                <div class="bg-black/55 rounded-xl p-2 border border-white/10">
-                  <p class="text-[9px] text-gray-400">Profit Earned</p>
-                  <p id="today-yield" class="text-xs font-extrabold font-mono text-emerald-400">+$0.00</p>
-                </div>
-                <div class="bg-black/55 rounded-xl p-2 border border-white/10">
-                  <p class="text-[9px] text-gray-400">Invite Bonus</p>
-                  <p id="team-rebate" class="text-xs font-extrabold font-mono text-amber-300">$0.00</p>
-                </div>
-                <div class="bg-black/55 rounded-xl p-2 border border-white/10">
-                  <p class="text-[9px] text-gray-400">Active Invites</p>
-                  <p id="hero-active-invites" class="text-xs font-extrabold font-mono text-purple-300">0 / 3</p>
-                </div>
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-yellow-400/20">
+              <div class="bg-black/45 rounded-xl p-2 border border-yellow-400/20">
+                <p class="text-[9px] text-yellow-100/70">Profit Earned</p>
+                <p id="today-yield" class="text-xs font-extrabold font-mono text-yellow-300">+$0.00</p>
               </div>
+              <div class="bg-black/45 rounded-xl p-2 border border-yellow-400/20">
+                <p class="text-[9px] text-yellow-100/70">Invite Bonus</p>
+                <p id="team-rebate" class="text-xs font-extrabold font-mono text-amber-300">$0.00</p>
+              </div>
+              <div class="bg-black/45 rounded-xl p-2 border border-yellow-400/20">
+                <p class="text-[9px] text-yellow-100/70">Active Invites</p>
+                <p id="hero-active-invites" class="text-xs font-extrabold font-mono text-yellow-200">0 / 3</p>
+              </div>
+            </div>
 
-              <div class="grid grid-cols-4 gap-2 pt-1">
-                <button onclick="switchTab('deposit')" class="flex flex-col items-center gap-1 p-2 rounded-xl gold-gradient text-obsidian font-extrabold shadow-lg">
-                  <span class="text-sm">+</span>
-                  <span class="text-[10px]">Deposit</span>
-                </button>
-                <button onclick="openWithdrawModal()" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/65 border border-cyan-400/35 text-cyan-200">
-                  <span class="text-sm">↗</span>
-                  <span class="text-[10px] font-bold">Withdraw</span>
-                </button>
-                <button onclick="claimDailyYield()" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/65 border border-emerald-400/35 text-emerald-300">
-                  <span class="text-sm">⚡</span>
-                  <span class="text-[10px] font-bold">Harvest</span>
-                </button>
-                <button onclick="switchTab('team')" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/65 border border-purple-400/35 text-purple-200">
-                  <span class="text-sm">🎁</span>
-                  <span class="text-[10px] font-bold">Surprises</span>
-                </button>
-              </div>
+            <div class="grid grid-cols-4 gap-2 pt-1">
+              <button onclick="switchTab('deposit')" class="flex flex-col items-center gap-1 p-2 rounded-xl gold-gradient text-black font-extrabold shadow-lg shine-sweep">
+                <span class="text-sm">+</span>
+                <span class="text-[10px]">Deposit</span>
+              </button>
+              <button onclick="openWithdrawModal()" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/50 border border-yellow-400/35 text-yellow-200 hover:bg-yellow-400/15 transition">
+                <span class="text-sm">↗</span>
+                <span class="text-[10px] font-bold">Withdraw</span>
+              </button>
+              <button onclick="claimDailyYield()" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/50 border border-yellow-400/35 text-yellow-300 hover:bg-yellow-400/15 transition">
+                <span class="text-sm">✦</span>
+                <span class="text-[10px] font-bold">Harvest</span>
+              </button>
+              <button onclick="switchTab('team')" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/50 border border-yellow-400/35 text-amber-200 hover:bg-yellow-400/15 transition">
+                <span class="text-sm">♛</span>
+                <span class="text-[10px] font-bold">Surprises</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="cyber-card rounded-2xl p-3.5 border-amber-400/35 flex items-center justify-between gap-3">
+        <div class="billionaire-glass rounded-2xl p-3.5 flex items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-sm">🎡</span>
-              <h2 class="text-xs font-extrabold text-white uppercase tracking-wider">Lucky Wealth Spin</h2>
-              <span class="px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 font-mono text-[10px] font-bold">
+              <span class="text-sm">✦</span>
+              <h2 class="text-xs font-extrabold text-white uppercase tracking-wider">Lucky Golden Spin</h2>
+              <span class="px-2 py-0.5 rounded bg-yellow-400/20 text-yellow-300 font-mono text-[10px] font-bold">
                 Spins: <span id="spin-count-badge">2</span>
               </span>
             </div>
-            <p class="text-[11px] text-gray-300 mt-0.5">Win up to <strong class="text-emerald-400">$1.00</strong> instant balance per spin!</p>
+            <p class="text-[11px] text-yellow-100/80 mt-0.5">Win up to <strong class="text-yellow-300">$1.00</strong> instant balance per spin!</p>
           </div>
-          <button onclick="playLuckySpin()" id="spin-now-btn" class="px-3.5 py-2.5 rounded-xl gold-gradient text-obsidian font-extrabold text-xs shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.45)]">
+          <button onclick="playLuckySpin()" id="spin-now-btn" class="px-3.5 py-2.5 rounded-xl gold-gradient text-black font-extrabold text-xs shrink-0 shadow-[0_0_22px_rgba(250,204,21,0.5)] shine-sweep">
             SPIN NOW
           </button>
         </div>
@@ -333,29 +367,29 @@
           <div class="flex items-center justify-between px-1">
             <div>
               <h2 class="text-sm font-extrabold text-white flex items-center gap-1.5">
-                <span>👑</span> VIP Wealth Tiers ($10 – $5,000)
+                <span class="gold-text">♛</span> VIP Wealth Tiers ($10 – $5,000)
               </h2>
-              <p class="text-[10px] text-gray-400">First 4 = 20 Days Open • Last 4 = 30 Days (3 Invites)</p>
+              <p class="text-[10px] text-yellow-100/70">First 4 = 20 Days Open • Last 4 = 30 Days (3 Invites)</p>
             </div>
-            <span class="text-[10px] font-mono font-bold text-purple-300">Invites: <span id="front-invites-count">0</span>/3</span>
+            <span class="text-[10px] font-mono font-bold text-yellow-300">Invites: <span id="front-invites-count">0</span>/3</span>
           </div>
 
           <div id="front-vip-tiers-list" class="space-y-2.5"></div>
         </div>
 
-        <div class="cyber-card rounded-2xl p-4">
+        <div class="billionaire-glass rounded-2xl p-4">
           <div class="flex items-center justify-between mb-2.5">
-            <h3 class="text-xs font-extrabold uppercase tracking-wider text-gray-200">Recent Order Receipts</h3>
-            <button onclick="syncSessionWithServer()" class="text-[11px] text-amber-300 font-bold">↻ Refresh</button>
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-yellow-200">Recent Order Receipts</h3>
+            <button onclick="syncSessionWithServer()" class="text-[11px] text-yellow-300 font-bold">↻ Refresh</button>
           </div>
           <div id="home-orders-list" class="space-y-2"></div>
         </div>
       </section>
 
       <section id="tab-vip" class="hidden space-y-3">
-        <div class="cyber-card rounded-2xl p-4 border-amber-400/40">
-          <h2 class="text-base font-extrabold text-white">All 9 VIP Wealth Plans</h2>
-          <p class="text-xs text-gray-300 mt-1">
+        <div class="billionaire-glass rounded-2xl p-4 border-yellow-400/40">
+          <h2 class="text-base font-extrabold gold-text">All 9 VIP Wealth Plans</h2>
+          <p class="text-xs text-yellow-100/80 mt-1">
             Plans 1–4 ($10, $25, $50, $100) run for <strong>20 Days</strong> for everyone. Plans 6–9 ($500–$5,000) run for <strong>30 Days</strong> and unlock once <strong>3 invited friends deposit</strong>.
           </p>
         </div>
@@ -363,65 +397,65 @@
       </section>
 
       <section id="tab-deposit" class="hidden space-y-4">
-        <div class="cyber-card rounded-2xl p-4 space-y-4">
+        <div class="billionaire-glass rounded-2xl p-4 space-y-4">
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-base font-extrabold text-white">Deposit USDT (Min $10)</h2>
-              <p class="text-[11px] text-gray-300">Send USDT & upload payment screenshot only</p>
+              <p class="text-[11px] text-yellow-100/75">Send USDT & upload payment screenshot only</p>
             </div>
-            <span class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">PROOF ONLY</span>
+            <span class="px-2 py-1 rounded-lg bg-yellow-400/20 text-yellow-300 text-[10px] font-bold">PROOF ONLY</span>
           </div>
 
           <div class="grid grid-cols-2 gap-2.5">
-            <button onclick="selectNetwork('TRC20')" id="net-TRC20" class="net-btn py-2.5 px-3 rounded-xl text-xs font-extrabold border border-amber-400 bg-amber-400/20 text-amber-300">USDT (TRC20)</button>
-            <button onclick="selectNetwork('BEP20')" id="net-BEP20" class="net-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-white/10 bg-white/5 text-gray-300">USDT (BEP20)</button>
+            <button onclick="selectNetwork('TRC20')" id="net-TRC20" class="net-btn py-2.5 px-3 rounded-xl text-xs font-extrabold border border-yellow-400 bg-yellow-400/20 text-yellow-300">USDT (TRC20)</button>
+            <button onclick="selectNetwork('BEP20')" id="net-BEP20" class="net-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-yellow-400/20 bg-black/40 text-yellow-100/75">USDT (BEP20)</button>
           </div>
 
-          <div class="bg-[#060911] rounded-2xl p-4 border border-amber-400/25 flex flex-col items-center text-center">
-            <div class="bg-white p-2.5 rounded-2xl mb-2.5 relative inline-flex items-center justify-center">
+          <div class="bg-black/55 rounded-2xl p-4 border border-yellow-400/30 flex flex-col items-center text-center">
+            <div class="bg-white p-2.5 rounded-2xl mb-2.5 relative inline-flex items-center justify-center shadow-[0_0_25px_rgba(250,204,21,0.35)]">
               <div id="real-qr-container" class="w-[156px] h-[156px] flex items-center justify-center"></div>
             </div>
-            <p id="network-label" class="text-[11px] font-bold text-amber-300 mb-1">Receiving Wallet • TRC20</p>
-            <div class="w-full flex items-center justify-between gap-2 bg-white/5 border border-white/15 rounded-xl px-3 py-2">
-              <span id="deposit-address-text" class="font-mono text-[11px] text-gray-100 break-all text-left">TER4vxuCgwKT4cymyC2NRZgVYnvWn6dFC9</span>
-              <button type="button" onclick="copyDepositAddress()" class="px-3 py-1.5 rounded-lg gold-gradient text-obsidian font-extrabold text-[11px] shrink-0">Copy</button>
+            <p id="network-label" class="text-[11px] font-bold text-yellow-300 mb-1">Receiving Wallet • TRC20</p>
+            <div class="w-full flex items-center justify-between gap-2 bg-black/60 border border-yellow-400/25 rounded-xl px-3 py-2">
+              <span id="deposit-address-text" class="font-mono text-[11px] text-yellow-100 break-all text-left">TER4vxuCgwKT4cymyC2NRZgVYnvWn6dFC9</span>
+              <button type="button" onclick="copyDepositAddress()" class="px-3 py-1.5 rounded-lg gold-gradient text-black font-extrabold text-[11px] shrink-0">Copy</button>
             </div>
           </div>
 
           <form onsubmit="submitDepositOrder(event)" class="space-y-3">
             <div>
-              <label class="text-[11px] font-semibold text-gray-300 block mb-1">Deposit Amount (USD — Minimum $10)</label>
-              <input id="deposit-amount-input" type="number" step="0.01" min="10" required placeholder="10.00" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white outline-none" />
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Deposit Amount (USD — Minimum $10)</label>
+              <input id="deposit-amount-input" type="number" step="0.01" min="10" required placeholder="10.00" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white outline-none" />
             </div>
 
             <div>
-              <label class="text-[11px] font-semibold text-amber-300 block mb-1">Upload Payment Screenshot (Required)</label>
-              <input id="deposit-proof-file" type="file" accept="image/*" required onchange="previewDepositProof(event)" class="w-full bg-black/60 border border-amber-400/30 rounded-xl p-2 text-xs text-gray-200 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:gold-gradient file:text-obsidian file:font-bold" />
-              <img id="deposit-proof-preview" class="hidden mt-2 w-full max-h-44 object-contain rounded-xl border border-white/15 bg-black/60" />
+              <label class="text-[11px] font-semibold text-yellow-300 block mb-1">Upload Payment Screenshot (Required)</label>
+              <input id="deposit-proof-file" type="file" accept="image/*" required onchange="previewDepositProof(event)" class="w-full bg-black/55 border border-yellow-400/30 rounded-xl p-2 text-xs text-yellow-100 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:gold-gradient file:text-black file:font-bold" />
+              <img id="deposit-proof-preview" class="hidden mt-2 w-full max-h-44 object-contain rounded-xl border border-yellow-400/25 bg-black/60" />
             </div>
 
-            <button type="submit" class="w-full py-3.5 rounded-xl gold-gradient text-obsidian font-extrabold text-xs uppercase tracking-wider shadow-[0_8px_25px_rgba(245,158,11,0.4)]">
+            <button type="submit" class="w-full py-3.5 rounded-xl gold-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-[0_8px_28px_rgba(250,204,21,0.45)] shine-sweep">
               Submit Screenshot & Generate Order ID
             </button>
           </form>
 
-          <div id="latest-order-slip" class="hidden bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-3.5 space-y-1 text-xs">
-            <p class="font-extrabold text-emerald-300">✓ Deposit Order Submitted</p>
-            <p class="text-gray-200">Order ID: <strong id="slip-order-id" class="font-mono text-amber-300"></strong></p>
-            <p class="text-gray-200">Date & Time: <strong id="slip-order-time" class="font-mono"></strong></p>
-            <p class="text-gray-200">Amount: <strong id="slip-order-amount" class="font-mono text-emerald-300"></strong></p>
+          <div id="latest-order-slip" class="hidden bg-yellow-400/15 border border-yellow-400/45 rounded-2xl p-3.5 space-y-1 text-xs">
+            <p class="font-extrabold text-yellow-300">✓ Deposit Order Submitted</p>
+            <p class="text-yellow-100">Order ID: <strong id="slip-order-id" class="font-mono text-yellow-300"></strong></p>
+            <p class="text-yellow-100">Date & Time: <strong id="slip-order-time" class="font-mono"></strong></p>
+            <p class="text-yellow-100">Amount: <strong id="slip-order-amount" class="font-mono text-yellow-300"></strong></p>
           </div>
         </div>
       </section>
 
       <section id="tab-team" class="hidden space-y-4">
-        <div class="turbo-border rounded-3xl p-[2px]">
-          <div class="turbo-border-inner p-4 space-y-3">
+        <div class="shining-frame rounded-3xl p-[2px]">
+          <div class="shining-frame-inner p-4 space-y-3">
             <div class="flex items-center justify-between">
-              <span class="px-2.5 py-1 rounded-full bg-amber-400/20 border border-amber-400/40 text-[10px] font-extrabold text-amber-300 uppercase">
-                🔥 High-Reward Invite Vault
+              <span class="px-2.5 py-1 rounded-full bg-yellow-400/20 border border-yellow-400/45 text-[10px] font-extrabold text-yellow-300 uppercase">
+                ♛ Sovereign Invite Vault
               </span>
-              <span class="font-mono text-xs font-extrabold text-purple-300">
+              <span class="font-mono text-xs font-extrabold text-yellow-200">
                 <span id="team-active-count">0</span> / 3 Invites
               </span>
             </div>
@@ -429,63 +463,63 @@
             <h2 class="text-base font-extrabold text-white leading-snug">
               Bring 3 Depositing Friends & Unlock <span class="gold-text">30-Day VIP 6–9 ($500–$5,000)</span> + Bonus Spins!
             </h2>
-            <p class="text-xs text-gray-300">
+            <p class="text-xs text-yellow-100/80">
               Every friend who joins with your <strong>7-Digit ID</strong> and deposits gives you:
-              <strong class="text-emerald-400">12% Instant Rebate</strong> + <strong class="text-amber-300">+1 Extra Lucky Spin</strong> + progress toward <strong class="text-purple-300">VIP 6–9 Unlock</strong>!
+              <strong class="text-yellow-300">12% Instant Rebate</strong> + <strong class="text-amber-300">+1 Extra Golden Spin</strong> + progress toward <strong class="text-yellow-200">VIP 6–9 Unlock</strong>!
             </p>
 
-            <div class="bg-black/65 border border-amber-400/35 rounded-2xl p-3 space-y-2">
-              <p class="text-[10px] text-gray-400 uppercase font-bold">Your Invite Link & 7-Digit Code</p>
-              <p id="my-invite-link" class="font-mono text-[11px] text-cyan-300 break-all bg-white/5 p-2 rounded-lg"></p>
+            <div class="bg-black/60 border border-yellow-400/35 rounded-2xl p-3 space-y-2">
+              <p class="text-[10px] text-yellow-200/70 uppercase font-bold">Your Invite Link & 7-Digit Code</p>
+              <p id="my-invite-link" class="font-mono text-[11px] text-yellow-300 break-all bg-black/50 p-2 rounded-lg"></p>
               <div class="flex gap-2">
-                <button type="button" onclick="copyInviteLink()" class="flex-1 py-2.5 rounded-xl gold-gradient text-obsidian font-extrabold text-xs">
+                <button type="button" onclick="copyInviteLink()" class="flex-1 py-2.5 rounded-xl gold-gradient text-black font-extrabold text-xs shine-sweep">
                   Copy Invite Link
                 </button>
-                <button type="button" onclick="shareInviteLink()" class="flex-1 py-2.5 rounded-xl emerald-gradient text-black font-extrabold text-xs">
-                  Share Now 🚀
+                <button type="button" onclick="shareInviteLink()" class="flex-1 py-2.5 rounded-xl emerald-gradient text-black font-extrabold text-xs shine-sweep">
+                  Share Now ✦
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="cyber-card rounded-2xl p-4 space-y-2.5">
-          <h3 class="text-xs font-extrabold uppercase tracking-wider text-amber-300">🎁 Invite Milestone Surprises</h3>
+        <div class="billionaire-glass rounded-2xl p-4 space-y-2.5">
+          <h3 class="text-xs font-extrabold uppercase tracking-wider text-yellow-300">✦ Invite Milestone Surprises</h3>
           <div class="grid grid-cols-3 gap-2 text-center text-xs">
-            <div class="bg-black/50 border border-white/10 rounded-xl p-2.5">
-              <p class="text-lg">🎁</p>
+            <div class="bg-black/50 border border-yellow-400/20 rounded-xl p-2.5">
+              <p class="text-lg gold-text font-extrabold">I</p>
               <p class="font-bold text-white text-[11px] mt-1">1st Invite</p>
-              <p class="text-[10px] text-emerald-400">+12% & +1 Spin</p>
+              <p class="text-[10px] text-yellow-300">+12% & +1 Spin</p>
             </div>
-            <div class="bg-black/50 border border-white/10 rounded-xl p-2.5">
-              <p class="text-lg">💎</p>
+            <div class="bg-black/50 border border-yellow-400/20 rounded-xl p-2.5">
+              <p class="text-lg gold-text font-extrabold">II</p>
               <p class="font-bold text-white text-[11px] mt-1">2nd Invite</p>
               <p class="text-[10px] text-amber-300">+12% & +1 Spin</p>
             </div>
-            <div class="bg-black/50 border border-purple-400/40 rounded-xl p-2.5">
-              <p class="text-lg">👑</p>
-              <p class="font-bold text-purple-200 text-[11px] mt-1">3rd Invite</p>
-              <p class="text-[10px] text-purple-300">VIP 6–9 UNLOCKED</p>
+            <div class="bg-black/50 border border-yellow-400/45 rounded-xl p-2.5">
+              <p class="text-lg gold-text font-extrabold">III</p>
+              <p class="font-bold text-yellow-200 text-[11px] mt-1">3rd Invite</p>
+              <p class="text-[10px] text-yellow-300">VIP 6–9 UNLOCKED</p>
             </div>
           </div>
         </div>
       </section>
 
       <section id="tab-account" class="hidden space-y-4">
-        <div class="cyber-card rounded-2xl p-4 space-y-3">
+        <div class="billionaire-glass rounded-2xl p-4 space-y-3">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-[10px] text-gray-400 uppercase font-bold">Unique 7-Digit Trader ID</p>
-              <p id="profile-uid-display" class="font-mono text-2xl font-extrabold text-amber-300">0000000</p>
+              <p class="text-[10px] text-yellow-200/70 uppercase font-bold">Unique 7-Digit Trader ID</p>
+              <p id="profile-uid-display" class="font-mono text-2xl font-extrabold gold-text">0000000</p>
             </div>
-            <button onclick="logoutUser()" class="px-3 py-1.5 rounded-xl bg-red-500/15 border border-red-500/35 text-xs font-bold text-red-400">Log Out</button>
+            <button onclick="logoutUser()" class="px-3 py-1.5 rounded-xl bg-red-500/15 border border-red-500/35 text-xs font-bold text-red-300">Log Out</button>
           </div>
-          <div class="pt-2 border-t border-white/10 text-xs text-gray-300 space-y-1">
+          <div class="pt-2 border-t border-yellow-400/20 text-xs text-yellow-100/85 space-y-1">
             <p>Name: <strong id="profile-name-display" class="text-white"></strong></p>
-            <p>Mobile: <strong id="profile-phone-display" class="font-mono text-cyan-300"></strong></p>
-            <p>Minimum Withdrawal: <strong class="font-mono text-emerald-400">$10.00 USD</strong></p>
+            <p>Mobile: <strong id="profile-phone-display" class="font-mono text-yellow-300"></strong></p>
+            <p>Minimum Withdrawal: <strong class="font-mono text-yellow-300">$10.00 USD</strong></p>
           </div>
-          <button onclick="openSupportModal()" class="w-full py-3 rounded-xl gold-gradient text-obsidian font-extrabold text-xs uppercase">
+          <button onclick="openSupportModal()" class="w-full py-3 rounded-xl gold-gradient text-black font-extrabold text-xs uppercase shine-sweep">
             💬 Open Photo / Video Live Support
           </button>
         </div>
@@ -493,78 +527,78 @@
 
     </main>
 
-    <button onclick="openSupportModal()" class="fixed sm:absolute bottom-20 right-4 z-40 px-3.5 py-2.5 rounded-full gold-gradient text-obsidian font-extrabold text-xs shadow-[0_10px_28px_rgba(245,158,11,0.55)] flex items-center gap-1.5">
+    <button onclick="openSupportModal()" class="fixed sm:absolute bottom-20 right-4 z-40 px-3.5 py-2.5 rounded-full gold-gradient text-black font-extrabold text-xs shadow-[0_10px_28px_rgba(250,204,21,0.6)] flex items-center gap-1.5 shine-sweep">
       <span>💬</span>
       <span>Live Chat</span>
     </button>
 
-    <nav class="sticky bottom-0 z-30 bg-obsidian/95 backdrop-blur-xl border-t border-amber-400/20 px-2 py-2 grid grid-cols-5 gap-1">
-      <button onclick="switchTab('home')" id="nav-home" class="nav-item flex flex-col items-center py-1 text-amber-300">
-        <span class="text-sm">📈</span>
+    <nav class="sticky bottom-0 z-30 bg-black/65 backdrop-blur-xl border-t border-yellow-400/25 px-2 py-2 grid grid-cols-5 gap-1">
+      <button onclick="switchTab('home')" id="nav-home" class="nav-item flex flex-col items-center py-1 text-yellow-300">
+        <span class="text-sm">✦</span>
         <span class="text-[10px] font-bold mt-0.5">Terminal</span>
       </button>
-      <button onclick="switchTab('vip')" id="nav-vip" class="nav-item flex flex-col items-center py-1 text-gray-400">
-        <span class="text-sm">👑</span>
+      <button onclick="switchTab('vip')" id="nav-vip" class="nav-item flex flex-col items-center py-1 text-yellow-100/60">
+        <span class="text-sm">♛</span>
         <span class="text-[10px] font-semibold mt-0.5">9 VIPs</span>
       </button>
-      <button onclick="switchTab('deposit')" id="nav-deposit" class="nav-item flex flex-col items-center py-1 text-amber-300">
-        <div class="w-8 h-8 -mt-3 rounded-xl gold-gradient text-obsidian flex items-center justify-center font-extrabold shadow">+</div>
+      <button onclick="switchTab('deposit')" id="nav-deposit" class="nav-item flex flex-col items-center py-1 text-yellow-300">
+        <div class="w-8 h-8 -mt-3 rounded-xl gold-gradient text-black flex items-center justify-center font-extrabold shadow shine-sweep">+</div>
         <span class="text-[10px] font-bold mt-0.5">Deposit</span>
       </button>
-      <button onclick="switchTab('team')" id="nav-team" class="nav-item flex flex-col items-center py-1 text-gray-400">
-        <span class="text-sm">🎁</span>
+      <button onclick="switchTab('team')" id="nav-team" class="nav-item flex flex-col items-center py-1 text-yellow-100/60">
+        <span class="text-sm">❖</span>
         <span class="text-[10px] font-semibold mt-0.5">Invite (3)</span>
       </button>
-      <button onclick="switchTab('account')" id="nav-account" class="nav-item flex flex-col items-center py-1 text-gray-400">
-        <span class="text-sm">🆔</span>
+      <button onclick="switchTab('account')" id="nav-account" class="nav-item flex flex-col items-center py-1 text-yellow-100/60">
+        <span class="text-sm">◈</span>
         <span class="text-[10px] font-semibold mt-0.5">My ID</span>
       </button>
     </nav>
 
-    <div id="withdraw-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div class="w-full max-w-[390px] cyber-card rounded-3xl p-5 border border-amber-400/40 space-y-4 relative">
-        <button onclick="closeWithdrawModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 text-gray-300 flex items-center justify-center">✕</button>
+    <div id="withdraw-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="w-full max-w-[390px] billionaire-glass rounded-3xl p-5 border border-yellow-400/45 space-y-4 relative">
+        <button onclick="closeWithdrawModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 text-yellow-200 flex items-center justify-center">✕</button>
         <div>
           <h3 class="text-base font-extrabold text-white">Withdraw USDT (Min $10.00)</h3>
-          <p class="text-[11px] text-gray-300">Available Balance: <span id="withdraw-avail-balance" class="font-mono text-emerald-400 font-bold">$0.00</span></p>
+          <p class="text-[11px] text-yellow-100/80">Available Balance: <span id="withdraw-avail-balance" class="font-mono text-yellow-300 font-bold">$0.00</span></p>
         </div>
         <form onsubmit="handleWithdrawSubmit(event)" class="space-y-3">
-          <input id="withdraw-address" type="text" required placeholder="Destination USDT (TRC20) Address" class="w-full bg-black/65 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
-          <input id="withdraw-amount" type="number" min="10" step="0.01" required placeholder="Minimum $10.00 USD" class="w-full bg-black/65 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
-          <button type="submit" class="w-full py-3 rounded-xl emerald-gradient text-black font-extrabold text-xs uppercase">Submit Payout Request</button>
+          <input id="withdraw-address" type="text" required placeholder="Destination USDT (TRC20) Address" class="w-full bg-black/60 border border-yellow-400/25 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
+          <input id="withdraw-amount" type="number" min="10" step="0.01" required placeholder="Minimum $10.00 USD" class="w-full bg-black/60 border border-yellow-400/25 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
+          <button type="submit" class="w-full py-3 rounded-xl gold-gradient text-black font-extrabold text-xs uppercase shine-sweep">Submit Payout Request</button>
         </form>
       </div>
     </div>
 
-    <div id="support-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3">
-      <div class="w-full max-w-[410px] cyber-card rounded-3xl p-4 border border-amber-400/40 flex flex-col h-[560px] relative">
-        <div class="flex items-center justify-between pb-2.5 border-b border-white/10">
+    <div id="support-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3">
+      <div class="w-full max-w-[410px] billionaire-glass rounded-3xl p-4 border border-yellow-400/45 flex flex-col h-[560px] relative">
+        <div class="flex items-center justify-between pb-2.5 border-b border-yellow-400/20">
           <div>
             <h3 class="text-sm font-extrabold text-white">💬 AUREX Live Support</h3>
-            <p class="text-[10px] text-emerald-400 font-semibold">Send Text, Photo & Video • Instant Sound</p>
+            <p class="text-[10px] text-yellow-300 font-semibold">Send Text, Photo & Video • Instant Sound</p>
           </div>
-          <button onclick="closeSupportModal()" class="w-8 h-8 rounded-full bg-white/10 text-gray-300 flex items-center justify-center">✕</button>
+          <button onclick="closeSupportModal()" class="w-8 h-8 rounded-full bg-white/10 text-yellow-200 flex items-center justify-center">✕</button>
         </div>
 
         <div id="support-chat-box" class="flex-1 overflow-y-auto py-3 space-y-2.5 text-xs"></div>
 
-        <div id="user-media-preview-bar" class="hidden bg-black/70 border border-amber-400/30 rounded-xl p-2 mb-2 flex items-center justify-between gap-2">
-          <span id="user-media-label" class="text-[11px] text-amber-300 font-mono truncate">Media attached</span>
-          <button type="button" onclick="clearUserMedia()" class="text-xs text-red-400 font-bold px-2">✕</button>
+        <div id="user-media-preview-bar" class="hidden bg-black/65 border border-yellow-400/35 rounded-xl p-2 mb-2 flex items-center justify-between gap-2">
+          <span id="user-media-label" class="text-[11px] text-yellow-300 font-mono truncate">Media attached</span>
+          <button type="button" onclick="clearUserMedia()" class="text-xs text-red-300 font-bold px-2">✕</button>
         </div>
 
-        <form onsubmit="sendSupportMessage(event)" class="pt-2 border-t border-white/10 space-y-2">
+        <form onsubmit="sendSupportMessage(event)" class="pt-2 border-t border-yellow-400/20 space-y-2">
           <div class="flex items-center gap-1.5">
-            <label class="px-2.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs cursor-pointer" title="Send Photo">
+            <label class="px-2.5 py-2 rounded-xl bg-yellow-400/15 border border-yellow-400/30 hover:bg-yellow-400/25 text-xs cursor-pointer" title="Send Photo">
               📷
               <input type="file" accept="image/*" class="hidden" onchange="handleSupportMediaSelect(event, 'image')" />
             </label>
-            <label class="px-2.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs cursor-pointer" title="Send Video">
+            <label class="px-2.5 py-2 rounded-xl bg-yellow-400/15 border border-yellow-400/30 hover:bg-yellow-400/25 text-xs cursor-pointer" title="Send Video">
               🎥
               <input type="file" accept="video/*" class="hidden" onchange="handleSupportMediaSelect(event, 'video')" />
             </label>
-            <input id="support-msg-input" type="text" placeholder="Type message..." class="flex-1 bg-black/65 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2 text-xs text-white outline-none" />
-            <button type="submit" class="px-4 py-2 rounded-xl gold-gradient text-obsidian font-extrabold text-xs">Send</button>
+            <input id="support-msg-input" type="text" placeholder="Type message..." class="flex-1 bg-black/60 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+            <button type="submit" class="px-4 py-2 rounded-xl gold-gradient text-black font-extrabold text-xs">Send</button>
           </div>
         </form>
       </div>
@@ -613,7 +647,7 @@
     let userSupportMedia = { type: 'none', data: '', name: '' };
     let lastSupportCount = 0;
 
-    function playChimeSound(freq = 740) {
+    function playChimeSound(freq = 780) {
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
@@ -634,7 +668,7 @@
     function showToast(msg, type = 'success') {
       const container = document.getElementById('toast-container');
       const el = document.createElement('div');
-      el.className = `cyber-card ${type === 'success' ? 'border-emerald-400/50 text-emerald-300' : 'border-amber-400/50 text-amber-300'} px-4 py-2.5 rounded-2xl text-xs font-bold shadow-2xl`;
+      el.className = `billionaire-glass ${type === 'success' ? 'border-yellow-300/60 text-yellow-200' : 'border-amber-400/50 text-amber-200'} px-4 py-2.5 rounded-2xl text-xs font-bold shadow-2xl`;
       el.textContent = msg;
       container.appendChild(el);
       setTimeout(() => el.remove(), 3200);
@@ -653,13 +687,13 @@
       if (mode === 'register') {
         regForm.classList.remove('hidden');
         logForm.classList.add('hidden');
-        btnReg.className = 'py-2 rounded-lg gold-gradient text-obsidian font-extrabold text-xs uppercase';
-        btnLog.className = 'py-2 rounded-lg text-gray-400 font-bold text-xs uppercase';
+        btnReg.className = 'py-2 rounded-lg gold-gradient text-black font-extrabold text-xs uppercase shine-sweep';
+        btnLog.className = 'py-2 rounded-lg text-yellow-100/70 font-bold text-xs uppercase';
       } else {
         regForm.classList.add('hidden');
         logForm.classList.remove('hidden');
-        btnLog.className = 'py-2 rounded-lg emerald-gradient text-black font-extrabold text-xs uppercase';
-        btnReg.className = 'py-2 rounded-lg text-gray-400 font-bold text-xs uppercase';
+        btnLog.className = 'py-2 rounded-lg gold-gradient text-black font-extrabold text-xs uppercase shine-sweep';
+        btnReg.className = 'py-2 rounded-lg text-yellow-100/70 font-bold text-xs uppercase';
       }
     }
 
@@ -691,7 +725,6 @@
       document.getElementById('auth-gate-screen').classList.add('hidden');
       document.getElementById('main-app-shell').classList.remove('hidden');
       updateUI();
-      startCandlestickCanvas('hero-candles-canvas');
     }
 
     function logoutUser() {
@@ -795,30 +828,30 @@
         const totalEst = (plan.daily * plan.days).toFixed(2);
 
         return `
-          <div class="cyber-card rounded-2xl p-3.5 ${isLocked ? 'border-purple-500/40' : 'border-amber-400/30'} space-y-2">
+          <div class="billionaire-glass rounded-2xl p-3.5 ${isLocked ? 'border-amber-500/45' : 'border-yellow-400/35'} space-y-2 shine-sweep">
             <div class="flex items-center justify-between">
               <div>
                 <div class="flex items-center gap-1.5">
                   <h3 class="text-xs font-extrabold text-white">${plan.name}</h3>
-                  <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono text-[10px] font-bold">${plan.days} Days</span>
+                  <span class="px-2 py-0.5 rounded bg-yellow-400/20 text-yellow-200 font-mono text-[10px] font-bold">${plan.days} Days</span>
                 </div>
-                <p class="text-[11px] font-mono text-emerald-400 font-bold mt-0.5">
+                <p class="text-[11px] font-mono text-yellow-300 font-bold mt-0.5">
                   Daily: +${formatUSD(plan.daily)} • Cycle Est: $${totalEst}
                 </p>
               </div>
               <div class="text-right">
-                <p class="font-mono font-extrabold text-sm text-amber-300">${formatUSD(plan.price)}</p>
-                <p class="text-[9px] ${isLocked ? 'text-purple-300' : 'text-emerald-300'}">${isLocked ? '🔒 3 Invites Req' : '● Open'}</p>
+                <p class="font-mono font-extrabold text-sm gold-text">${formatUSD(plan.price)}</p>
+                <p class="text-[9px] ${isLocked ? 'text-amber-300' : 'text-yellow-200'}">${isLocked ? '🔒 3 Invites Req' : '✦ Open'}</p>
               </div>
             </div>
             ${
               isCurrent
-                ? `<div class="w-full py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-center text-[11px] font-extrabold text-emerald-300">✓ Active (${plan.days} Days)</div>`
+                ? `<div class="w-full py-2 rounded-xl bg-yellow-400/20 border border-yellow-400/45 text-center text-[11px] font-extrabold text-yellow-200">✓ Active (${plan.days} Days)</div>`
                 : isLocked
-                ? `<button onclick="switchTab('team')" class="w-full py-2 rounded-xl bg-purple-500/20 border border-purple-500/40 text-[11px] font-bold text-purple-200">
+                ? `<button onclick="switchTab('team')" class="w-full py-2 rounded-xl bg-amber-500/20 border border-amber-400/45 text-[11px] font-bold text-amber-200">
                      🔒 Invite ${3 - state.activeInvites} More Depositing Friends to Unlock
                    </button>`
-                : `<button onclick="activatePlan(${plan.level})" class="w-full py-2 rounded-xl gold-gradient text-obsidian font-extrabold text-[11px] uppercase">
+                : `<button onclick="activatePlan(${plan.level})" class="w-full py-2 rounded-xl gold-gradient text-black font-extrabold text-[11px] uppercase shine-sweep">
                      Activate ${plan.name} (${formatUSD(plan.price)})
                    </button>`
             }
@@ -885,34 +918,34 @@
       }
       playChimeSound(990);
       applyServerSnapshot(data);
-      showToast(`🎉 Won +${formatUSD(data.reward)} (${data.label})!`);
+      showToast(`✦ Won +${formatUSD(data.reward)} (${data.label})!`);
     }
 
     function renderOrders() {
       const el = document.getElementById('home-orders-list');
       if (!el) return;
       if (!state.orders.length) {
-        el.innerHTML = `<p class="text-xs text-gray-400">No orders yet. Deposit $10+ with screenshot to begin.</p>`;
+        el.innerHTML = `<p class="text-xs text-yellow-100/70">No orders yet. Deposit $10+ with screenshot to begin.</p>`;
         return;
       }
       el.innerHTML = state.orders.map(o => {
         const badge = o.status === 'Approved'
-          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+          ? 'bg-yellow-400/20 text-yellow-300 border-yellow-400/45'
           : o.status === 'Rejected'
           ? 'bg-red-500/20 text-red-300 border-red-500/40'
-          : 'bg-amber-400/20 text-amber-300 border-amber-400/40';
+          : 'bg-amber-400/20 text-amber-200 border-amber-400/40';
         const sign = (o.order_type === 'Withdraw' || o.network === 'PLAN') ? '-' : '+';
         return `
-          <div class="bg-black/50 border border-white/10 rounded-xl p-2.5 space-y-1 text-xs">
+          <div class="bg-black/45 border border-yellow-400/20 rounded-xl p-2.5 space-y-1 text-xs">
             <div class="flex items-center justify-between">
-              <span class="font-mono font-bold text-amber-300 text-[11px]">${o.order_id}</span>
+              <span class="font-mono font-bold text-yellow-300 text-[11px]">${o.order_id}</span>
               <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badge}">${o.status}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="font-semibold text-white">${o.order_type} (${o.network})</span>
-              <span class="font-mono font-bold ${sign === '-' ? 'text-gray-300' : 'text-emerald-400'}">${sign}${formatUSD(o.amount)}</span>
+              <span class="font-mono font-bold ${sign === '-' ? 'text-yellow-100/70' : 'text-yellow-300'}">${sign}${formatUSD(o.amount)}</span>
             </div>
-            <p class="font-mono text-[10px] text-gray-400">🕒 ${o.created_at}</p>
+            <p class="font-mono text-[10px] text-yellow-100/60">🕒 ${o.created_at}</p>
           </div>
         `;
       }).join('');
@@ -922,11 +955,11 @@
       ['home', 'vip', 'deposit', 'team', 'account'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add('hidden');
         const nav = document.getElementById(`nav-${t}`);
-        if (nav && t !== 'deposit') nav.classList.replace('text-amber-300', 'text-gray-400');
+        if (nav && t !== 'deposit') nav.classList.replace('text-yellow-300', 'text-yellow-100/60');
       });
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
       if (tabName !== 'deposit') {
-        document.getElementById(`nav-${tabName}`).classList.replace('text-gray-400', 'text-amber-300');
+        document.getElementById(`nav-${tabName}`).classList.replace('text-yellow-100/60', 'text-yellow-300');
       }
       if (tabName === 'deposit') renderRealQRCode(state.networks[state.selectedNetwork]);
     }
@@ -934,9 +967,9 @@
     function selectNetwork(net) {
       state.selectedNetwork = net;
       document.querySelectorAll('.net-btn').forEach(b => {
-        b.className = 'net-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-white/10 bg-white/5 text-gray-300';
+        b.className = 'net-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-yellow-400/20 bg-black/40 text-yellow-100/75';
       });
-      document.getElementById(`net-${net}`).className = 'net-btn py-2.5 px-3 rounded-xl text-xs font-extrabold border border-amber-400 bg-amber-400/20 text-amber-300';
+      document.getElementById(`net-${net}`).className = 'net-btn py-2.5 px-3 rounded-xl text-xs font-extrabold border border-yellow-400 bg-yellow-400/20 text-yellow-300';
       document.getElementById('network-label').textContent = `Receiving Wallet • ${net}`;
       document.getElementById('deposit-address-text').textContent = state.networks[net];
       renderRealQRCode(state.networks[net]);
@@ -947,7 +980,7 @@
       if (!box || !addr) return;
       box.innerHTML = '';
       if (typeof QRCode !== 'undefined') {
-        new QRCode(box, { text: addr, width: 156, height: 156, colorDark: '#06080E', colorLight: '#FFFFFF' });
+        new QRCode(box, { text: addr, width: 156, height: 156, colorDark: '#06070B', colorLight: '#FFFFFF' });
       }
     }
 
@@ -1104,23 +1137,23 @@
     function renderSupportChat(messages) {
       const box = document.getElementById('support-chat-box');
       if (!box) return;
-      const intro = `<div class="bg-white/5 border border-white/10 rounded-2xl p-2.5 text-gray-300">👋 Member <strong>#${state.userUid}</strong> — send text, photo, or video to support.</div>`;
+      const intro = `<div class="bg-yellow-400/10 border border-yellow-400/25 rounded-2xl p-2.5 text-yellow-100">✦ Member <strong>#${state.userUid}</strong> — send text, photo, or video to support.</div>`;
       const items = messages.map(m => {
         const isUser = m.sender === 'user';
         let mediaHtml = '';
         if (m.media_type === 'image' && m.media_data) {
-          mediaHtml = `<img src="${m.media_data}" class="mt-1.5 rounded-xl max-h-44 w-full object-contain border border-white/15" />`;
+          mediaHtml = `<img src="${m.media_data}" class="mt-1.5 rounded-xl max-h-44 w-full object-contain border border-yellow-400/25" />`;
         } else if (m.media_type === 'video' && m.media_data) {
-          mediaHtml = `<video src="${m.media_data}" controls class="mt-1.5 rounded-xl max-h-44 w-full border border-white/15"></video>`;
+          mediaHtml = `<video src="${m.media_data}" controls class="mt-1.5 rounded-xl max-h-44 w-full border border-yellow-400/25"></video>`;
         }
         return `
           <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'}">
-            <div class="${isUser ? 'bg-amber-400/20 border border-amber-400/40 text-white' : 'bg-emerald-500/15 border border-emerald-500/35 text-emerald-100'} rounded-2xl px-3 py-2 max-w-[85%]">
-              <p class="text-[10px] font-bold ${isUser ? 'text-amber-300' : 'text-emerald-400'}">${isUser ? 'You (#' + state.userUid + ')' : '🛡️ Support Desk'}</p>
+            <div class="${isUser ? 'bg-yellow-400/20 border border-yellow-400/45 text-white' : 'bg-black/60 border border-yellow-400/25 text-yellow-100'} rounded-2xl px-3 py-2 max-w-[85%]">
+              <p class="text-[10px] font-bold ${isUser ? 'text-yellow-300' : 'text-amber-300'}">${isUser ? 'You (#' + state.userUid + ')' : '♛ Support Desk'}</p>
               ${m.message ? `<p class="mt-0.5">${m.message}</p>` : ''}
               ${mediaHtml}
             </div>
-            <span class="text-[9px] text-gray-500 mt-0.5 px-1">${m.created_at}</span>
+            <span class="text-[9px] text-yellow-100/50 mt-0.5 px-1">${m.created_at}</span>
           </div>
         `;
       }).join('');
@@ -1159,76 +1192,126 @@
       }
     }
 
-    function startCandlestickCanvas(canvasId) {
-      const canvas = document.getElementById(canvasId);
+    /* Full-Screen Shining Golden Candles + Golden Sparkles Animation */
+    function startGlobalGoldenCandles() {
+      const canvas = document.getElementById('global-golden-candles');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      let width = (canvas.width = canvas.offsetWidth || 420);
-      let height = (canvas.height = canvas.offsetHeight || 240);
 
-      const count = 28;
-      const candles = [];
-      let price = height * 0.52;
-
-      for (let i = 0; i < count; i++) {
-        const open = price;
-        const close = Math.max(20, Math.min(height - 20, open + (Math.random() - 0.45) * 38));
-        candles.push({
-          open,
-          close,
-          high: Math.min(open, close) - Math.random() * 16,
-          low: Math.max(open, close) + Math.random() * 16
-        });
-        price = close;
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
       }
+      resize();
+      window.addEventListener('resize', resize);
 
-      setInterval(() => {
-        const last = candles[candles.length - 1];
-        last.close = Math.max(20, Math.min(height - 20, last.close + (Math.random() - 0.47) * 16));
-        last.high = Math.min(last.high, last.close - 5);
-        last.low = Math.max(last.low, last.close + 5);
-      }, 180);
+      const candles = Array.from({ length: 24 }, (_, idx) => ({
+        x: (idx / 24) * window.innerWidth + Math.random() * 28,
+        y: Math.random() * window.innerHeight,
+        w: 9 + Math.random() * 8,
+        bodyH: 22 + Math.random() * 44,
+        wickTop: 8 + Math.random() * 18,
+        wickBot: 8 + Math.random() * 18,
+        speedY: 0.45 + Math.random() * 0.95,
+        shinePhase: Math.random() * Math.PI * 2,
+        tilt: (Math.random() - 0.5) * 0.16
+      }));
 
-      setInterval(() => {
-        const prev = candles[candles.length - 1];
-        const open = prev.close;
-        const close = Math.max(20, Math.min(height - 20, open + (Math.random() - 0.45) * 34));
-        candles.shift();
-        candles.push({
-          open,
-          close,
-          high: Math.min(open, close) - Math.random() * 14,
-          low: Math.max(open, close) + Math.random() * 14
-        });
-      }, 900);
+      const sparks = Array.from({ length: 42 }, () => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: 1 + Math.random() * 2.5,
+        vy: 0.3 + Math.random() * 0.8,
+        phase: Math.random() * Math.PI * 2
+      }));
 
-      function draw() {
-        ctx.clearRect(0, 0, width, height);
-        const slot = width / count;
-        candles.forEach((c, i) => {
-          const x = i * slot + slot * 0.5;
-          const bull = c.close <= c.open;
-          const col = bull ? '#10B981' : '#FBBF24';
+      let t = 0;
+      function render() {
+        t += 0.035;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          ctx.strokeStyle = col;
+        // Soft golden radial ambient glow
+        const glow = ctx.createRadialGradient(
+          canvas.width * 0.5,
+          canvas.height * 0.28,
+          20,
+          canvas.width * 0.5,
+          canvas.height * 0.4,
+          Math.max(canvas.width, canvas.height) * 0.65
+        );
+        glow.addColorStop(0, 'rgba(250, 204, 21, 0.14)');
+        glow.addColorStop(0.55, 'rgba(217, 119, 6, 0.05)');
+        glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Shining Golden Candles rising & pulsing
+        candles.forEach(c => {
+          c.y -= c.speedY;
+          if (c.y < -100) {
+            c.y = canvas.height + 80;
+            c.x = Math.random() * canvas.width;
+          }
+          const pulse = 0.55 + 0.45 * Math.sin(t * 2.4 + c.shinePhase);
+
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.rotate(c.tilt);
+
+          ctx.shadowColor = `rgba(254, 240, 138, ${0.75 * pulse})`;
+          ctx.shadowBlur = 18 * pulse;
+
+          // Wick
+          ctx.strokeStyle = `rgba(254, 249, 195, ${0.55 + 0.4 * pulse})`;
           ctx.lineWidth = 1.6;
           ctx.beginPath();
-          ctx.moveTo(x, c.high);
-          ctx.lineTo(x, c.low);
+          ctx.moveTo(0, -c.bodyH * 0.5 - c.wickTop);
+          ctx.lineTo(0, c.bodyH * 0.5 + c.wickBot);
           ctx.stroke();
 
-          ctx.fillStyle = bull ? 'rgba(16, 185, 129, 0.88)' : 'rgba(251, 191, 36, 0.88)';
-          const top = Math.min(c.open, c.close);
-          const h = Math.max(5, Math.abs(c.close - c.open));
-          ctx.fillRect(x - slot * 0.3, top, slot * 0.6, h);
+          // Golden candle body gradient
+          const grad = ctx.createLinearGradient(-c.w / 2, -c.bodyH / 2, c.w / 2, c.bodyH / 2);
+          grad.addColorStop(0, `rgba(254, 249, 195, ${0.55 + 0.4 * pulse})`);
+          grad.addColorStop(0.5, `rgba(250, 204, 21, ${0.45 + 0.45 * pulse})`);
+          grad.addColorStop(1, `rgba(180, 83, 9, ${0.45 + 0.35 * pulse})`);
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.roundRect(-c.w / 2, -c.bodyH / 2, c.w, c.bodyH, 3);
+          ctx.fill();
+
+          // Shining highlight bar inside candle
+          ctx.fillStyle = `rgba(255, 255, 255, ${0.35 * pulse})`;
+          ctx.fillRect(-c.w * 0.22, -c.bodyH * 0.42, c.w * 0.22, c.bodyH * 0.84);
+
+          ctx.restore();
         });
-        requestAnimationFrame(draw);
+
+        // Floating golden diamond sparks
+        sparks.forEach(s => {
+          s.y -= s.vy;
+          if (s.y < -15) {
+            s.y = canvas.height + 15;
+            s.x = Math.random() * canvas.width;
+          }
+          const alpha = 0.25 + 0.75 * Math.abs(Math.sin(t * 2.1 + s.phase));
+          ctx.save();
+          ctx.translate(s.x, s.y);
+          ctx.rotate(Math.PI / 4);
+          ctx.fillStyle = `rgba(254, 240, 138, ${alpha})`;
+          ctx.shadowColor = 'rgba(250, 204, 21, 0.9)';
+          ctx.shadowBlur = 10;
+          ctx.fillRect(-s.r, -s.r, s.r * 2, s.r * 2);
+          ctx.restore();
+        });
+
+        requestAnimationFrame(render);
       }
-      draw();
+      render();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      startCandlestickCanvas('auth-candles-canvas');
+      startGlobalGoldenCandles();
 
       const params = new URLSearchParams(window.location.search);
       const refParam = params.get('ref');
