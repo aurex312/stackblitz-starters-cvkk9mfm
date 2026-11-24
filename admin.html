@@ -1,334 +1,209 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AUREX VAULT — Owner Admin Command Center</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        background-color: #06080c;
-        color: #f3f4f6;
-        font-family: 'Inter', sans-serif;
-      }
-      .mono {
-        font-family: 'JetBrains Mono', monospace;
-      }
-      .panel-card {
-        background: #111622;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-      }
-    </style>
-  </head>
-  <body class="min-h-screen p-4 sm:p-8">
-    <!-- Admin Login Gate -->
-    <div
-      id="admin-login-screen"
-      class="max-w-md mx-auto mt-16 panel-card rounded-3xl p-6 space-y-4 shadow-2xl"
-    >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-10 h-10 rounded-xl bg-amber-400 text-black font-extrabold flex items-center justify-center"
-        >
-          AV
-        </div>
-        <div>
-          <h1 class="text-lg font-extrabold text-white">
-            AUREX Owner Admin Panel
-          </h1>
-          <p class="text-xs text-gray-400">
-            Restricted Access • Deposit Orders & Wallet Control
-          </p>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AUREX VAULT — Owner Admin Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #06080C; color: #F3F4F6; font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .panel-card { background: #111622; border: 1px solid rgba(255,255,255,0.08); }
+  </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+
+  <!-- Admin Login Gate -->
+  <div id="admin-login-screen" class="max-w-md mx-auto mt-16 panel-card rounded-3xl p-6 space-y-4 shadow-2xl">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-amber-400 text-black font-extrabold flex items-center justify-center">AV</div>
+      <div>
+        <h1 class="text-lg font-extrabold text-white">AUREX Owner Admin Panel</h1>
+        <p class="text-xs text-gray-400">Restricted Access • Deposit Orders & Wallet Control</p>
       </div>
-      <form onsubmit="loginAdmin(event)" class="space-y-3">
-        <div>
-          <label class="text-xs text-gray-400 block mb-1"
-            >Admin Security Key</label
-          >
-          <input
-            id="admin-secret-input"
-            type="password"
-            required
-            placeholder="Enter Admin Key (default: AUREX-ADMIN-2026)"
-            class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm mono text-white outline-none"
-          />
-        </div>
-        <button
-          type="submit"
-          class="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider"
-        >
-          Unlock Admin Dashboard
+    </div>
+    <form onsubmit="loginAdmin(event)" class="space-y-3">
+      <div>
+        <label class="text-xs text-gray-400 block mb-1">Admin Security Key</label>
+        <input id="admin-secret-input" type="password" required placeholder="Enter Admin Key (default: AUREX-ADMIN-2026)" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm mono text-white outline-none" />
+      </div>
+      <button type="submit" class="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase tracking-wider">
+        Unlock Admin Dashboard
+      </button>
+      <p id="admin-login-error" class="hidden text-xs text-red-400 font-semibold"></p>
+    </form>
+  </div>
+
+  <!-- Main Admin Dashboard -->
+  <div id="admin-dashboard" class="hidden max-w-6xl mx-auto space-y-6">
+
+    <!-- Top Bar -->
+    <div class="panel-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">● Live Production Control</span>
+        <h1 class="text-xl font-extrabold text-white">AUREX VAULT — Admin Command Center</h1>
+      </div>
+      <div class="flex items-center gap-2.5">
+        <button onclick="loadAdminData()" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-amber-400">
+          ↻ Refresh Orders
         </button>
-        <p
-          id="admin-login-error"
-          class="hidden text-xs text-red-400 font-semibold"
-        ></p>
-      </form>
-    </div>
-
-    <!-- Main Admin Dashboard -->
-    <div id="admin-dashboard" class="hidden max-w-6xl mx-auto space-y-6">
-      <!-- Top Bar -->
-      <div
-        class="panel-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4"
-      >
-        <div>
-          <span
-            class="text-[11px] font-bold uppercase tracking-wider text-emerald-400"
-            >● Live Production Control</span
-          >
-          <h1 class="text-xl font-extrabold text-white">
-            AUREX VAULT — Admin Command Center
-          </h1>
-        </div>
-        <div class="flex items-center gap-2.5">
-          <button
-            onclick="loadAdminData()"
-            class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-amber-400"
-          >
-            ↻ Refresh Orders
-          </button>
-          <a
-            href="/"
-            target="_blank"
-            class="px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs font-semibold text-emerald-400"
-          >
-            Open Customer App ↗
-          </a>
-          <button
-            onclick="logoutAdmin()"
-            class="px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-
-      <!-- Stats Summary -->
-      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div class="panel-card rounded-2xl p-4">
-          <p class="text-xs text-gray-400">Pending Deposit Orders</p>
-          <p
-            id="stat-pending-count"
-            class="text-2xl font-extrabold mono text-amber-400 mt-1"
-          >
-            0
-          </p>
-        </div>
-        <div class="panel-card rounded-2xl p-4">
-          <p class="text-xs text-gray-400">Approved Deposits (USD)</p>
-          <p
-            id="stat-approved-volume"
-            class="text-2xl font-extrabold mono text-emerald-400 mt-1"
-          >
-            $0.00
-          </p>
-        </div>
-        <div class="panel-card rounded-2xl p-4">
-          <p class="text-xs text-gray-400">Total Registered Users</p>
-          <p
-            id="stat-users-count"
-            class="text-2xl font-extrabold mono text-white mt-1"
-          >
-            0
-          </p>
-        </div>
-        <div class="panel-card rounded-2xl p-4">
-          <p class="text-xs text-gray-400">Total Orders Logged</p>
-          <p
-            id="stat-total-orders"
-            class="text-2xl font-extrabold mono text-purple-300 mt-1"
-          >
-            0
-          </p>
-        </div>
-      </div>
-
-      <!-- Wallet QR Settings -->
-      <div class="panel-card rounded-2xl p-5 space-y-4">
-        <div class="flex items-center justify-between">
-          <h2
-            class="text-sm font-extrabold uppercase tracking-wider text-amber-400"
-          >
-            Receiving USDT Wallet Addresses (Live QR Sync)
-          </h2>
-          <span id="wallet-save-status" class="text-xs text-emerald-400"></span>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="space-y-1.5">
-            <label class="text-xs text-gray-400"
-              >USDT TRC20 (TRX Network)</label
-            >
-            <div class="flex gap-2">
-              <input
-                id="wallet-trc20"
-                type="text"
-                class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none"
-              />
-              <button
-                onclick="saveWallet('TRC20')"
-                class="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-          <div class="space-y-1.5">
-            <label class="text-xs text-gray-400"
-              >USDT BEP20 (BSC Network)</label
-            >
-            <div class="flex gap-2">
-              <input
-                id="wallet-bep20"
-                type="text"
-                class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none"
-              />
-              <button
-                onclick="saveWallet('BEP20')"
-                class="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- All Customer Deposit & Payout Orders Table -->
-      <div class="panel-card rounded-2xl p-5 space-y-4 overflow-x-auto">
-        <div class="flex items-center justify-between">
-          <h2
-            class="text-sm font-extrabold uppercase tracking-wider text-white"
-          >
-            Customer Deposit & Payout Orders
-          </h2>
-          <span class="text-xs text-gray-400"
-            >Auto-refreshes every 10 seconds</span
-          >
-        </div>
-
-        <table class="w-full text-left border-collapse text-xs">
-          <thead>
-            <tr
-              class="border-b border-white/10 text-gray-400 uppercase text-[10px]"
-            >
-              <th class="py-3 px-2">Order ID</th>
-              <th class="py-3 px-2">Date & Time</th>
-              <th class="py-3 px-2">Customer</th>
-              <th class="py-3 px-2">Type / Network</th>
-              <th class="py-3 px-2">Amount (USD)</th>
-              <th class="py-3 px-2">TxID / Wallet</th>
-              <th class="py-3 px-2">Status</th>
-              <th class="py-3 px-2 text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody
-            id="admin-orders-tbody"
-            class="divide-y divide-white/5"
-          ></tbody>
-        </table>
+        <a href="/" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs font-semibold text-emerald-400">
+          Open Customer App ↗
+        </a>
+        <button onclick="logoutAdmin()" class="px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400">
+          Logout
+        </button>
       </div>
     </div>
 
-    <script>
-      let adminSecret = localStorage.getItem('aurex_admin_secret') || '';
+    <!-- Stats Summary -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div class="panel-card rounded-2xl p-4">
+        <p class="text-xs text-gray-400">Pending Deposit Orders</p>
+        <p id="stat-pending-count" class="text-2xl font-extrabold mono text-amber-400 mt-1">0</p>
+      </div>
+      <div class="panel-card rounded-2xl p-4">
+        <p class="text-xs text-gray-400">Approved Deposits (USD)</p>
+        <p id="stat-approved-volume" class="text-2xl font-extrabold mono text-emerald-400 mt-1">$0.00</p>
+      </div>
+      <div class="panel-card rounded-2xl p-4">
+        <p class="text-xs text-gray-400">Total Registered Users</p>
+        <p id="stat-users-count" class="text-2xl font-extrabold mono text-white mt-1">0</p>
+      </div>
+      <div class="panel-card rounded-2xl p-4">
+        <p class="text-xs text-gray-400">Total Orders Logged</p>
+        <p id="stat-total-orders" class="text-2xl font-extrabold mono text-purple-300 mt-1">0</p>
+      </div>
+    </div>
 
-      async function loginAdmin(e) {
-        e.preventDefault();
-        adminSecret = document
-          .getElementById('admin-secret-input')
-          .value.trim();
-        const errBox = document.getElementById('admin-login-error');
-        errBox.classList.add('hidden');
-        const ok = await loadAdminData();
-        if (ok) {
-          localStorage.setItem('aurex_admin_secret', adminSecret);
-          document.getElementById('admin-login-screen').classList.add('hidden');
-          document.getElementById('admin-dashboard').classList.remove('hidden');
-        } else {
-          errBox.textContent =
-            'Invalid Admin Security Key! Default is AUREX-ADMIN-2026';
-          errBox.classList.remove('hidden');
-        }
+    <!-- Wallet QR Settings -->
+    <div class="panel-card rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">Receiving USDT Wallet Addresses (Live QR Sync)</h2>
+        <span id="wallet-save-status" class="text-xs text-emerald-400"></span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-1.5">
+          <label class="text-xs text-gray-400">USDT TRC20 (TRX Network)</label>
+          <div class="flex gap-2">
+            <input id="wallet-trc20" type="text" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
+            <button onclick="saveWallet('TRC20')" class="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs">Save</button>
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs text-gray-400">USDT BEP20 (BSC Network)</label>
+          <div class="flex gap-2">
+            <input id="wallet-bep20" type="text" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
+            <button onclick="saveWallet('BEP20')" class="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Customer Deposit & Payout Orders Table -->
+    <div class="panel-card rounded-2xl p-5 space-y-4 overflow-x-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-white">Customer Deposit & Payout Orders</h2>
+        <span class="text-xs text-gray-400">Auto-refreshes every 10 seconds</span>
+      </div>
+
+      <table class="w-full text-left border-collapse text-xs">
+        <thead>
+          <tr class="border-b border-white/10 text-gray-400 uppercase text-[10px]">
+            <th class="py-3 px-2">Order ID</th>
+            <th class="py-3 px-2">Date & Time</th>
+            <th class="py-3 px-2">Customer</th>
+            <th class="py-3 px-2">Type / Network</th>
+            <th class="py-3 px-2">Amount (USD)</th>
+            <th class="py-3 px-2">TxID / Wallet</th>
+            <th class="py-3 px-2">Status</th>
+            <th class="py-3 px-2 text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody id="admin-orders-tbody" class="divide-y divide-white/5"></tbody>
+      </table>
+    </div>
+
+    <!-- Customer Live Support Inbox -->
+    <div class="panel-card rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">💬 Customer Live Support Inbox</h2>
+        <span class="text-xs text-gray-400">Reply directly to customers on website</span>
+      </div>
+      <div id="admin-support-list" class="space-y-3 max-h-[380px] overflow-y-auto"></div>
+    </div>
+
+  </div>
+
+  <script>
+    let adminSecret = localStorage.getItem('aurex_admin_secret') || '';
+
+    async function loginAdmin(e) {
+      e.preventDefault();
+      adminSecret = document.getElementById('admin-secret-input').value.trim();
+      const errBox = document.getElementById('admin-login-error');
+      errBox.classList.add('hidden');
+      const ok = await loadAdminData();
+      if (ok) {
+        localStorage.setItem('aurex_admin_secret', adminSecret);
+        document.getElementById('admin-login-screen').classList.add('hidden');
+        document.getElementById('admin-dashboard').classList.remove('hidden');
+        loadAdminSupport();
+      } else {
+        errBox.textContent = 'Invalid Admin Security Key! Default is AUREX-ADMIN-2026';
+        errBox.classList.remove('hidden');
       }
+    }
 
-      function logoutAdmin() {
-        localStorage.removeItem('aurex_admin_secret');
-        location.reload();
-      }
+    function logoutAdmin() {
+      localStorage.removeItem('aurex_admin_secret');
+      location.reload();
+    }
 
-      async function loadAdminData() {
-        if (!adminSecret) return false;
-        try {
-          const res = await fetch('/api/admin/dashboard', {
-            headers: { 'x-admin-secret': adminSecret },
-          });
-          if (!res.ok) return false;
-          const data = await res.json();
+    async function loadAdminData() {
+      if (!adminSecret) return false;
+      try {
+        const res = await fetch('/api/admin/dashboard', {
+          headers: { 'x-admin-secret': adminSecret }
+        });
+        if (!res.ok) return false;
+        const data = await res.json();
 
-          document.getElementById('wallet-trc20').value =
-            data.networks?.TRC20 || '';
-          document.getElementById('wallet-bep20').value =
-            data.networks?.BEP20 || '';
+        document.getElementById('wallet-trc20').value = data.networks?.TRC20 || '';
+        document.getElementById('wallet-bep20').value = data.networks?.BEP20 || '';
 
-          const orders = data.orders || [];
-          const users = data.users || [];
+        const orders = data.orders || [];
+        const users = data.users || [];
 
-          const pendingDeposits = orders.filter(
-            (o) => o.order_type === 'Deposit' && o.status === 'Pending'
-          );
-          const approvedVolume = orders
-            .filter(
-              (o) => o.order_type === 'Deposit' && o.status === 'Approved'
-            )
-            .reduce((sum, o) => sum + Number(o.amount || 0), 0);
+        const pendingDeposits = orders.filter(o => o.order_type === 'Deposit' && o.status === 'Pending');
+        const approvedVolume = orders
+          .filter(o => o.order_type === 'Deposit' && o.status === 'Approved')
+          .reduce((sum, o) => sum + Number(o.amount || 0), 0);
 
-          document.getElementById('stat-pending-count').textContent =
-            pendingDeposits.length;
-          document.getElementById('stat-approved-volume').textContent =
-            '$' + approvedVolume.toFixed(2);
-          document.getElementById('stat-users-count').textContent =
-            users.length;
-          document.getElementById('stat-total-orders').textContent =
-            orders.length;
+        document.getElementById('stat-pending-count').textContent = pendingDeposits.length;
+        document.getElementById('stat-approved-volume').textContent = '$' + approvedVolume.toFixed(2);
+        document.getElementById('stat-users-count').textContent = users.length;
+        document.getElementById('stat-total-orders').textContent = orders.length;
 
-          const tbody = document.getElementById('admin-orders-tbody');
-          tbody.innerHTML = orders
-            .map((o) => {
-              const isPending = o.status === 'Pending';
-              const badge =
-                o.status === 'Approved'
-                  ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                  : o.status === 'Rejected'
-                  ? 'bg-red-500/15 text-red-400 border-red-500/30'
-                  : 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+        const tbody = document.getElementById('admin-orders-tbody');
+        tbody.innerHTML = orders.map(o => {
+          const isPending = o.status === 'Pending';
+          const badge = o.status === 'Approved'
+            ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+            : o.status === 'Rejected'
+            ? 'bg-red-500/15 text-red-400 border-red-500/30'
+            : 'bg-amber-500/15 text-amber-300 border-amber-500/30';
 
-              return `
+          return `
             <tr class="hover:bg-white/[0.02]">
-              <td class="py-3 px-2 mono font-bold text-amber-400">${
-                o.order_id
-              }</td>
+              <td class="py-3 px-2 mono font-bold text-amber-400">${o.order_id}</td>
               <td class="py-3 px-2 mono text-gray-300">${o.created_at}</td>
-              <td class="py-3 px-2 mono text-white">${o.country_flag} ${
-                o.dial_code
-              } ${o.phone}</td>
-              <td class="py-3 px-2 text-gray-300">${
-                o.order_type
-              } • <span class="mono text-amber-300">${o.network}</span></td>
-              <td class="py-3 px-2 mono font-bold text-emerald-400">$${Number(
-                o.amount
-              ).toFixed(2)}</td>
-              <td class="py-3 px-2 mono text-gray-400 max-w-[160px] truncate" title="${
-                o.txid
-              }">${o.txid}</td>
-              <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badge}">${
-                o.status
-              }</span></td>
+              <td class="py-3 px-2 mono text-white">${o.country_flag} ${o.dial_code} ${o.phone}</td>
+              <td class="py-3 px-2 text-gray-300">${o.order_type} • <span class="mono text-amber-300">${o.network}</span></td>
+              <td class="py-3 px-2 mono font-bold text-emerald-400">$${Number(o.amount).toFixed(2)}</td>
+              <td class="py-3 px-2 mono text-gray-400 max-w-[160px] truncate" title="${o.txid}">${o.txid}</td>
+              <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badge}">${o.status}</span></td>
               <td class="py-3 px-2 text-right space-x-1.5">
                 ${
                   isPending
@@ -339,70 +214,113 @@
               </td>
             </tr>
           `;
-            })
-            .join('');
+        }).join('');
 
-          return true;
-        } catch (err) {
-          return false;
-        }
+        return true;
+      } catch (err) {
+        return false;
       }
+    }
 
-      async function handleOrderAction(orderId, action) {
-        const res = await fetch(`/api/admin/orders/${orderId}/action`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-admin-secret': adminSecret,
-          },
-          body: JSON.stringify({ action }),
+    async function loadAdminSupport() {
+      if (!adminSecret) return;
+      try {
+        const res = await fetch('/api/admin/support', {
+          headers: { 'x-admin-secret': adminSecret }
         });
-        if (res.ok) {
-          loadAdminData();
+        if (!res.ok) return;
+        const data = await res.json();
+        const msgs = data.messages || [];
+        const list = document.getElementById('admin-support-list');
+        if (!msgs.length) {
+          list.innerHTML = `<p class="text-xs text-gray-500">No customer support messages yet.</p>`;
+          return;
         }
-      }
+        list.innerHTML = msgs.map(m => `
+          <div class="bg-black/40 border border-white/10 rounded-xl p-3 space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="mono font-bold ${m.sender === 'admin' ? 'text-emerald-400' : 'text-amber-400'}">
+                ${m.sender === 'admin' ? '🛡️ Admin Reply → ' + m.user_key : m.country_flag + ' ' + m.dial_code + ' ' + m.phone}
+              </span>
+              <span class="mono text-[10px] text-gray-400">${m.created_at}</span>
+            </div>
+            <p class="text-gray-200">${m.message}</p>
+            ${m.sender === 'user' ? `
+              <div class="flex gap-2 pt-1">
+                <input id="reply-input-${m.id}" type="text" placeholder="Type reply to ${m.phone}..." class="flex-1 bg-black/60 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none" />
+                <button onclick="sendAdminReply('${m.user_key}', ${m.id})" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs">Reply</button>
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+      } catch (err) {}
+    }
 
-      async function saveWallet(network) {
-        const address = document
-          .getElementById(network === 'TRC20' ? 'wallet-trc20' : 'wallet-bep20')
-          .value.trim();
-        const res = await fetch('/api/admin/wallets', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-admin-secret': adminSecret,
-          },
-          body: JSON.stringify({ network, address }),
-        });
-        if (res.ok) {
-          const st = document.getElementById('wallet-save-status');
-          st.textContent = `✓ ${network} wallet updated`;
-          setTimeout(() => (st.textContent = ''), 3000);
-        }
-      }
-
-      window.addEventListener('DOMContentLoaded', async () => {
-        if (adminSecret) {
-          const ok = await loadAdminData();
-          if (ok) {
-            document
-              .getElementById('admin-login-screen')
-              .classList.add('hidden');
-            document
-              .getElementById('admin-dashboard')
-              .classList.remove('hidden');
-          }
-        }
-        setInterval(() => {
-          if (
-            !document
-              .getElementById('admin-dashboard')
-              .classList.contains('hidden')
-          ) {
-            loadAdminData();
-          }
-        }, 10000);
+    async function sendAdminReply(userKey, msgId) {
+      const input = document.getElementById(`reply-input-${msgId}`);
+      const message = input?.value.trim();
+      if (!message) return;
+      const res = await fetch('/api/admin/support/reply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': adminSecret
+        },
+        body: JSON.stringify({ userKey, message })
       });
-    </script>
-  </body>
+      if (res.ok) {
+        input.value = '';
+        loadAdminSupport();
+      }
+    }
+
+    async function handleOrderAction(orderId, action) {
+      const res = await fetch(`/api/admin/orders/${orderId}/action`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': adminSecret
+        },
+        body: JSON.stringify({ action })
+      });
+      if (res.ok) {
+        loadAdminData();
+      }
+    }
+
+    async function saveWallet(network) {
+      const address = document.getElementById(network === 'TRC20' ? 'wallet-trc20' : 'wallet-bep20').value.trim();
+      const res = await fetch('/api/admin/wallets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': adminSecret
+        },
+        body: JSON.stringify({ network, address })
+      });
+      if (res.ok) {
+        const st = document.getElementById('wallet-save-status');
+        st.textContent = `✓ ${network} wallet updated`;
+        setTimeout(() => (st.textContent = ''), 3000);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      if (adminSecret) {
+        const ok = await loadAdminData();
+        if (ok) {
+          document.getElementById('admin-login-screen').classList.add('hidden');
+          document.getElementById('admin-dashboard').classList.remove('hidden');
+          loadAdminSupport();
+        }
+      }
+      setInterval(() => {
+        if (!document.getElementById('admin-dashboard').classList.contains('hidden')) {
+          loadAdminData();
+          loadAdminSupport();
+        }
+      }, 10000);
+    });
+  </script>
+</body>
 </html>

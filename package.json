@@ -1,14 +1,14 @@
 {
   "name": "aurex-vault-platform",
-  "version": "2.0.0",
-  "description": "AUREX VAULT Customer App + Separate Admin Panel with Order Tracking",
+  "version": "2.1.0",
+  "description": "AUREX VAULT Customer App + Separate Admin Panel with Live Support",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+  "start": "node server.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "sqlite3": "^5.1.7"
+  "cors": "^2.8.5",
+  "express": "^4.21.2",
+  "sql.js": "^1.12.0"
   }
-}
+  }
