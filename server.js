@@ -115,7 +115,6 @@ async function initDatabase() {
 
   db.run(`
     CREATE TABLE IF NOT EXISTS orders (
-      rowid INTEGER PRIMARY KEY AUTOINCREMENT,
       order_id TEXT PRIMARY KEY,
       user_key TEXT NOT NULL,
       country_flag TEXT NOT NULL,
@@ -168,7 +167,7 @@ function getUserSnapshot(dialCode, phone) {
   });
 
   const orders = queryAll(
-    `SELECT * FROM orders WHERE user_key = ? ORDER BY rowid DESC LIMIT 30`,
+    `SELECT * FROM orders WHERE user_key = ? ORDER BY created_at DESC LIMIT 30`,
     [userKey]
   );
 
@@ -427,7 +426,7 @@ app.post('/api/rewards/claim', (req, res) => {
 
 app.get('/api/admin/dashboard', verifyAdmin, (req, res) => {
   try {
-    const orders = queryAll(`SELECT * FROM orders ORDER BY rowid DESC LIMIT 100`);
+    const orders = queryAll(`SELECT * FROM orders ORDER BY created_at DESC LIMIT 100`);
     const users = queryAll(`SELECT id, full_name, country_flag, dial_code, phone, ref_code, invited_by, active_invites, balance, vip_level, plan_days_left, created_at FROM users ORDER BY id DESC LIMIT 100`);
     const sRows = queryAll(`SELECT key, value FROM settings`);
     const networks = {};
