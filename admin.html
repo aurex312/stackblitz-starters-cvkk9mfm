@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -20,7 +19,7 @@
       <div class="w-10 h-10 rounded-xl bg-amber-400 text-black font-extrabold flex items-center justify-center">AV</div>
       <div>
         <h1 class="text-lg font-extrabold text-white">AUREX Owner Admin Panel</h1>
-        <p class="text-xs text-gray-400">Deposit Screenshots, 7-Digit IDs & Media Chat</p>
+        <p class="text-xs text-gray-400">Deposit Screenshots, 7-Digit IDs &amp; Media Chat</p>
       </div>
     </div>
     <form onsubmit="loginAdmin(event)" class="space-y-3">
@@ -37,6 +36,7 @@
       <div>
         <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">● Live Production Control</span>
         <h1 class="text-xl font-extrabold text-white">AUREX VAULT — Admin Command Center</h1>
+        <p id="admin-24h-clock" class="text-[11px] mono text-amber-300 mt-0.5"></p>
       </div>
       <div class="flex items-center gap-2.5">
         <button onclick="loadAdminData(); loadAdminSupport(false);" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-amber-400">↻ Refresh</button>
@@ -64,10 +64,23 @@
       </div>
     </div>
 
+    <!-- Search Bar by User ID or Order ID -->
+    <div class="panel-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex-1 min-w-[240px]">
+        <label class="text-[11px] font-bold uppercase tracking-wider text-amber-400 block mb-1">
+          Search by User ID (e.g. 9181780) or Order Number (e.g. DEP-00001 / WDR-00001)
+        </label>
+        <input id="admin-search-input" type="text" oninput="renderAdminTables()" placeholder="Search UID, Order ID, Name, or Phone..." class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2 text-xs mono text-white outline-none" />
+      </div>
+      <button type="button" onclick="document.getElementById('admin-search-input').value=''; renderAdminTables();" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-gray-200 mt-4 sm:mt-5">
+        Clear
+      </button>
+    </div>
+
     <!-- Receiving USDT Wallets & Official Telegram Links -->
     <div class="panel-card rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">Receiving USDT Wallets & Telegram Links</h2>
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">Receiving USDT Wallets &amp; Telegram Links</h2>
         <span id="wallet-save-status" class="text-xs text-emerald-400"></span>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -90,20 +103,20 @@
       </div>
       <div class="flex justify-end">
         <button onclick="saveSettings()" class="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase">
-          Save Wallets & Telegram Settings
+          Save Wallets &amp; Telegram Settings
         </button>
       </div>
     </div>
 
     <!-- Orders Table with Screenshot Proof Viewer -->
     <div class="panel-card rounded-2xl p-5 space-y-4 overflow-x-auto">
-      <h2 class="text-sm font-extrabold uppercase tracking-wider text-white">Customer Deposit & Payout Orders</h2>
+      <h2 class="text-sm font-extrabold uppercase tracking-wider text-white">Customer Deposit &amp; Payout Orders (24-Hour Time)</h2>
       <table class="w-full text-left border-collapse text-xs">
         <thead>
           <tr class="border-b border-white/10 text-gray-400 uppercase text-[10px]">
             <th class="py-3 px-2">Order ID</th>
             <th class="py-3 px-2">User ID</th>
-            <th class="py-3 px-2">Date & Time</th>
+            <th class="py-3 px-2">Date &amp; Time (24H)</th>
             <th class="py-3 px-2">Customer</th>
             <th class="py-3 px-2">Type / Net</th>
             <th class="py-3 px-2">Amount</th>
@@ -116,15 +129,15 @@
       </table>
     </div>
 
-    <!-- Users & Spin/Channel Reward Status -->
+    <!-- Users & Spin/Channel Reward Status + Balance Edit -->
     <div class="panel-card rounded-2xl p-5 space-y-4 overflow-x-auto">
-      <h2 class="text-sm font-extrabold uppercase tracking-wider text-cyan-300">Users, VIP & Spin / Channel Reward Status</h2>
+      <h2 class="text-sm font-extrabold uppercase tracking-wider text-cyan-300">Users, VIP, Balance Edit &amp; Spin / Channel Reward Status</h2>
       <table class="w-full text-left border-collapse text-xs">
         <thead>
           <tr class="border-b border-white/10 text-gray-400 uppercase text-[10px]">
             <th class="py-3 px-2">UID</th>
-            <th class="py-3 px-2">Name & Phone</th>
-            <th class="py-3 px-2">Balance</th>
+            <th class="py-3 px-2">Name &amp; Phone</th>
+            <th class="py-3 px-2">Balance &amp; Edit</th>
             <th class="py-3 px-2">Depositor / VIP</th>
             <th class="py-3 px-2">Spins / Held Spin</th>
             <th class="py-3 px-2">Channel Reward</th>
@@ -134,11 +147,20 @@
       </table>
     </div>
 
+    <!-- VIP Plans Editor -->
+    <div class="panel-card rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-emerald-400">VIP Plans Editor (Price / Days / Daily Return)</h2>
+        <span id="plan-save-status" class="text-xs text-emerald-400"></span>
+      </div>
+      <div id="admin-plans-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs"></div>
+    </div>
+
     <!-- Live Support Inbox with Threads + Photo + Video + Sound -->
     <div class="panel-card rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between">
         <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">💬 Customer Support Inbox (Text + Photo + Video)</h2>
-        <span class="text-xs text-gray-400">Instant chime on new message</span>
+        <span class="text-xs text-gray-400">Instant chime on new message • 24H Time</span>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div id="admin-support-threads" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div>
@@ -183,6 +205,34 @@
     let activeThreadLabel = '';
     let lastThreadTotalMsgs = 0;
     let adminMediaDraft = { type: null, data: null, name: '' };
+    let latestAdminSnapshot = { orders: [], users: [], plans: [] };
+
+    function format24HourDateTime(val) {
+      if (!val) return '-';
+      const d = new Date(val);
+      if (Number.isNaN(d.getTime())) return String(val);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      const sec = String(d.getSeconds()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd} ${hh}:${min}:${sec}`;
+    }
+
+    function format24HourTimeOnly(val) {
+      if (!val) return '';
+      const d = new Date(val);
+      if (Number.isNaN(d.getTime())) return String(val);
+      return d.toLocaleTimeString('en-GB', { hour12: false });
+    }
+
+    setInterval(() => {
+      const clockEl = document.getElementById('admin-24h-clock');
+      if (clockEl) {
+        clockEl.textContent = `24-Hour Server Clock: ${format24HourDateTime(new Date())}`;
+      }
+    }, 1000);
 
     function playAdminChime(freq = 880) {
       try {
@@ -244,9 +294,16 @@
 
         const orders = data.orders || [];
         const users = data.users || [];
-        const pendingDeposits = orders.filter(o => o.type === 'deposit' && o.status === 'pending');
+        const plans = data.plans || data.vip_plans || [];
+        latestAdminSnapshot = { orders, users, plans };
+
+        const pendingDeposits = orders.filter(
+          o => String(o.type || o.order_type || '').toLowerCase() === 'deposit' && String(o.status || '').toLowerCase() === 'pending'
+        );
         const approvedVolume = orders
-          .filter(o => o.type === 'deposit' && o.status === 'approved')
+          .filter(
+            o => String(o.type || o.order_type || '').toLowerCase() === 'deposit' && String(o.status || '').toLowerCase() === 'approved'
+          )
           .reduce((sum, o) => sum + Number(o.amount || 0), 0);
 
         document.getElementById('stat-pending-count').textContent = pendingDeposits.length;
@@ -254,66 +311,201 @@
         document.getElementById('stat-users-count').textContent = users.length;
         document.getElementById('stat-total-orders').textContent = orders.length;
 
-        const userMap = {};
-        users.forEach(u => { userMap[u.id] = u; });
-
-        const tbody = document.getElementById('admin-orders-tbody');
-        tbody.innerHTML = orders.map(o => {
-          const isPending = o.status === 'pending';
-          const u = userMap[o.user_id] || {};
-          const badge = o.status === 'approved'
-            ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-            : o.status === 'rejected'
-            ? 'bg-red-500/15 text-red-400 border-red-500/30'
-            : 'bg-amber-500/15 text-amber-300 border-amber-500/30';
-
-          const proofCell = o.proof_data
-            ? `<button onclick="openProofModal('${o.proof_data}')" class="px-2 py-1 rounded bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-bold text-[10px]">View Screenshot</button>`
-            : `<span class="mono text-gray-400 truncate max-w-[140px] inline-block">${o.wallet_address || '-'}</span>`;
-
-          return `
-            <tr class="hover:bg-white/[0.02]">
-              <td class="py-3 px-2 mono font-bold text-amber-400">${o.order_code}</td>
-              <td class="py-3 px-2 mono font-bold text-cyan-300">#${o.user_uid || '0000000'}</td>
-              <td class="py-3 px-2 mono text-gray-300">${new Date(o.created_at).toLocaleString()}</td>
-              <td class="py-3 px-2 mono text-white">${u.full_name || ''} (${u.phone || ''})</td>
-              <td class="py-3 px-2 text-gray-300">${String(o.type).toUpperCase()} • <span class="mono text-amber-300">${o.network || '-'}</span></td>
-              <td class="py-3 px-2 mono font-bold text-emerald-400">$${Number(o.amount).toFixed(2)}</td>
-              <td class="py-3 px-2">${proofCell}</td>
-              <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase ${badge}">${o.status}</span></td>
-              <td class="py-3 px-2 text-right space-x-1.5">
-                ${
-                  isPending
-                    ? `<button onclick="handleOrderAction(${o.id}, 'approve')" class="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-bold text-[11px]">Approve</button>
-                       <button onclick="handleOrderAction(${o.id}, 'reject')" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/40 font-bold text-[11px]">Reject</button>`
-                    : `<span class="text-gray-500 text-[11px]">Processed</span>`
-                }
-              </td>
-            </tr>
-          `;
-        }).join('');
-
-        const usersTbody = document.getElementById('admin-users-tbody');
-        usersTbody.innerHTML = users.map(u => `
-          <tr class="hover:bg-white/[0.02]">
-            <td class="py-2.5 px-2 mono font-bold text-cyan-300">#${u.user_uid}</td>
-            <td class="py-2.5 px-2 text-white">${u.full_name} <span class="mono text-gray-400">(${u.phone})</span></td>
-            <td class="py-2.5 px-2 mono font-bold text-emerald-400">$${Number(u.balance || 0).toFixed(2)}</td>
-            <td class="py-2.5 px-2 mono text-amber-300">
-              ${u.first_deposit_done ? 'Depositor' : 'Locked'} • VIP ${u.vip_level || 0} (${u.has_active_plan ? 'Active Plan' : 'No Active Plan'})
-            </td>
-            <td class="py-2.5 px-2 mono text-gray-200">
-              Spins: ${u.spins_left} • Held Spin: $${Number(u.pending_spin_reward || 0).toFixed(2)}
-            </td>
-            <td class="py-2.5 px-2 mono text-xs">
-              ${u.channel_reward_claimed ? `<span class="text-emerald-400">Claimed ($0.50) ${u.telegram_username || ''}</span>` : `<span class="text-gray-500">Unclaimed</span>`}
-            </td>
-          </tr>
-        `).join('');
-
+        renderAdminTables();
+        renderPlansEditor(plans);
         return true;
       } catch (err) {
         return false;
+      }
+    }
+
+    function renderAdminTables() {
+      const q = (document.getElementById('admin-search-input')?.value || '').trim().toLowerCase();
+      const orders = latestAdminSnapshot.orders || [];
+      const users = latestAdminSnapshot.users || [];
+
+      const userMap = {};
+      users.forEach(u => {
+        userMap[u.id] = u;
+        if (u.user_uid) userMap[String(u.user_uid)] = u;
+      });
+
+      const filteredOrders = orders.filter(o => {
+        if (!q) return true;
+        const u = userMap[o.user_id] || userMap[String(o.user_uid)] || {};
+        return (
+          String(o.order_code || o.order_id || '').toLowerCase().includes(q) ||
+          String(o.user_uid || u.user_uid || '').toLowerCase().includes(q) ||
+          String(u.full_name || '').toLowerCase().includes(q) ||
+          String(u.phone || '').toLowerCase().includes(q)
+        );
+      });
+
+      const tbody = document.getElementById('admin-orders-tbody');
+      tbody.innerHTML = filteredOrders.length
+        ? filteredOrders.map(o => {
+            const statusLower = String(o.status || '').toLowerCase();
+            const isPending = statusLower === 'pending';
+            const u = userMap[o.user_id] || userMap[String(o.user_uid)] || {};
+            const orderCode = o.order_code || o.order_id || ('#' + o.id);
+            const uid = o.user_uid || u.user_uid || '0000000';
+            const orderType = o.type || o.order_type || 'order';
+
+            const badge = statusLower === 'approved'
+              ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+              : statusLower === 'rejected'
+              ? 'bg-red-500/15 text-red-400 border-red-500/30'
+              : 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+
+            const proofCell = o.proof_data
+              ? `<button onclick="openProofModal('${o.proof_data}')" class="px-2 py-1 rounded bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-bold text-[10px]">View Screenshot</button>`
+              : `<span class="mono text-gray-400 truncate max-w-[140px] inline-block">${o.wallet_address || '-'}</span>`;
+
+            return `
+              <tr class="hover:bg-white/[0.02]">
+                <td class="py-3 px-2 mono font-bold text-amber-400">${orderCode}</td>
+                <td class="py-3 px-2 mono font-bold text-cyan-300">#${uid}</td>
+                <td class="py-3 px-2 mono text-gray-300">${format24HourDateTime(o.created_at_iso || o.created_at)}</td>
+                <td class="py-3 px-2 mono text-white">${u.full_name || ''} (${u.phone || ''})</td>
+                <td class="py-3 px-2 text-gray-300">${String(orderType).toUpperCase()} • <span class="mono text-amber-300">${o.network || '-'}</span></td>
+                <td class="py-3 px-2 mono font-bold text-emerald-400">$${Number(o.amount || 0).toFixed(2)}</td>
+                <td class="py-3 px-2">${proofCell}</td>
+                <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase ${badge}">${o.status}</span></td>
+                <td class="py-3 px-2 text-right space-x-1.5">
+                  ${
+                    isPending
+                      ? `<button onclick="handleOrderAction(${o.id}, 'approve')" class="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-bold text-[11px]">Approve</button>
+                         <button onclick="handleOrderAction(${o.id}, 'reject')" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/40 font-bold text-[11px]">Reject</button>`
+                      : `<span class="text-gray-500 text-[11px]">Processed</span>`
+                  }
+                </td>
+              </tr>
+            `;
+          }).join('')
+        : `<tr><td colspan="9" class="py-4 text-center text-gray-500">No matching orders found.</td></tr>`;
+
+      const filteredUsers = users.filter(u => {
+        if (!q) return true;
+        return (
+          String(u.user_uid || '').toLowerCase().includes(q) ||
+          String(u.full_name || '').toLowerCase().includes(q) ||
+          String(u.phone || '').toLowerCase().includes(q)
+        );
+      });
+
+      const usersTbody = document.getElementById('admin-users-tbody');
+      usersTbody.innerHTML = filteredUsers.length
+        ? filteredUsers.map(u => `
+            <tr class="hover:bg-white/[0.02]">
+              <td class="py-2.5 px-2 mono font-bold text-cyan-300">#${u.user_uid}</td>
+              <td class="py-2.5 px-2 text-white">${u.full_name} <span class="mono text-gray-400">(${u.phone})</span></td>
+              <td class="py-2.5 px-2 mono">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-emerald-400 mr-1">$${Number(u.balance || 0).toFixed(2)}</span>
+                  <input id="edit-bal-${u.id}" type="number" step="0.01" value="${Number(u.balance || 0).toFixed(2)}" class="w-24 bg-black/65 border border-white/15 rounded-lg px-2 py-1 text-xs mono text-white outline-none" />
+                  <button type="button" onclick="updateUserBalance(${u.id})" class="px-2.5 py-1 rounded-lg bg-amber-400 text-black font-bold text-[11px]">Save Balance</button>
+                </div>
+              </td>
+              <td class="py-2.5 px-2 mono text-amber-300">
+                ${(u.first_deposit_done || u.has_deposited) ? 'Depositor' : 'Locked'} • VIP ${u.vip_level || 0}
+              </td>
+              <td class="py-2.5 px-2 mono text-gray-200">
+                Spins: ${u.spins_left ?? 0} • Held Spin: $${Number(u.pending_spin_reward || 0).toFixed(2)}
+              </td>
+              <td class="py-2.5 px-2 mono text-xs">
+                ${u.channel_reward_claimed ? `<span class="text-emerald-400">Claimed ($0.50) ${u.telegram_username || ''}</span>` : `<span class="text-gray-500">Unclaimed</span>`}
+              </td>
+            </tr>
+          `).join('')
+        : `<tr><td colspan="6" class="py-4 text-center text-gray-500">No matching users found.</td></tr>`;
+    }
+
+    function renderPlansEditor(plans) {
+      const grid = document.getElementById('admin-plans-grid');
+      if (!grid) return;
+      if (!plans.length) {
+        grid.innerHTML = `<p class="text-gray-500">VIP plans list will appear after server overview loads.</p>`;
+        return;
+      }
+      grid.innerHTML = plans.map(p => `
+        <div class="bg-black/45 border border-white/10 rounded-2xl p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-amber-300">VIP ${p.level}</span>
+            <span class="mono text-[10px] text-gray-400">Min Invites: ${p.min_invites || 0}</span>
+          </div>
+          <div>
+            <label class="text-[10px] text-gray-400 block mb-0.5">Plan Name</label>
+            <input id="plan-name-${p.level}" type="text" value="${p.name || ''}" class="w-full bg-black/65 border border-white/15 rounded-lg px-2.5 py-1 text-xs text-white outline-none" />
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="text-[10px] text-gray-400 block mb-0.5">Price ($)</label>
+              <input id="plan-price-${p.level}" type="number" step="0.01" value="${Number(p.amount ?? p.price ?? 0)}" class="w-full bg-black/65 border border-white/15 rounded-lg px-2 py-1 text-xs mono text-white outline-none" />
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 block mb-0.5">Days</label>
+              <input id="plan-days-${p.level}" type="number" value="${Number(p.days || 20)}" class="w-full bg-black/65 border border-white/15 rounded-lg px-2 py-1 text-xs mono text-white outline-none" />
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 block mb-0.5">Daily ($)</label>
+              <input id="plan-daily-${p.level}" type="number" step="0.01" value="${Number(p.daily_return ?? p.daily ?? 0)}" class="w-full bg-black/65 border border-white/15 rounded-lg px-2 py-1 text-xs mono text-emerald-400 outline-none" />
+            </div>
+          </div>
+          <button type="button" onclick="saveVipPlan(${p.level})" class="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-[11px] uppercase">
+            Save VIP ${p.level} Plan
+          </button>
+        </div>
+      `).join('');
+    }
+
+    async function updateUserBalance(userId) {
+      const input = document.getElementById(`edit-bal-${userId}`);
+      if (!input) return;
+      const amount = Number(input.value);
+      if (!Number.isFinite(amount) || amount < 0) {
+        alert('Please enter a valid non-negative balance.');
+        return;
+      }
+      const res = await fetch(`/api/admin/users/${userId}/balance`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': adminSecret
+        },
+        body: JSON.stringify({ mode: 'set', amount })
+      });
+      if (res.ok) {
+        playAdminChime(860);
+        await loadAdminData();
+      } else {
+        alert('Failed to update user balance.');
+      }
+    }
+
+    async function saveVipPlan(level) {
+      const name = document.getElementById(`plan-name-${level}`)?.value.trim();
+      const amount = Number(document.getElementById(`plan-price-${level}`)?.value);
+      const days = Number(document.getElementById(`plan-days-${level}`)?.value);
+      const daily_return = Number(document.getElementById(`plan-daily-${level}`)?.value);
+
+      const res = await fetch(`/api/admin/vip/plans/${level}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': adminSecret
+        },
+        body: JSON.stringify({ name, amount, days, daily_return })
+      });
+      if (res.ok) {
+        playAdminChime(920);
+        const st = document.getElementById('plan-save-status');
+        if (st) {
+          st.textContent = `✓ VIP ${level} plan saved`;
+          setTimeout(() => (st.textContent = ''), 2500);
+        }
+        await loadAdminData();
+      } else {
+        alert(`Failed to update VIP ${level} plan.`);
       }
     }
 
@@ -399,6 +591,7 @@
 
       container.innerHTML = msgs.map(m => {
         const isAdmin = m.sender === 'admin';
+        const msgText = m.message_text || m.message || '';
         let mediaBlock = '';
         if (m.media_type === 'image' && m.media_data) {
           mediaBlock = `<img src="${m.media_data}" class="mt-1.5 rounded-xl max-h-44 object-contain border border-white/15 bg-black" />`;
@@ -409,10 +602,10 @@
           <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'}">
             <div class="${isAdmin ? 'bg-emerald-500/15 border border-emerald-500/35 text-emerald-100' : 'bg-white/5 border border-white/10 text-gray-200'} rounded-2xl px-3 py-2 max-w-[85%]">
               <p class="text-[10px] font-bold ${isAdmin ? 'text-emerald-400' : 'text-amber-400'}">${isAdmin ? '🛡️ Admin' : 'User #' + m.user_uid}</p>
-              ${m.message_text ? `<p class="mt-0.5">${m.message_text}</p>` : ''}
+              ${msgText ? `<p class="mt-0.5">${msgText}</p>` : ''}
               ${mediaBlock}
             </div>
-            <span class="text-[9px] text-gray-500 mt-0.5 px-1">${new Date(m.created_at).toLocaleTimeString()}</span>
+            <span class="text-[9px] text-gray-500 mt-0.5 px-1">${format24HourTimeOnly(m.created_at_iso || m.created_at)}</span>
           </div>
         `;
       }).join('');
@@ -435,7 +628,9 @@
         },
         body: JSON.stringify({
           user_id: activeThreadUserId,
+          userId: activeThreadUserId,
           message_text: messageText,
+          message: messageText,
           media_type: adminMediaDraft.type,
           media_data: adminMediaDraft.data
         })
