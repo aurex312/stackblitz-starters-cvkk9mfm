@@ -39,7 +39,7 @@
         <p id="admin-24h-clock" class="text-[11px] mono text-amber-300 mt-0.5"></p>
       </div>
       <div class="flex items-center gap-2.5">
-        <button onclick="loadAdminData(); loadAdminSupport(false);" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-amber-400">↻ Refresh</button>
+        <button onclick="loadAdminData(true); loadAdminSupport(false);" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-amber-400">↻ Refresh</button>
         <a href="/" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs font-semibold text-emerald-400">Customer App ↗</a>
         <button onclick="logoutAdmin()" class="px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400">Logout</button>
       </div>
@@ -150,7 +150,7 @@
       </table>
     </div>
 
-    <!-- VIP Plans Editor Only -->
+    <!-- VIP Plans Editor -->
     <div class="panel-card rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between">
         <h2 class="text-sm font-extrabold uppercase tracking-wider text-emerald-400">VIP Plans Editor (Price / Days / Daily Return)</h2>
@@ -209,6 +209,19 @@
     let lastThreadTotalMsgs = 0;
     let adminMediaDraft = { type: null, data: null, name: '' };
     let latestAdminSnapshot = { orders: [], users: [], plans: [] };
+    let plansGridInitialized = false;
+
+    function isEditingAnyField() {
+      const active = document.activeElement;
+      if (!active) return false;
+      const tag = active.tagName;
+      if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') return false;
+      if (active.id === 'admin-search-input' || active.id === 'admin-reply-input') return false;
+      return Boolean(
+        active.closest('#admin-orders-tbody, #admin-users-tbody, #admin-plans-grid, #wallet-trc20, #wallet-bep20, #tg-channel, #tg-support') ||
+        ['wallet-trc20', 'wallet-bep20', 'tg-channel', 'tg-support'].includes(active.id)
+      );
+    }
 
     function format24HourDateTime(val) {
       if (!val) return '-';
@@ -264,7 +277,7 @@
       adminSecret = document.getElementById('admin-secret-input').value.trim();
       const errBox = document.getElementById('admin-login-error');
       errBox.classList.add('hidden');
-      const ok = await loadAdminData();
+      const ok = await loadAdminData(true);
       if (ok) {
         localStorage.setItem('aurex_admin_secret', adminSecret);
         document.getElementById('admin-login-screen').classList.add('hidden');
@@ -281,7 +294,7 @@
       location.reload();
     }
 
-    async function loadAdminData() {
+    async function loadAdminData(forceRender = false) {
       if (!adminSecret) return false;
       try {
         const res = await fetch('/api/admin/overview', {
@@ -289,11 +302,6 @@
         });
         if (!res.ok) return false;
         const data = await res.json();
-
-        document.getElementById('wallet-trc20').value = data.wallets?.TRC20 || '';
-        document.getElementById('wallet-bep20').value = data.wallets?.BEP20 || '';
-        document.getElementById('tg-channel').value = data.telegram?.channel || 'https://t.me/AurexVaultOfficial';
-        document.getElementById('tg-support').value = data.telegram?.support || 'https://t.me/AurexVaultSupport';
 
         const orders = data.orders || [];
         const users = data.users || [];
@@ -314,8 +322,28 @@
         document.getElementById('stat-users-count').textContent = users.length;
         document.getElementById('stat-total-orders').textContent = orders.length;
 
+        if (!forceRender && isEditingAnyField()) {
+          return true;
+        }
+
+        if (document.activeElement?.id !== 'wallet-trc20') {
+          document.getElementById('wallet-trc20').value = data.wallets?.TRC20 || '';
+        }
+        if (document.activeElement?.id !== 'wallet-bep20') {
+          document.getElementById('wallet-bep20').value = data.wallets?.BEP20 || '';
+        }
+        if (document.activeElement?.id !== 'tg-channel') {
+          document.getElementById('tg-channel').value = data.telegram?.channel || 'https://t.me/AurexVaultOfficial';
+        }
+        if (document.activeElement?.id !== 'tg-support') {
+          document.getElementById('tg-support').value = data.telegram?.support || 'https://t.me/AurexVaultSupport';
+        }
+
         renderAdminTables();
-        renderPlansEditor(plans);
+        if (forceRender || !plansGridInitialized) {
+          renderPlansEditor(plans);
+          plansGridInitialized = true;
+        }
         return true;
       } catch (err) {
         return false;
@@ -482,7 +510,7 @@
           st.textContent = `✓ VIP ${level} plan saved`;
           setTimeout(() => (st.textContent = ''), 2500);
         }
-        await loadAdminData();
+        await loadAdminData(true);
       } else {
         alert(`Failed to update VIP ${level} plan.`);
       }
@@ -506,7 +534,7 @@
       });
       if (res.ok) {
         playAdminChime(860);
-        await loadAdminData();
+        await loadAdminData(true);
       } else {
         alert('Failed to update user balance.');
       }
@@ -654,7 +682,7 @@
         },
         body: JSON.stringify({ action })
       });
-      if (res.ok) loadAdminData();
+      if (res.ok) await loadAdminData(true);
     }
 
     async function saveSettings() {
@@ -675,12 +703,13 @@
         const st = document.getElementById('wallet-save-status');
         st.textContent = '✓ Wallets & Telegram settings saved';
         setTimeout(() => (st.textContent = ''), 2500);
+        await loadAdminData(true);
       }
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
       if (adminSecret) {
-        const ok = await loadAdminData();
+        const ok = await loadAdminData(true);
         if (ok) {
           document.getElementById('admin-login-screen').classList.add('hidden');
           document.getElementById('admin-dashboard').classList.remove('hidden');
@@ -689,7 +718,7 @@
       }
       setInterval(() => {
         if (!document.getElementById('admin-dashboard').classList.contains('hidden')) {
-          loadAdminData();
+          loadAdminData(false);
           loadAdminSupport(true);
         }
       }, 5000);

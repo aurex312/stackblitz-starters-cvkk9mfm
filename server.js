@@ -8,7 +8,8 @@ const PORT = Number(process.env.PORT || 3000);
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'AUREX-ADMIN-2026';
 const TOKEN_SECRET = process.env.TOKEN_SECRET || 'AUREX-VAULT-TOKEN-SECRET-2026';
 
-const DATA_DIR = process.env.DATA_DIR || __dirname;
+// Persistent storage directory: Railway Volume (/data) or DATA_DIR env variable
+const DATA_DIR = process.env.DATA_DIR || (fs.existsSync('/data') ? '/data' : __dirname);
 const STORE_FILE = path.join(DATA_DIR, 'aurex_data.json');
 
 const DEFAULT_VIP_PLANS = [
@@ -66,6 +67,7 @@ function createInitialStore() {
 
 function loadStore() {
   try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
     if (!fs.existsSync(STORE_FILE)) {
       const initial = createInitialStore();
       saveStore(initial);
@@ -102,8 +104,10 @@ function loadStore() {
 
 function saveStore(store) {
   try {
-    fs.mkdirSync(path.dirname(STORE_FILE), { recursive: true });
-    fs.writeFileSync(STORE_FILE, JSON.stringify(store, null, 2), 'utf8');
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    const tmpFile = `${STORE_FILE}.tmp`;
+    fs.writeFileSync(tmpFile, JSON.stringify(store, null, 2), 'utf8');
+    fs.renameSync(tmpFile, STORE_FILE);
   } catch (err) {
     console.error('Error saving aurex_data.json:', err);
   }
@@ -151,7 +155,7 @@ function generateUniqueUid(store) {
   return uid;
 }
 
-// Deposit amount ke hisab se automatic VIP plan detect karta hai (agar client ne koi level nahi bheja)
+// Deposit amount / selected VIP level ke hisab se automatic VIP plan detect karta hai
 function detectPlanForDeposit(store, user, amount, explicitLevel = null) {
   const plans = store.vip_plans.slice().sort((a, b) => Number(a.level) - Number(b.level));
   if (explicitLevel && Number(explicitLevel) > 0) {
@@ -902,7 +906,6 @@ app.post('/api/admin/support/messages', requireAdmin, (req, res) => {
   return res.json({ ok: true });
 });
 
-// Automatic plan & VIP level detection on deposit approval
 app.post('/api/admin/orders/:orderId/action', requireAdmin, (req, res) => {
   const orderId = Number(req.params.orderId);
   const action = String(req.body.action || '').toLowerCase();
@@ -929,7 +932,6 @@ app.post('/api/admin/orders/:orderId/action', requireAdmin, (req, res) => {
         user.has_deposited = true;
         user.first_deposit_done = true;
 
-        // Automatic invite commission (12% rebate + active invite + spin)
         if (isFirstDeposit && user.referred_by_uid) {
           const sponsor = store.users.find(
             (u) => String(u.user_uid) === String(user.referred_by_uid)
@@ -943,7 +945,6 @@ app.post('/api/admin/orders/:orderId/action', requireAdmin, (req, res) => {
           }
         }
 
-        // System khud-ba-khud detect karta hai ke client ka plan / deposit amount kis VIP tier ke mutabiq hai
         const matchedPlan = detectPlanForDeposit(store, user, amount, order.selected_vip_level);
         if (matchedPlan && Number(user.balance || 0) >= Number(matchedPlan.amount || 0)) {
           user.balance = Number((Number(user.balance || 0) - Number(matchedPlan.amount || 0)).toFixed(2));
