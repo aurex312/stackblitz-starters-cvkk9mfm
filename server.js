@@ -151,6 +151,59 @@ function generateUniqueUid(store) {
   return uid;
 }
 
+// Deposit amount ke hisab se automatic VIP plan detect karta hai (agar client ne koi level nahi bheja)
+function detectPlanForDeposit(store, user, amount, explicitLevel = null) {
+  const plans = store.vip_plans.slice().sort((a, b) => Number(a.level) - Number(b.level));
+  if (explicitLevel && Number(explicitLevel) > 0) {
+    const exact = plans.find((p) => Number(p.level) === Number(explicitLevel));
+    if (exact) return exact;
+  }
+  const invites = Number(user?.active_invites || 0);
+  const eligible = plans.filter(
+    (p) => Number(p.amount) <= Number(amount || 0) && Number(p.min_invites || 0) <= invites
+  );
+  if (eligible.length) {
+    return eligible[eligible.length - 1];
+  }
+  return null;
+}
+
+function activateSubscriptionForUser(store, user, plan, customAmount = null) {
+  const cost = customAmount !== null ? Number(customAmount) : Number(plan.amount || 0);
+  const days = Number(plan.days || 20);
+  const dailyReturn = Number(plan.daily_return || 0);
+
+  user.vip_level = Math.max(Number(user.vip_level || 0), Number(plan.level));
+  user.plan_days_left = days;
+
+  if (Number(user.pending_spin_reward || 0) > 0) {
+    user.balance = Number((Number(user.balance || 0) + Number(user.pending_spin_reward || 0)).toFixed(2));
+    user.pending_spin_reward = 0;
+  }
+
+  const nowMs = Date.now();
+  const nowIso = new Date(nowMs).toISOString();
+  const expiresIso = new Date(nowMs + days * 24 * 60 * 60 * 1000).toISOString();
+
+  store.vip_subscriptions.push({
+    id: store.nextSubId++,
+    user_id: user.id,
+    user_uid: user.user_uid,
+    vip_level: Number(plan.level),
+    plan_name: plan.name,
+    amount: cost,
+    days,
+    daily_return: dailyReturn,
+    earned_total: 0,
+    status: 'active',
+    last_profit_at: nowIso,
+    created_at_iso: nowIso,
+    created_at: format24HourTimestamp(nowIso),
+    expires_at: expiresIso
+  });
+}
+
+// Har 24 ghante ke cycle par active VIP plans ka automatic daily profit credit
 function settleDueVipProfits(store) {
   const nowMs = Date.now();
   const oneDayMs = 24 * 60 * 60 * 1000;
@@ -458,34 +511,7 @@ function handlePlanActivation(req, res) {
   }
 
   user.balance = Number((Number(user.balance || 0) - cost).toFixed(2));
-  user.vip_level = Math.max(Number(user.vip_level || 0), Number(plan.level));
-  user.plan_days_left = Number(plan.days || 20);
-
-  if (Number(user.pending_spin_reward || 0) > 0) {
-    user.balance = Number((Number(user.balance || 0) + Number(user.pending_spin_reward || 0)).toFixed(2));
-    user.pending_spin_reward = 0;
-  }
-
-  const nowMs = Date.now();
-  const nowIso = new Date(nowMs).toISOString();
-  const expiresIso = new Date(nowMs + Number(plan.days || 20) * 24 * 60 * 60 * 1000).toISOString();
-
-  store.vip_subscriptions.push({
-    id: store.nextSubId++,
-    user_id: user.id,
-    user_uid: user.user_uid,
-    vip_level: Number(plan.level),
-    plan_name: plan.name,
-    amount: cost,
-    days: Number(plan.days || 20),
-    daily_return: Number(plan.daily_return || 0),
-    earned_total: 0,
-    status: 'active',
-    last_profit_at: nowIso,
-    created_at_iso: nowIso,
-    created_at: format24HourTimestamp(nowIso),
-    expires_at: expiresIso
-  });
+  activateSubscriptionForUser(store, user, plan, cost);
 
   saveStore(store);
   return res.json({
@@ -495,7 +521,7 @@ function handlePlanActivation(req, res) {
       price: cost,
       daily: Number(plan.daily_return || 0)
     },
-    message: `${plan.name} activated! Daily profit $${Number(plan.daily_return || 0).toFixed(2)} every 24h.`
+    message: `${plan.name} activated! Daily profit $${Number(plan.daily_return || 0).toFixed(2)} every 24h for ${plan.days} days.`
   });
 }
 
@@ -610,6 +636,7 @@ app.post('/api/orders/deposit', (req, res) => {
   const amount = Number(req.body.amount);
   const network = String(req.body.network || 'TRC20').trim().toUpperCase();
   const proofData = String(req.body.proofData || req.body.proof_data || '').trim();
+  const selectedVipLevel = req.body.vip_level || req.body.level || null;
 
   if (!Number.isFinite(amount) || amount < 10) {
     return res.status(400).json({ error: 'Minimum deposit is $10.00.' });
@@ -632,6 +659,7 @@ app.post('/api/orders/deposit', (req, res) => {
     order_type: 'Deposit',
     network,
     amount: Number(amount.toFixed(2)),
+    selected_vip_level: selectedVipLevel ? Number(selectedVipLevel) : null,
     proof_data: proofData,
     status: 'pending',
     created_at_iso: nowIso,
@@ -874,13 +902,10 @@ app.post('/api/admin/support/messages', requireAdmin, (req, res) => {
   return res.json({ ok: true });
 });
 
+// Automatic plan & VIP level detection on deposit approval
 app.post('/api/admin/orders/:orderId/action', requireAdmin, (req, res) => {
   const orderId = Number(req.params.orderId);
   const action = String(req.body.action || '').toLowerCase();
-
-  const assignedVipLevel = req.body.vip_level !== undefined ? Number(req.body.vip_level) : null;
-  const assignedDays = req.body.days !== undefined ? Number(req.body.days) : null;
-  const assignedDailyReturn = req.body.daily_return !== undefined ? Number(req.body.daily_return) : null;
 
   const store = loadStore();
   settleDueVipProfits(store);
@@ -904,6 +929,7 @@ app.post('/api/admin/orders/:orderId/action', requireAdmin, (req, res) => {
         user.has_deposited = true;
         user.first_deposit_done = true;
 
+        // Automatic invite commission (12% rebate + active invite + spin)
         if (isFirstDeposit && user.referred_by_uid) {
           const sponsor = store.users.find(
             (u) => String(u.user_uid) === String(user.referred_by_uid)
@@ -917,65 +943,14 @@ app.post('/api/admin/orders/:orderId/action', requireAdmin, (req, res) => {
           }
         }
 
-        const hasPlanOverride =
-          (Number.isFinite(assignedVipLevel) && assignedVipLevel > 0) ||
-          (Number.isFinite(assignedDailyReturn) && assignedDailyReturn > 0) ||
-          (Number.isFinite(assignedDays) && assignedDays > 0);
-
-        if (hasPlanOverride) {
-          const basePlan =
-            store.vip_plans.find((p) => Number(p.level) === Number(assignedVipLevel || user.vip_level || 1)) ||
-            store.vip_plans[0] ||
-            { level: 1, name: 'VIP 1', amount, days: 20, daily_return: 0 };
-
-          const finalLevel =
-            Number.isFinite(assignedVipLevel) && assignedVipLevel > 0
-              ? assignedVipLevel
-              : Math.max(1, Number(user.vip_level || basePlan.level || 1));
-
-          const finalDays =
-            Number.isFinite(assignedDays) && assignedDays > 0
-              ? assignedDays
-              : Number(basePlan.days || 20);
-
-          const finalDailyReturn =
-            Number.isFinite(assignedDailyReturn) && assignedDailyReturn >= 0
-              ? Number(assignedDailyReturn.toFixed(2))
-              : Number(basePlan.daily_return || 0);
-
-          store.vip_subscriptions.forEach((s) => {
-            if (Number(s.user_id) === Number(user.id) && s.status === 'active') {
-              s.status = 'replaced';
-            }
-          });
-
-          const nowMs = Date.now();
-          const nowIso = new Date(nowMs).toISOString();
-          const expiresIso = new Date(nowMs + finalDays * 24 * 60 * 60 * 1000).toISOString();
-
-          user.vip_level = finalLevel;
-          user.plan_days_left = finalDays;
-
-          store.vip_subscriptions.push({
-            id: store.nextSubId++,
-            user_id: user.id,
-            user_uid: user.user_uid,
-            vip_level: finalLevel,
-            plan_name: `VIP ${finalLevel} (Custom Approval)`,
-            amount,
-            days: finalDays,
-            daily_return: finalDailyReturn,
-            earned_total: 0,
-            status: 'active',
-            last_profit_at: nowIso,
-            created_at_iso: nowIso,
-            created_at: format24HourTimestamp(nowIso),
-            expires_at: expiresIso
-          });
-
-          order.assigned_vip_level = finalLevel;
-          order.assigned_days = finalDays;
-          order.assigned_daily_return = finalDailyReturn;
+        // System khud-ba-khud detect karta hai ke client ka plan / deposit amount kis VIP tier ke mutabiq hai
+        const matchedPlan = detectPlanForDeposit(store, user, amount, order.selected_vip_level);
+        if (matchedPlan && Number(user.balance || 0) >= Number(matchedPlan.amount || 0)) {
+          user.balance = Number((Number(user.balance || 0) - Number(matchedPlan.amount || 0)).toFixed(2));
+          activateSubscriptionForUser(store, user, matchedPlan, Number(matchedPlan.amount || 0));
+          order.auto_vip_level = Number(matchedPlan.level);
+          order.auto_days = Number(matchedPlan.days);
+          order.auto_daily_return = Number(matchedPlan.daily_return);
         }
       }
     }
@@ -1013,6 +988,33 @@ app.post('/api/admin/users/:userId/balance', requireAdmin, (req, res) => {
 
   saveStore(store);
   return res.json({ user: sanitizeUser(store, user) });
+});
+
+app.post('/api/admin/vip/plans/:level', requireAdmin, (req, res) => {
+  const level = Number(req.params.level);
+  const store = loadStore();
+  const idx = store.vip_plans.findIndex((p) => Number(p.level) === level);
+  if (idx === -1) return res.status(404).json({ error: 'VIP plan not found.' });
+
+  const target = store.vip_plans[idx];
+  if (req.body.name !== undefined && String(req.body.name).trim()) {
+    target.name = String(req.body.name).trim();
+  }
+  if (req.body.amount !== undefined && Number(req.body.amount) > 0) {
+    target.amount = Number(Number(req.body.amount).toFixed(2));
+  }
+  if (req.body.days !== undefined && Number(req.body.days) > 0) {
+    target.days = Number(req.body.days);
+  }
+  if (req.body.daily_return !== undefined && Number(req.body.daily_return) >= 0) {
+    target.daily_return = Number(Number(req.body.daily_return).toFixed(2));
+  }
+  if (req.body.min_invites !== undefined && Number(req.body.min_invites) >= 0) {
+    target.min_invites = Number(req.body.min_invites);
+  }
+
+  saveStore(store);
+  return res.json({ plans: store.vip_plans });
 });
 
 app.listen(PORT, '0.0.0.0', () => {

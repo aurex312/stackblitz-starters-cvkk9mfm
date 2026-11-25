@@ -108,11 +108,11 @@
       </div>
     </div>
 
-    <!-- Orders Table with Deposit Plan Edit on Approval -->
+    <!-- Orders Table (Auto VIP & Plan Detection on Approval) -->
     <div class="panel-card rounded-2xl p-5 space-y-4 overflow-x-auto">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h2 class="text-sm font-extrabold uppercase tracking-wider text-white">Customer Deposit &amp; Payout Orders (24-Hour Time)</h2>
-        <span class="text-[11px] mono text-amber-300">Deposit Approve Inputs: [VIP Level] [Days] [Daily $]</span>
+        <span class="text-[11px] mono text-emerald-400">Auto VIP Detection &amp; 24H Daily Profit Active</span>
       </div>
       <table class="w-full text-left border-collapse text-xs">
         <thead>
@@ -125,7 +125,7 @@
             <th class="py-3 px-2">Amount</th>
             <th class="py-3 px-2">Proof / Info</th>
             <th class="py-3 px-2">Status</th>
-            <th class="py-3 px-2 text-right">Plan Edit &amp; Action</th>
+            <th class="py-3 px-2 text-right">Action</th>
           </tr>
         </thead>
         <tbody id="admin-orders-tbody" class="divide-y divide-white/5"></tbody>
@@ -148,6 +148,15 @@
         </thead>
         <tbody id="admin-users-tbody" class="divide-y divide-white/5"></tbody>
       </table>
+    </div>
+
+    <!-- VIP Plans Editor Only -->
+    <div class="panel-card rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-emerald-400">VIP Plans Editor (Price / Days / Daily Return)</h2>
+        <span id="plan-save-status" class="text-xs text-emerald-400"></span>
+      </div>
+      <div id="admin-plans-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs"></div>
     </div>
 
     <!-- Live Support Inbox with Threads + Photo + Video + Sound -->
@@ -306,6 +315,7 @@
         document.getElementById('stat-total-orders').textContent = orders.length;
 
         renderAdminTables();
+        renderPlansEditor(plans);
         return true;
       } catch (err) {
         return false;
@@ -316,7 +326,6 @@
       const q = (document.getElementById('admin-search-input')?.value || '').trim().toLowerCase();
       const orders = latestAdminSnapshot.orders || [];
       const users = latestAdminSnapshot.users || [];
-      const plans = latestAdminSnapshot.plans || [];
 
       const userMap = {};
       users.forEach(u => {
@@ -339,21 +348,11 @@
       tbody.innerHTML = filteredOrders.length
         ? filteredOrders.map(o => {
             const orderTypeLower = String(o.type || o.order_type || 'order').toLowerCase();
-            const isDeposit = orderTypeLower === 'deposit';
             const statusLower = String(o.status || '').toLowerCase();
             const isPending = statusLower === 'pending';
             const u = userMap[o.user_id] || userMap[String(o.user_uid)] || {};
             const orderCode = o.order_code || o.order_id || ('#' + o.id);
             const uid = o.user_uid || u.user_uid || '0000000';
-
-            const matchedPlan =
-              plans.find(p => Number(p.amount) <= Number(o.amount || 0)) ||
-              plans[0] ||
-              { level: 1, days: 20, daily_return: 0 };
-
-            const defaultVip = Number(o.assigned_vip_level ?? u.vip_level ?? matchedPlan.level ?? 1);
-            const defaultDays = Number(o.assigned_days ?? matchedPlan.days ?? 20);
-            const defaultDaily = Number(o.assigned_daily_return ?? matchedPlan.daily_return ?? 0);
 
             const badge = statusLower === 'approved'
               ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
@@ -365,30 +364,9 @@
               ? `<button onclick="openProofModal('${o.proof_data}')" class="px-2 py-1 rounded bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-bold text-[10px]">View Screenshot</button>`
               : `<span class="mono text-gray-400 truncate max-w-[140px] inline-block">${o.wallet_address || '-'}</span>`;
 
-            const actionCell = isPending
-              ? `
-                <div class="flex flex-col items-end gap-1.5 min-w-[205px]">
-                  ${
-                    isDeposit
-                      ? `
-                        <div class="flex items-center gap-1 text-[10px] mono">
-                          <span class="text-gray-400">VIP:</span>
-                          <input id="app-vip-${o.id}" type="number" min="0" max="9" value="${defaultVip}" title="Customer VIP Level" class="w-11 bg-black/70 border border-white/15 rounded px-1 py-0.5 text-amber-300 outline-none" />
-                          <span class="text-gray-400">D:</span>
-                          <input id="app-days-${o.id}" type="number" min="1" value="${defaultDays}" title="Plan Days" class="w-11 bg-black/70 border border-white/15 rounded px-1 py-0.5 text-cyan-300 outline-none" />
-                          <span class="text-gray-400">$:</span>
-                          <input id="app-daily-${o.id}" type="number" step="0.01" min="0" value="${defaultDaily}" title="Daily Profit $" class="w-14 bg-black/70 border border-white/15 rounded px-1 py-0.5 text-emerald-400 outline-none" />
-                        </div>
-                      `
-                      : ''
-                  }
-                  <div class="flex items-center gap-1.5">
-                    <button onclick="handleOrderAction(${o.id}, 'approve')" class="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-bold text-[11px]">Approve</button>
-                    <button onclick="handleOrderAction(${o.id}, 'reject')" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/40 font-bold text-[11px]">Reject</button>
-                  </div>
-                </div>
-              `
-              : `<span class="text-gray-500 text-[11px]">Processed${o.assigned_vip_level ? ` • VIP ${o.assigned_vip_level} ($${Number(o.assigned_daily_return || 0).toFixed(2)}/d)` : ''}</span>`;
+            const autoTag = o.auto_vip_level
+              ? `<span class="text-emerald-400 mono text-[10px] ml-1">VIP ${o.auto_vip_level} (${o.auto_days}d • $${Number(o.auto_daily_return || 0).toFixed(2)}/d)</span>`
+              : '';
 
             return `
               <tr class="hover:bg-white/[0.02]">
@@ -399,8 +377,15 @@
                 <td class="py-3 px-2 text-gray-300">${orderTypeLower.toUpperCase()} • <span class="mono text-amber-300">${o.network || '-'}</span></td>
                 <td class="py-3 px-2 mono font-bold text-emerald-400">$${Number(o.amount || 0).toFixed(2)}</td>
                 <td class="py-3 px-2">${proofCell}</td>
-                <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase ${badge}">${o.status}</span></td>
-                <td class="py-3 px-2 text-right">${actionCell}</td>
+                <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase ${badge}">${o.status}</span>${autoTag}</td>
+                <td class="py-3 px-2 text-right space-x-1.5">
+                  ${
+                    isPending
+                      ? `<button onclick="handleOrderAction(${o.id}, 'approve')" class="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-bold text-[11px]">Approve</button>
+                         <button onclick="handleOrderAction(${o.id}, 'reject')" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/40 font-bold text-[11px]">Reject</button>`
+                      : `<span class="text-gray-500 text-[11px]">Processed</span>`
+                  }
+                </td>
               </tr>
             `;
           }).join('')
@@ -429,7 +414,7 @@
                 </div>
               </td>
               <td class="py-2.5 px-2 mono text-amber-300">
-                ${(u.first_deposit_done || u.has_deposited) ? 'Depositor' : 'Locked'} • VIP ${u.vip_level || 0}
+                ${(u.first_deposit_done || u.has_deposited) ? 'Depositor' : 'Locked'} • VIP ${u.vip_level || 0} (${Number(u.plan_days_left || 0)}d left)
               </td>
               <td class="py-2.5 px-2 mono text-gray-200">
                 Spins: ${u.spins_left ?? 0} • Held Spin: $${Number(u.pending_spin_reward || 0).toFixed(2)}
@@ -440,6 +425,67 @@
             </tr>
           `).join('')
         : `<tr><td colspan="6" class="py-4 text-center text-gray-500">No matching users found.</td></tr>`;
+    }
+
+    function renderPlansEditor(plans) {
+      const grid = document.getElementById('admin-plans-grid');
+      if (!grid) return;
+      grid.innerHTML = plans.map(p => `
+        <div class="bg-black/45 border border-white/10 rounded-2xl p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-amber-300">VIP ${p.level}</span>
+            <span class="mono text-[10px] text-gray-400">Min Invites: ${p.min_invites || 0}</span>
+          </div>
+          <div>
+            <label class="text-[10px] text-gray-400 block mb-0.5">Plan Name</label>
+            <input id="plan-name-${p.level}" type="text" value="${p.name || ''}" class="w-full bg-black/65 border border-white/15 rounded-lg px-2.5 py-1 text-xs text-white outline-none" />
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="text-[10px] text-gray-400 block mb-0.5">Price ($)</label>
+              <input id="plan-price-${p.level}" type="number" step="0.01" value="${Number(p.amount ?? p.price ?? 0)}" class="w-full bg-black/65 border border-white/15 rounded-lg px-2 py-1 text-xs mono text-white outline-none" />
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 block mb-0.5">Days</label>
+              <input id="plan-days-${p.level}" type="number" value="${Number(p.days || 20)}" class="w-full bg-black/65 border border-white/15 rounded-lg px-2 py-1 text-xs mono text-white outline-none" />
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 block mb-0.5">Daily ($)</label>
+              <input id="plan-daily-${p.level}" type="number" step="0.01" value="${Number(p.daily_return ?? p.daily ?? 0)}" class="w-full bg-black/65 border border-white/15 rounded-lg px-2 py-1 text-xs mono text-emerald-400 outline-none" />
+            </div>
+          </div>
+          <button type="button" onclick="saveVipPlan(${p.level})" class="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-[11px] uppercase">
+            Save VIP ${p.level} Plan
+          </button>
+        </div>
+      `).join('');
+    }
+
+    async function saveVipPlan(level) {
+      const name = document.getElementById(`plan-name-${level}`)?.value.trim();
+      const amount = Number(document.getElementById(`plan-price-${level}`)?.value);
+      const days = Number(document.getElementById(`plan-days-${level}`)?.value);
+      const daily_return = Number(document.getElementById(`plan-daily-${level}`)?.value);
+
+      const res = await fetch(`/api/admin/vip/plans/${level}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': adminSecret
+        },
+        body: JSON.stringify({ name, amount, days, daily_return })
+      });
+      if (res.ok) {
+        playAdminChime(920);
+        const st = document.getElementById('plan-save-status');
+        if (st) {
+          st.textContent = `✓ VIP ${level} plan saved`;
+          setTimeout(() => (st.textContent = ''), 2500);
+        }
+        await loadAdminData();
+      } else {
+        alert(`Failed to update VIP ${level} plan.`);
+      }
     }
 
     async function updateUserBalance(userId) {
@@ -600,23 +646,13 @@
     }
 
     async function handleOrderAction(orderId, action) {
-      const payload = { action };
-      if (action === 'approve') {
-        const vipEl = document.getElementById(`app-vip-${orderId}`);
-        const daysEl = document.getElementById(`app-days-${orderId}`);
-        const dailyEl = document.getElementById(`app-daily-${orderId}`);
-        if (vipEl && vipEl.value !== '') payload.vip_level = Number(vipEl.value);
-        if (daysEl && daysEl.value !== '') payload.days = Number(daysEl.value);
-        if (dailyEl && dailyEl.value !== '') payload.daily_return = Number(dailyEl.value);
-      }
-
       const res = await fetch(`/api/admin/orders/${orderId}/action`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-admin-secret': adminSecret
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ action })
       });
       if (res.ok) loadAdminData();
     }

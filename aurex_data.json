@@ -1,0 +1,92 @@
+{
+  "nextUserId": 1,
+  "nextOrderId": 1,
+  "nextSubId": 1,
+  "nextMsgId": 1,
+  "vip_plans": [
+    {
+      "level": 1,
+      "name": "VIP 1 • Micro Scalper",
+      "amount": 10,
+      "days": 20,
+      "daily_return": 0.85,
+      "min_invites": 0
+    },
+    {
+      "level": 2,
+      "name": "VIP 2 • Bronze Node",
+      "amount": 25,
+      "days": 20,
+      "daily_return": 2.25,
+      "min_invites": 0
+    },
+    {
+      "level": 3,
+      "name": "VIP 3 • Silver Pulse",
+      "amount": 50,
+      "days": 20,
+      "daily_return": 4.75,
+      "min_invites": 0
+    },
+    {
+      "level": 4,
+      "name": "VIP 4 • Gold Matrix",
+      "amount": 100,
+      "days": 20,
+      "daily_return": 10,
+      "min_invites": 0
+    },
+    {
+      "level": 5,
+      "name": "VIP 5 • Platinum Pro",
+      "amount": 250,
+      "days": 25,
+      "daily_return": 26.5,
+      "min_invites": 0
+    },
+    {
+      "level": 6,
+      "name": "VIP 6 • Diamond Syndicate",
+      "amount": 500,
+      "days": 30,
+      "daily_return": 58,
+      "min_invites": 3
+    },
+    {
+      "level": 7,
+      "name": "VIP 7 • Emerald Whale",
+      "amount": 1000,
+      "days": 30,
+      "daily_return": 122,
+      "min_invites": 3
+    },
+    {
+      "level": 8,
+      "name": "VIP 8 • Sovereign Vault",
+      "amount": 2500,
+      "days": 30,
+      "daily_return": 320,
+      "min_invites": 3
+    },
+    {
+      "level": 9,
+      "name": "VIP 9 • Imperial Apex",
+      "amount": 5000,
+      "days": 30,
+      "daily_return": 680,
+      "min_invites": 3
+    }
+  ],
+  "wallets": {
+    "TRC20": "TER4vxuCgwKT4cymyC2NRZgVYnvWn6dFC9",
+    "BEP20": "0xe37ab67b88eadcb56c05fe80ebde4ea5786962aa"
+  },
+  "telegram": {
+    "channel": "https://t.me/AurexVaultOfficial",
+    "support": "https://t.me/AurexVaultSupport"
+  },
+  "users": [],
+  "orders": [],
+  "vip_subscriptions": [],
+  "support_messages": []
+}
