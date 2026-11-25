@@ -119,6 +119,63 @@ function ensureUserColumns() {
   if (!cols.includes('telegram_username')) {
     db.run('ALTER TABLE users ADD COLUMN telegram_username TEXT');
   }
+  saveDb();
+}
+
+function insertNewUser({
+  userUid,
+  refCode,
+  fullName,
+  phone,
+  passwordHash,
+  referredByUid,
+  dialCode,
+  countryCode,
+  countryFlag,
+  nowIso
+}) {
+  const tableInfo = queryAll('PRAGMA table_info(users)');
+  const columnMap = {
+    user_uid: userUid,
+    ref_code: refCode,
+    full_name: fullName,
+    phone,
+    password_hash: passwordHash,
+    referred_by_uid: referredByUid,
+    dial_code: dialCode || '+92',
+    country_code: countryCode || 'PK',
+    country_flag: countryFlag || '🇵🇰',
+    balance: 0,
+    pending_spin_reward: 0,
+    team_rebate: 0,
+    vip_level: 0,
+    active_invites: 0,
+    spins_left: 2,
+    first_deposit_done: 0,
+    channel_reward_claimed: 0,
+    telegram_username: null,
+    created_at: nowIso
+  };
+
+  const colsToInsert = [];
+  const params = [];
+
+  for (const col of tableInfo) {
+    if (col.name === 'id') continue;
+    if (Object.prototype.hasOwnProperty.call(columnMap, col.name)) {
+      colsToInsert.push(col.name);
+      params.push(columnMap[col.name]);
+    } else if (col.notnull === 1 && col.dflt_value === null) {
+      colsToInsert.push(col.name);
+      params.push('');
+    }
+  }
+
+  const placeholders = colsToInsert.map(() => '?').join(', ');
+  execSql(
+    `INSERT INTO users (${colsToInsert.join(', ')}) VALUES (${placeholders})`,
+    params
+  );
 }
 
 function hasActiveVipPlan(userId, nowIso = new Date().toISOString()) {
@@ -340,6 +397,8 @@ app.post('/api/auth/register', (req, res) => {
     const body = req.body || {};
     const fullName = String(body.full_name ?? body.fullName ?? '').trim();
     const dialCode = String(body.dial_code ?? body.dialCode ?? '').trim();
+    const countryCode = String(body.country_code ?? body.countryCode ?? 'PK').trim();
+    const countryFlag = String(body.country_flag ?? body.countryFlag ?? '🇵🇰').trim();
     const rawPhone = body.phone ?? body.mobile ?? '';
     const phone = normalizePhone(rawPhone, dialCode);
     const password = String(body.password ?? '');
@@ -375,14 +434,18 @@ app.post('/api/auth/register', (req, res) => {
     const passwordHash = hashPassword(password);
     const nowIso = new Date().toISOString();
 
-    execSql(
-      `INSERT INTO users (
-        user_uid, ref_code, full_name, phone, password_hash, referred_by_uid,
-        balance, pending_spin_reward, team_rebate, vip_level, active_invites,
-        spins_left, first_deposit_done, channel_reward_claimed, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 2, 0, 0, ?)`,
-      [userUid, userUid, fullName, phone, passwordHash, referredByUid, nowIso]
-    );
+    insertNewUser({
+      userUid,
+      refCode: userUid,
+      fullName,
+      phone,
+      passwordHash,
+      referredByUid,
+      dialCode,
+      countryCode,
+      countryFlag,
+      nowIso
+    });
 
     const createdUser = queryOne('SELECT * FROM users WHERE user_uid = ?', [userUid]);
     const token = generateToken();
@@ -408,7 +471,10 @@ app.post('/api/auth/register', (req, res) => {
       });
     }
     console.error('Register error:', err);
-    return res.status(500).json({ error: 'Failed to register account.' });
+    return res.status(500).json({
+      error: 'Failed to register account.',
+      details: err.message
+    });
   }
 });
 
