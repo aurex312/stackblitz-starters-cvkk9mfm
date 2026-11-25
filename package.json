@@ -1,14 +1,11 @@
 {
-  "name": "aurex-vault-platform",
-  "version": "2.1.0",
-  "description": "AUREX VAULT Customer App + Separate Admin Panel with Live Support",
+  "name": "aurex-vault",
+  "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-  "start": "node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
-  "cors": "^2.8.5",
-  "express": "^4.21.2",
-  "sql.js": "^1.12.0"
+    "express": "^4.19.2"
   }
-  }
+}
