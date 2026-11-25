@@ -2,894 +2,1592 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AUREX VAULT PRO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AUREX VAULT PRO — Billionaire Golden Capital Terminal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            obsidian: '#06070B',
+            gold: { 300: '#FEF08A', 400: '#FACC15', 500: '#EAB308', 600: '#CA8A04' }
+          }
+        }
+      }
+    };
+  </script>
   <style>
     body {
-      background: radial-gradient(circle at top, #1f1706 0%, #07080c 60%, #050608 100%);
-      color: #f3f4f6;
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
+      background: radial-gradient(circle at 50% 0%, #241A06 0%, #090806 55%, #040508 100%);
+      color: #FFFBEB;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
     }
-    .mono { font-family: 'JetBrains Mono', monospace; }
-    .gold-btn {
-      background: linear-gradient(90deg, #b88318 0%, #f5c85c 50%, #c68d1e 100%);
-      color: #090a0d;
+
+    #global-golden-candles {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
     }
-    .vault-card {
-      background: rgba(17, 20, 29, 0.92);
-      border: 1px solid rgba(245, 200, 92, 0.22);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+
+    .billionaire-glass {
+      background: linear-gradient(155deg, rgba(28, 22, 10, 0.58) 0%, rgba(10, 9, 7, 0.72) 100%);
+      border: 1px solid rgba(250, 204, 21, 0.28);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(254, 240, 138, 0.16);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .gold-gradient {
+      background: linear-gradient(135deg, #FEF9C3 0%, #FACC15 48%, #B45309 100%);
+    }
+
+    .emerald-gradient {
+      background: linear-gradient(135deg, #6EE7B7 0%, #10B981 55%, #047857 100%);
+    }
+
+    .gold-text {
+      background: linear-gradient(135deg, #FEF9C3 0%, #FACC15 50%, #F59E0B 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 14px rgba(250, 204, 21, 0.35));
+    }
+
+    .shining-frame {
+      position: relative;
+      overflow: hidden;
+    }
+    .shining-frame::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: conic-gradient(from 0deg, #FACC15, #FEF08A, #D97706, #FDE047, #FACC15);
+      animation: goldRingSpin 3.2s linear infinite;
+      z-index: 0;
+    }
+    .shining-frame-inner {
+      position: relative;
+      z-index: 1;
+      background: rgba(12, 10, 6, 0.76);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: inherit;
+    }
+    @keyframes goldRingSpin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .shine-sweep {
+      position: relative;
+      overflow: hidden;
+    }
+    .shine-sweep::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -120%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(90deg, transparent, rgba(255, 251, 235, 0.45), transparent);
+      transform: rotate(22deg);
+      animation: lightSweep 3.4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes lightSweep {
+      0% { left: -120%; }
+      55%, 100% { left: 160%; }
+    }
+
+    .ticker-scroll {
+      display: inline-block;
+      white-space: nowrap;
+      animation: fastMarquee 12s linear infinite;
+    }
+    @keyframes fastMarquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
     }
   </style>
 </head>
-<body class="p-3 sm:p-6">
+<body class="min-h-screen flex justify-center items-start sm:py-3 relative">
 
-  <!-- Toast Banner -->
-  <div id="toast-banner" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-[92%] px-4 py-3 rounded-2xl border border-amber-400/50 bg-[#141720]/95 text-xs font-semibold text-amber-200 shadow-2xl">
-    <span id="toast-text"></span>
-  </div>
+  <canvas id="global-golden-candles"></canvas>
 
-  <div class="max-w-xl mx-auto space-y-4">
+  <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[410px] pointer-events-none flex flex-col gap-2"></div>
 
-    <!-- AUTH SCREEN -->
-    <div id="auth-screen" class="vault-card rounded-3xl p-5 sm:p-7 space-y-5 mt-4">
-      <div class="text-center space-y-2">
-        <div class="w-12 h-12 mx-auto rounded-2xl gold-btn font-extrabold text-lg flex items-center justify-center shadow-lg">AV</div>
-        <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-amber-400/10 text-amber-300 border border-amber-400/30">
-          Billionaire Capital Vault
-        </span>
-        <h1 class="text-2xl font-extrabold tracking-tight text-amber-300">AUREX VAULT PRO</h1>
-        <p class="text-xs text-gray-400">Step into high-tier wealth &amp; daily growth</p>
-      </div>
+  <!-- ========================================================= -->
+  <!-- 1. MANDATORY REGISTRATION / LOGIN SCREEN                  -->
+  <!-- ========================================================= -->
+  <div id="auth-gate-screen" class="relative z-10 w-full max-w-[440px] min-h-screen sm:min-h-[850px] sm:rounded-[34px] bg-black/35 sm:border sm:border-yellow-400/35 shadow-[0_25px_80px_rgba(0,0,0,0.85)] backdrop-blur-[6px] flex flex-col justify-between overflow-hidden">
 
-      <div class="grid grid-cols-2 gap-2 bg-black/50 p-1.5 rounded-2xl border border-white/10">
-        <button type="button" id="tab-register" onclick="switchAuthTab('register')" class="py-2.5 rounded-xl text-xs font-extrabold uppercase gold-btn">
-          Create ID
-        </button>
-        <button type="button" id="tab-login" onclick="switchAuthTab('login')" class="py-2.5 rounded-xl text-xs font-extrabold uppercase text-gray-300 hover:text-white">
-          Sign In
-        </button>
-      </div>
-
-      <!-- Register Form -->
-      <form id="register-form" onsubmit="handleRegister(event)" class="space-y-3.5">
-        <div>
-          <label class="text-xs font-semibold text-gray-300 block mb-1">Full Name</label>
-          <input id="reg-name" type="text" required placeholder="Malik Nouman" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none" />
-        </div>
-
-        <div>
-          <label class="text-xs font-semibold text-gray-300 block mb-1">Country &amp; Mobile Number</label>
-          <div class="flex gap-2">
-            <select id="reg-dial" class="bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2.5 text-xs mono text-amber-300 outline-none">
-              <option value="+92" data-flag="🇵🇰" data-code="PK" selected>🇵🇰 +92</option>
-              <option value="+971" data-flag="🇦🇪" data-code="AE">🇦🇪 +971</option>
-              <option value="+966" data-flag="🇸🇦" data-code="SA">🇸🇦 +966</option>
-              <option value="+1" data-flag="🇺🇸" data-code="US">🇺🇸 +1</option>
-              <option value="+44" data-flag="🇬🇧" data-code="GB">🇬🇧 +44</option>
-            </select>
-            <input id="reg-phone" type="text" required placeholder="3074532161" class="flex-1 bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm mono text-white outline-none" />
-          </div>
-        </div>
-
-        <div>
-          <label class="text-xs font-semibold text-gray-300 block mb-1">Password</label>
-          <input id="reg-password" type="password" required minlength="4" placeholder="••••••••" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none" />
-        </div>
-
-        <div>
-          <label class="text-xs font-semibold text-gray-400 block mb-1">Sponsor ID / Code (Optional)</label>
-          <input id="reg-ref" type="text" placeholder="Optional — leave blank if none" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm mono text-white outline-none" />
-        </div>
-
-        <button type="submit" class="w-full py-3.5 rounded-2xl gold-btn font-extrabold text-xs uppercase tracking-wider shadow-lg">
-          Unlock My Future Vault →
-        </button>
-      </form>
-
-      <!-- Login Form -->
-      <form id="login-form" onsubmit="handleLogin(event)" class="hidden space-y-3.5">
-        <div>
-          <label class="text-xs font-semibold text-gray-300 block mb-1">Country &amp; Mobile Number</label>
-          <div class="flex gap-2">
-            <select id="login-dial" class="bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3 py-2.5 text-xs mono text-amber-300 outline-none">
-              <option value="+92" selected>🇵🇰 +92</option>
-              <option value="+971">🇦🇪 +971</option>
-              <option value="+966">🇸🇦 +966</option>
-              <option value="+1">🇺🇸 +1</option>
-              <option value="+44">🇬🇧 +44</option>
-            </select>
-            <input id="login-phone" type="text" required placeholder="3074532161" class="flex-1 bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm mono text-white outline-none" />
-          </div>
-        </div>
-
-        <div>
-          <label class="text-xs font-semibold text-gray-300 block mb-1">Password</label>
-          <input id="login-password" type="password" required placeholder="••••••••" class="w-full bg-black/60 border border-white/15 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none" />
-        </div>
-
-        <button type="submit" class="w-full py-3.5 rounded-2xl gold-btn font-extrabold text-xs uppercase tracking-wider shadow-lg">
-          Sign In to Vault →
-        </button>
-      </form>
-
-      <div class="grid grid-cols-3 gap-2 pt-1 text-center">
-        <div class="bg-black/45 border border-white/10 rounded-xl p-2">
-          <p class="text-xs font-extrabold text-amber-300 mono">$10 MIN</p>
-          <p class="text-[10px] text-gray-400">Start &amp; Payout</p>
-        </div>
-        <div class="bg-black/45 border border-white/10 rounded-xl p-2">
-          <p class="text-xs font-extrabold text-amber-300 mono">20 / 30 DAYS</p>
-          <p class="text-[10px] text-gray-400">VIP Cycles</p>
-        </div>
-        <div class="bg-black/45 border border-white/10 rounded-xl p-2">
-          <p class="text-xs font-extrabold text-amber-300 mono">3 INVITES</p>
-          <p class="text-[10px] text-gray-400">Unlock VIP 6–9</p>
-        </div>
+    <div class="relative z-10 bg-black/50 border-b border-yellow-400/25 py-2 overflow-hidden backdrop-blur-md">
+      <div class="ticker-scroll font-mono text-[11px] text-yellow-200 space-x-6">
+        <span>✦ XAU/USD GOLD <strong class="text-yellow-300">$2,940.80 ▲</strong></span>
+        <span>✦ BTC/USDT <strong class="text-yellow-300">$96,840 ▲</strong></span>
+        <span>✦ INSTITUTIONAL VAULT <strong class="text-amber-300">LIVE GOLDEN FLOW</strong></span>
+        <span>✦ VIP 1–9 <strong class="text-yellow-300">$10 TO $5,000</strong></span>
+        <span>✦ XAU/USD GOLD <strong class="text-yellow-300">$2,940.80 ▲</strong></span>
+        <span>✦ BTC/USDT <strong class="text-yellow-300">$96,840 ▲</strong></span>
       </div>
     </div>
 
-    <!-- MAIN DASHBOARD SCREEN -->
-    <div id="dashboard-screen" class="hidden space-y-4 pb-10">
-
-      <!-- Top Header -->
-      <div class="vault-card rounded-2xl p-3.5 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-10 h-10 shrink-0 rounded-xl gold-btn font-extrabold text-sm flex items-center justify-center">AV</div>
-          <div class="min-w-0">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-sm font-extrabold text-amber-300">AUREX VAULT PRO</span>
-              <span id="hdr-uid" class="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/35 text-[11px] mono font-bold text-amber-200">ID: 0000000</span>
-            </div>
-            <p id="hdr-user-meta" class="text-[11px] text-gray-400 truncate">● User • +92</p>
+    <div class="relative z-10 px-5 py-5 my-auto space-y-4">
+      <div class="text-center space-y-1.5">
+        <div class="w-16 h-16 mx-auto rounded-2xl gold-gradient p-[2px] shadow-[0_0_35px_rgba(250,204,21,0.65)] shine-sweep">
+          <div class="w-full h-full bg-black/80 rounded-[14px] flex items-center justify-center">
+            <svg class="w-9 h-9" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="#FEF08A" stroke-width="2"/>
+              <path d="M7 15L11 10L14 13L18 7" stroke="#FACC15" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
           </div>
         </div>
-
-        <div class="flex items-center gap-2 shrink-0">
-          <button type="button" onclick="openAppTab('wallet')" class="px-3 py-1.5 rounded-xl bg-amber-400/15 border border-amber-400/40 text-xs mono font-extrabold text-amber-300 flex items-center gap-1">
-            <span id="hdr-balance">$0.00</span>
-            <span class="w-4 h-4 rounded-full gold-btn text-[10px] flex items-center justify-center font-black">+</span>
-          </button>
-          <button type="button" onclick="logoutUser()" title="Logout" class="w-9 h-9 rounded-xl bg-red-500/15 border border-red-500/35 text-red-300 flex items-center justify-center text-xs font-bold">
-            ⏻
-          </button>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400/15 border border-yellow-400/40 text-[10px] font-extrabold text-yellow-200 uppercase tracking-widest">
+          <span class="w-2 h-2 rounded-full bg-yellow-300 animate-ping"></span> Billionaire Capital Vault
         </div>
+        <h1 class="text-2xl font-extrabold text-white">AUREX <span class="gold-text">VAULT PRO</span></h1>
+        <p class="text-xs text-yellow-100/90">Step into high-tier wealth & daily growth</p>
       </div>
 
-      <!-- Ticker Strip -->
-      <div class="bg-black/60 border border-amber-400/20 rounded-xl px-3 py-2 text-[11px] mono text-amber-200/90 flex items-center justify-between gap-3 overflow-x-auto whitespace-nowrap">
-        <span>✦ VIP 1–4 20 DAYS OPEN</span>
-        <span>✦ VIP 6–9 30 DAYS • 3 INVITES</span>
-        <span>✦ CHANNEL JOIN +$0.50</span>
-      </div>
-
-      <!-- Navigation Tabs -->
-      <div class="grid grid-cols-5 gap-1.5 bg-black/55 p-1.5 rounded-2xl border border-white/10">
-        <button type="button" id="nav-tiers" onclick="openAppTab('tiers')" class="nav-btn py-2 rounded-xl text-[11px] font-extrabold uppercase gold-btn">Tiers</button>
-        <button type="button" id="nav-wallet" onclick="openAppTab('wallet')" class="nav-btn py-2 rounded-xl text-[11px] font-bold uppercase text-gray-300 hover:text-white">Wallet</button>
-        <button type="button" id="nav-spin" onclick="openAppTab('spin')" class="nav-btn py-2 rounded-xl text-[11px] font-bold uppercase text-gray-300 hover:text-white">Spin</button>
-        <button type="button" id="nav-invite" onclick="openAppTab('invite')" class="nav-btn py-2 rounded-xl text-[11px] font-bold uppercase text-gray-300 hover:text-white">Invite</button>
-        <button type="button" id="nav-support" onclick="openAppTab('support')" class="nav-btn py-2 rounded-xl text-[11px] font-bold uppercase text-gray-300 hover:text-white">Support</button>
-      </div>
-
-      <!-- TAB 1: TIERS (VIP PLANS) -->
-      <div id="view-tiers" class="space-y-3">
-        <div class="vault-card rounded-2xl p-4 flex items-center justify-between">
-          <div>
-            <h2 class="text-sm font-extrabold text-amber-300 uppercase tracking-wider">VIP Investment Tiers</h2>
-            <p class="text-xs text-gray-400">Active VIP level: <span id="tiers-current-vip" class="mono text-emerald-400 font-bold">VIP 0</span> • Active invites: <span id="tiers-invites" class="mono text-cyan-300 font-bold">0</span></p>
-          </div>
-          <button type="button" onclick="refreshProfile()" class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/15 text-xs font-semibold text-amber-300">↻ Sync</button>
-        </div>
-
-        <div id="tiers-list" class="space-y-3"></div>
-
-        <div class="vault-card rounded-2xl p-4 space-y-2">
-          <h3 class="text-xs font-extrabold uppercase tracking-wider text-emerald-400">Active VIP Subscriptions</h3>
-          <div id="active-subs-list" class="space-y-2 text-xs text-gray-300"></div>
-        </div>
-      </div>
-
-      <!-- TAB 2: WALLET (DEPOSIT + WITHDRAW + ORDERS) -->
-      <div id="view-wallet" class="hidden space-y-4">
-        <div class="vault-card rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-extrabold text-amber-300 uppercase">Deposit USDT</h2>
-            <span class="text-[11px] mono text-gray-400">Min $10.00</span>
+      <div class="shining-frame rounded-3xl p-[2px]">
+        <div class="shining-frame-inner p-4 space-y-3.5">
+          <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-black/55 border border-yellow-400/20">
+            <button type="button" id="tab-btn-register" onclick="toggleAuthMode('register')" class="py-2 rounded-lg gold-gradient text-black font-extrabold text-xs uppercase shine-sweep">Create ID</button>
+            <button type="button" id="tab-btn-login" onclick="toggleAuthMode('login')" class="py-2 rounded-lg text-yellow-100/70 font-bold text-xs uppercase">Sign In</button>
           </div>
 
-          <div class="grid grid-cols-2 gap-2">
+          <form id="register-form" onsubmit="submitRegister(event)" class="space-y-2.5">
             <div>
-              <label class="text-[11px] text-gray-400 block mb-1">Network</label>
-              <select id="dep-network" onchange="updateDepositWalletDisplay()" class="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-amber-300 outline-none">
-                <option value="TRC20">TRC20</option>
-                <option value="BEP20">BEP20</option>
-              </select>
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Full Name</label>
+              <input id="reg-name" type="text" required placeholder="e.g. Ali Raza" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2 text-xs text-white outline-none" />
             </div>
             <div>
-              <label class="text-[11px] text-gray-400 block mb-1">Amount (USD)</label>
-              <input id="dep-amount" type="number" min="10" step="0.01" placeholder="10.00" class="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
-            </div>
-          </div>
-
-          <div class="bg-black/50 border border-amber-400/20 rounded-xl p-3 flex items-center justify-between gap-2">
-            <div class="min-w-0">
-              <p class="text-[10px] text-gray-400 uppercase">Receiving Address</p>
-              <p id="dep-wallet-addr" class="text-xs mono text-amber-200 truncate">Loading...</p>
-            </div>
-            <button type="button" onclick="copyDepositWallet()" class="px-2.5 py-1 rounded-lg bg-amber-400/15 border border-amber-400/35 text-[11px] font-bold text-amber-300 shrink-0">Copy</button>
-          </div>
-
-          <div>
-            <label class="text-[11px] text-gray-400 block mb-1">Payment Screenshot (Required)</label>
-            <input id="dep-proof-file" type="file" accept="image/*" onchange="handleDepositProofPick(event)" class="w-full text-xs text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-400 file:text-black" />
-          </div>
-
-          <button type="button" onclick="submitDepositOrder()" class="w-full py-3 rounded-xl gold-btn font-extrabold text-xs uppercase">
-            Submit Deposit Proof
-          </button>
-        </div>
-
-        <div class="vault-card rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-extrabold text-emerald-400 uppercase">Withdraw USDT</h2>
-            <span class="text-[11px] mono text-gray-400">Min $10.00</span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-[11px] text-gray-400 block mb-1">Network</label>
-              <select id="wd-network" class="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-emerald-300 outline-none">
-                <option value="TRC20">TRC20</option>
-                <option value="BEP20">BEP20</option>
-              </select>
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Country & Mobile Number</label>
+              <div class="flex gap-2">
+                <select id="reg-country" class="bg-black/65 border border-yellow-400/25 rounded-xl px-2 py-2 text-xs font-mono text-white outline-none">
+                  <option value="PK|🇵🇰|+92">🇵🇰 +92</option>
+                  <option value="US|🇺🇸|+1">🇺🇸 +1</option>
+                  <option value="GB|🇬🇧|+44">🇬🇧 +44</option>
+                  <option value="AE|🇦🇪|+971">🇦🇪 +971</option>
+                  <option value="IN|🇮🇳|+91">🇮🇳 +91</option>
+                  <option value="SA|🇸🇦|+966">🇸🇦 +966</option>
+                </select>
+                <input id="reg-phone" type="tel" required placeholder="300-1234567" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2 text-xs font-mono text-white outline-none" />
+              </div>
             </div>
             <div>
-              <label class="text-[11px] text-gray-400 block mb-1">Amount (USD)</label>
-              <input id="wd-amount" type="number" min="10" step="0.01" placeholder="10.00" class="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Password</label>
+              <input id="reg-pass" type="password" required minlength="4" placeholder="Create password (min 4 chars)" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2 text-xs font-mono text-white outline-none" />
             </div>
-          </div>
-
-          <div>
-            <label class="text-[11px] text-gray-400 block mb-1">Your Wallet Address</label>
-            <input id="wd-address" type="text" placeholder="Enter destination wallet address" class="w-full bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
-          </div>
-
-          <button type="button" onclick="submitWithdrawOrder()" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase">
-            Request Withdrawal
-          </button>
-        </div>
-
-        <div class="vault-card rounded-2xl p-4 space-y-2.5">
-          <h3 class="text-xs font-extrabold uppercase tracking-wider text-white">Order History</h3>
-          <div id="orders-history-list" class="space-y-2 text-xs"></div>
-        </div>
-      </div>
-
-      <!-- TAB 3: LUCKY SPIN & CHANNEL REWARD -->
-      <div id="view-spin" class="hidden space-y-4">
-        <div class="vault-card rounded-2xl p-5 text-center space-y-3">
-          <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-amber-400/15 text-amber-300 border border-amber-400/35">
-            Depositors Only • Max Reward $1.00
-          </span>
-          <h2 class="text-lg font-extrabold text-amber-300">Lucky Golden Spin</h2>
-          <p id="spin-status-note" class="text-xs text-gray-300">
-            Spins Left: <span id="spin-left-count" class="mono font-bold text-amber-300">0</span> • Held Spin Reward: <span id="spin-held-amount" class="mono font-bold text-cyan-300">$0.00</span>
-          </p>
-          <button type="button" id="spin-play-btn" onclick="playLuckySpin()" class="px-6 py-3 rounded-2xl gold-btn font-extrabold text-xs uppercase shadow-lg">
-            ✦ Spin Golden Wheel
-          </button>
-          <p id="spin-result-box" class="text-xs font-bold text-emerald-400 min-h-[18px]"></p>
-        </div>
-
-        <div class="vault-card rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-xs font-extrabold uppercase text-cyan-300">Official Telegram Channel Reward (+$0.50)</h3>
-              <p class="text-[11px] text-gray-400">Join our official channel and submit your @username once.</p>
+              <label class="text-[11px] font-semibold text-yellow-300 block mb-1">Sponsor ID / Code (Optional)</label>
+              <input id="reg-invite" type="text" placeholder="Enter sponsor code" class="w-full bg-black/55 border border-yellow-400/35 focus:border-yellow-300 rounded-xl px-3 py-2 text-xs font-mono text-yellow-200 outline-none" />
             </div>
-            <a id="tg-channel-link" href="https://t.me/AurexVaultOfficial" target="_blank" class="px-3 py-1.5 rounded-xl bg-cyan-500/15 border border-cyan-400/40 text-xs font-bold text-cyan-300">
-              Join ↗
-            </a>
-          </div>
-          <div class="flex gap-2">
-            <input id="tg-username-input" type="text" placeholder="@your_telegram_username" class="flex-1 bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
-            <button type="button" id="tg-claim-btn" onclick="claimChannelReward()" class="px-4 py-2 rounded-xl bg-cyan-400 text-black font-extrabold text-xs uppercase">
-              Claim $0.50
+            <button type="submit" class="w-full py-3 rounded-xl gold-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-[0_8px_28px_rgba(250,204,21,0.45)] shine-sweep">
+              Unlock My Future Vault →
             </button>
-          </div>
-        </div>
-      </div>
+          </form>
 
-      <!-- TAB 4: INVITE & TEAM -->
-      <div id="view-invite" class="hidden space-y-4">
-        <div class="vault-card rounded-2xl p-4 space-y-3">
-          <h2 class="text-sm font-extrabold text-amber-300 uppercase">Invite &amp; Referral Code</h2>
-          <div class="bg-black/55 border border-white/10 rounded-xl p-3 flex items-center justify-between">
+          <form id="login-form" onsubmit="submitLogin(event)" class="hidden space-y-3">
             <div>
-              <p class="text-[10px] text-gray-400 uppercase">Your Referral / UID</p>
-              <p id="invite-code-display" class="text-base mono font-extrabold text-amber-300">0000000</p>
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Country & Mobile Number</label>
+              <div class="flex gap-2">
+                <select id="log-country" class="bg-black/65 border border-yellow-400/25 rounded-xl px-2 py-2.5 text-xs font-mono text-white outline-none">
+                  <option value="PK|🇵🇰|+92">🇵🇰 +92</option>
+                  <option value="US|🇺🇸|+1">🇺🇸 +1</option>
+                  <option value="GB|🇬🇧|+44">🇬🇧 +44</option>
+                  <option value="AE|🇦🇪|+971">🇦🇪 +971</option>
+                  <option value="IN|🇮🇳|+91">🇮🇳 +91</option>
+                  <option value="SA|🇸🇦|+966">🇸🇦 +966</option>
+                </select>
+                <input id="log-phone" type="tel" required placeholder="300-1234567" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2.5 text-xs font-mono text-white outline-none" />
+              </div>
             </div>
-            <button type="button" onclick="copyInviteCode()" class="px-3 py-1.5 rounded-xl gold-btn text-xs font-extrabold">Copy Code</button>
-          </div>
-          <div class="grid grid-cols-2 gap-2.5 text-center">
-            <div class="bg-black/45 border border-white/10 rounded-xl p-3">
-              <p class="text-[10px] text-gray-400 uppercase">Active Invites</p>
-              <p id="invite-active-count" class="text-lg mono font-extrabold text-cyan-300">0</p>
+            <div>
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Password</label>
+              <input id="log-pass" type="password" required placeholder="Your password" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2.5 text-xs font-mono text-white outline-none" />
             </div>
-            <div class="bg-black/45 border border-white/10 rounded-xl p-3">
-              <p class="text-[10px] text-gray-400 uppercase">Team Rebate</p>
-              <p id="invite-rebate-total" class="text-lg mono font-extrabold text-emerald-400">$0.00</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 5: LIVE SUPPORT -->
-      <div id="view-support" class="hidden space-y-3">
-        <div class="vault-card rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-extrabold text-amber-300 uppercase">Live Support Chat</h2>
-            <a id="tg-support-link" href="https://t.me/AurexVaultSupport" target="_blank" class="px-3 py-1 rounded-lg bg-white/10 text-xs font-bold text-amber-300">
-              Telegram Support ↗
-            </a>
-          </div>
-          <div id="support-messages-box" class="bg-black/50 border border-white/10 rounded-xl p-3 h-60 overflow-y-auto space-y-2 text-xs"></div>
-          <form onsubmit="sendSupportMessage(event)" class="flex gap-2">
-            <input id="support-msg-input" type="text" placeholder="Write message to support..." class="flex-1 bg-black/60 border border-white/15 rounded-xl px-3 py-2 text-xs text-white outline-none" />
-            <button type="submit" class="px-4 py-2 rounded-xl gold-btn font-extrabold text-xs uppercase">Send</button>
+            <button type="submit" class="w-full py-3 rounded-xl gold-gradient text-black font-extrabold text-xs uppercase tracking-wider shine-sweep">
+              Enter Vault Terminal →
+            </button>
           </form>
         </div>
       </div>
 
+      <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
+        <div class="billionaire-glass rounded-xl p-2">
+          <p class="font-mono font-bold text-yellow-300">$10 MIN</p>
+          <p class="text-yellow-100/75">Start & Payout</p>
+        </div>
+        <div class="billionaire-glass rounded-xl p-2">
+          <p class="font-mono font-bold text-yellow-300">20 / 30 DAYS</p>
+          <p class="text-yellow-100/75">VIP Cycles</p>
+        </div>
+        <div class="billionaire-glass rounded-xl p-2">
+          <p class="font-mono font-bold text-yellow-300">3 INVITES</p>
+          <p class="text-yellow-100/75">Unlock VIP 6–9</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative z-10 text-center pb-3 text-[10px] text-yellow-200/65">
+      256-Bit Encrypted Vault • Official Channel: @AurexVaultOfficial
     </div>
   </div>
 
+  <!-- ========================================================= -->
+  <!-- 2. MAIN TRADING DASHBOARD                                 -->
+  <!-- ========================================================= -->
+  <div id="main-app-shell" class="hidden relative z-10 w-full max-w-[440px] min-h-screen sm:min-h-[850px] sm:rounded-[34px] bg-black/30 sm:border sm:border-yellow-400/35 shadow-[0_25px_80px_rgba(0,0,0,0.88)] backdrop-blur-[5px] flex flex-col overflow-hidden">
+
+    <header class="sticky top-0 z-30 bg-black/60 backdrop-blur-xl border-b border-yellow-400/25 px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl gold-gradient p-[1.5px] shadow-[0_0_20px_rgba(250,204,21,0.55)] shine-sweep">
+          <div class="w-full h-full bg-black/80 rounded-[10.5px] flex items-center justify-center font-extrabold text-xs text-yellow-300">AV</div>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-sm text-white">AUREX <span class="gold-text">VAULT PRO</span></span>
+            <span class="px-2 py-0.5 rounded bg-yellow-400/15 border border-yellow-400/40 font-mono text-[10px] font-extrabold text-yellow-200">
+              ID: <span id="header-uid">0000000</span>
+            </span>
+          </div>
+          <p class="text-[10px] text-yellow-300/90 flex items-center gap-1 font-semibold">
+            <span class="w-1.5 h-1.5 rounded-full bg-yellow-300 animate-ping"></span>
+            <span id="header-user-label">Member Active</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button onclick="switchTab('deposit')" class="px-2.5 py-1.5 rounded-xl bg-yellow-400/15 border border-yellow-400/45 flex items-center gap-1 shine-sweep">
+          <span class="text-xs font-extrabold font-mono text-yellow-300" id="header-balance">$0.00</span>
+          <span class="w-4 h-4 rounded-md gold-gradient text-black font-extrabold text-xs flex items-center justify-center">+</span>
+        </button>
+        <button onclick="logoutUser()" title="Sign Out" class="w-8 h-8 rounded-xl bg-red-500/15 border border-red-500/35 text-red-300 text-xs flex items-center justify-center">⏻</button>
+      </div>
+    </header>
+
+    <div class="bg-yellow-500/10 border-b border-yellow-400/20 py-1.5 overflow-hidden backdrop-blur-md">
+      <div class="ticker-scroll font-mono text-[10px] text-yellow-200 space-x-6">
+        <span>✦ WIN UP TO $10.00 DAILY <strong class="text-yellow-300">LUCKY SPIN</strong></span>
+        <span>✦ VIP 1–4 <strong class="text-yellow-300">20 DAYS OPEN</strong></span>
+        <span>✦ VIP 6–9 <strong class="text-amber-300">30 DAYS • 3 INVITES</strong></span>
+        <span>✦ CHANNEL JOIN BONUS <strong class="text-yellow-300">$0.50 REWARD</strong></span>
+        <span>✦ MIN PAYOUT <strong class="text-yellow-200">$10.00</strong></span>
+      </div>
+    </div>
+
+    <main class="flex-1 overflow-y-auto pb-24 px-4 pt-3 space-y-4">
+
+      <section id="tab-home" class="space-y-4">
+        <div class="shining-frame rounded-3xl p-[2px] shadow-[0_18px_45px_rgba(0,0,0,0.65)]">
+          <div class="shining-frame-inner p-4 relative overflow-hidden space-y-3">
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-yellow-300 font-bold">✦ Sovereign Equity Balance</span>
+                <h1 id="hero-balance" class="text-3xl font-extrabold font-mono gold-text mt-0.5">$0.00</h1>
+                <p id="pending-spin-banner" class="hidden text-[10px] font-mono text-amber-300 mt-0.5">
+                  ⏳ Held Spin Reward: <span id="pending-spin-amount">$0.00</span> (Activate plan to unlock)
+                </p>
+              </div>
+              <div class="text-right">
+                <span id="hero-vip-badge" class="px-2.5 py-1 rounded-xl bg-yellow-400/20 border border-yellow-400/45 text-[10px] font-mono font-extrabold text-yellow-200">
+                  NO VIP ACTIVE
+                </span>
+                <p id="hero-plan-days" class="text-[10px] text-yellow-200/80 font-mono mt-1">Min Withdraw: $10.00</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-yellow-400/20">
+              <div class="bg-black/45 rounded-xl p-2 border border-yellow-400/20">
+                <p class="text-[9px] text-yellow-100/70">Profit Earned</p>
+                <p id="today-yield" class="text-xs font-extrabold font-mono text-yellow-300">+$0.00</p>
+              </div>
+              <div class="bg-black/45 rounded-xl p-2 border border-yellow-400/20">
+                <p class="text-[9px] text-yellow-100/70">Invite Bonus</p>
+                <p id="team-rebate" class="text-xs font-extrabold font-mono text-amber-300">$0.00</p>
+              </div>
+              <div class="bg-black/45 rounded-xl p-2 border border-yellow-400/20">
+                <p class="text-[9px] text-yellow-100/70">Active Invites</p>
+                <p id="hero-active-invites" class="text-xs font-extrabold font-mono text-yellow-200">0 / 3</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2 pt-1">
+              <button onclick="switchTab('deposit')" class="flex flex-col items-center gap-1 p-2 rounded-xl gold-gradient text-black font-extrabold shadow-lg shine-sweep">
+                <span class="text-sm">+</span>
+                <span class="text-[10px]">Deposit</span>
+              </button>
+              <button onclick="openWithdrawModal()" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/50 border border-yellow-400/35 text-yellow-200 hover:bg-yellow-400/15 transition">
+                <span class="text-sm">↗</span>
+                <span class="text-[10px] font-bold">Withdraw</span>
+              </button>
+              <button onclick="claimDailyYield()" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/50 border border-yellow-400/35 text-yellow-300 hover:bg-yellow-400/15 transition">
+                <span class="text-sm">✦</span>
+                <span class="text-[10px] font-bold">Harvest</span>
+              </button>
+              <button onclick="switchTab('team')" class="flex flex-col items-center gap-1 p-2 rounded-xl bg-black/50 border border-yellow-400/35 text-amber-200 hover:bg-yellow-400/15 transition">
+                <span class="text-sm">♛</span>
+                <span class="text-[10px] font-bold">Surprises</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Official Telegram Channel & Join Reward Card -->
+        <div class="billionaire-glass rounded-2xl p-3.5 border-yellow-400/40 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-mono font-extrabold text-yellow-300 uppercase">📢 Official Telegram Hub</span>
+              <p class="text-[11px] text-yellow-100/85 mt-0.5">
+                Join <strong>Aurex Vault Official</strong> & claim <strong class="text-yellow-300">$0.50 Join Reward</strong>!
+              </p>
+            </div>
+            <a id="official-channel-link" href="https://t.me/AurexVaultOfficial" target="_blank" rel="noopener noreferrer"
+               class="px-3 py-2 rounded-xl bg-yellow-400/20 border border-yellow-400/45 text-yellow-200 font-extrabold text-[11px] shrink-0 hover:bg-yellow-400/30 transition">
+              Join Channel ↗
+            </a>
+          </div>
+          <div class="flex items-center gap-2 pt-1">
+            <input id="tg-username-input" type="text" placeholder="@YourTelegramUsername"
+                   class="flex-1 bg-black/60 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-1.5 text-xs font-mono text-white outline-none" />
+            <button type="button" id="claim-channel-reward-btn" onclick="claimChannelJoinReward()"
+                    class="px-3 py-1.5 rounded-xl gold-gradient text-black font-extrabold text-[11px] shrink-0 shine-sweep">
+              Claim $0.50
+            </button>
+          </div>
+        </div>
+
+        <!-- Lucky Golden Spin Card -->
+        <div class="billionaire-glass rounded-2xl p-3.5 space-y-2">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm">✦</span>
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider">Lucky Golden Spin</h2>
+                <span class="px-2 py-0.5 rounded bg-yellow-400/20 text-yellow-300 font-mono text-[10px] font-bold">
+                  Spins: <span id="spin-count-badge">2</span>
+                </span>
+              </div>
+              <p class="text-[11px] text-yellow-100/80 mt-0.5">
+                <strong class="text-yellow-300">WIN UP TO $10.00 DAILY</strong> • Depositors & Active Plan Required
+              </p>
+            </div>
+            <button onclick="playLuckySpin()" id="spin-now-btn" class="px-3.5 py-2.5 rounded-xl gold-gradient text-black font-extrabold text-xs shrink-0 shadow-[0_0_22px_rgba(250,204,21,0.5)] shine-sweep">
+              SPIN NOW
+            </button>
+          </div>
+          <p id="spin-status-hint" class="text-[10px] font-mono text-yellow-200/75"></p>
+        </div>
+
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between px-1">
+            <div>
+              <h2 class="text-sm font-extrabold text-white flex items-center gap-1.5">
+                <span class="gold-text">♛</span> VIP Wealth Tiers ($10 – $5,000)
+              </h2>
+              <p class="text-[10px] text-yellow-100/70">First 4 = 20 Days Open • Last 4 = 30 Days (3 Invites)</p>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-yellow-300">Invites: <span id="front-invites-count">0</span>/3</span>
+          </div>
+
+          <div id="front-vip-tiers-list" class="space-y-2.5"></div>
+        </div>
+
+        <div class="billionaire-glass rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-2.5">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-yellow-200">Recent Order Receipts</h3>
+            <button onclick="syncSessionWithServer()" class="text-[11px] text-yellow-300 font-bold">↻ Refresh</button>
+          </div>
+          <div id="home-orders-list" class="space-y-2"></div>
+        </div>
+      </section>
+
+      <section id="tab-vip" class="hidden space-y-3">
+        <div class="billionaire-glass rounded-2xl p-4 border-yellow-400/40">
+          <h2 class="text-base font-extrabold gold-text">All 9 VIP Wealth Plans</h2>
+          <p class="text-xs text-yellow-100/80 mt-1">
+            Plans 1–4 ($10, $25, $50, $100) run for <strong>20 Days</strong> for everyone. Plans 6–9 ($500–$5,000) run for <strong>30 Days</strong> and unlock once <strong>3 invited friends deposit</strong>.
+          </p>
+        </div>
+        <div id="full-vip-tiers-list" class="space-y-2.5"></div>
+      </section>
+
+      <section id="tab-deposit" class="hidden space-y-4">
+        <div class="billionaire-glass rounded-2xl p-4 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-extrabold text-white">Deposit USDT (Min $10)</h2>
+              <p class="text-[11px] text-yellow-100/75">Send USDT & upload payment screenshot only</p>
+            </div>
+            <span class="px-2 py-1 rounded-lg bg-yellow-400/20 text-yellow-300 text-[10px] font-bold">PROOF ONLY</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <button onclick="selectNetwork('TRC20')" id="net-TRC20" class="net-btn py-2.5 px-3 rounded-xl text-xs font-extrabold border border-yellow-400 bg-yellow-400/20 text-yellow-300">USDT (TRC20)</button>
+            <button onclick="selectNetwork('BEP20')" id="net-BEP20" class="net-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-yellow-400/20 bg-black/40 text-yellow-100/75">USDT (BEP20)</button>
+          </div>
+
+          <div class="bg-black/55 rounded-2xl p-4 border border-yellow-400/30 flex flex-col items-center text-center">
+            <div class="bg-white p-2.5 rounded-2xl mb-2.5 relative inline-flex items-center justify-center shadow-[0_0_25px_rgba(250,204,21,0.35)]">
+              <div id="real-qr-container" class="w-[156px] h-[156px] flex items-center justify-center"></div>
+            </div>
+            <p id="network-label" class="text-[11px] font-bold text-yellow-300 mb-1">Receiving Wallet • TRC20</p>
+            <div class="w-full flex items-center justify-between gap-2 bg-black/60 border border-yellow-400/25 rounded-xl px-3 py-2">
+              <span id="deposit-address-text" class="font-mono text-[11px] text-yellow-100 break-all text-left">TER4vxuCgwKT4cymyC2NRZgVYnvWn6dFC9</span>
+              <button type="button" onclick="copyDepositAddress()" class="px-3 py-1.5 rounded-lg gold-gradient text-black font-extrabold text-[11px] shrink-0">Copy</button>
+            </div>
+          </div>
+
+          <form onsubmit="submitDepositOrder(event)" class="space-y-3">
+            <div>
+              <label class="text-[11px] font-semibold text-yellow-100/85 block mb-1">Deposit Amount (USD — Minimum $10)</label>
+              <input id="deposit-amount-input" type="number" step="0.01" min="10" required placeholder="10.00" class="w-full bg-black/55 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white outline-none" />
+            </div>
+
+            <div>
+              <label class="text-[11px] font-semibold text-yellow-300 block mb-1">Upload Payment Screenshot (Required)</label>
+              <input id="deposit-proof-file" type="file" accept="image/*" required onchange="previewDepositProof(event)" class="w-full bg-black/55 border border-yellow-400/30 rounded-xl p-2 text-xs text-yellow-100 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:gold-gradient file:text-black file:font-bold" />
+              <img id="deposit-proof-preview" class="hidden mt-2 w-full max-h-44 object-contain rounded-xl border border-yellow-400/25 bg-black/60" />
+            </div>
+
+            <button type="submit" class="w-full py-3.5 rounded-xl gold-gradient text-black font-extrabold text-xs uppercase tracking-wider shadow-[0_8px_28px_rgba(250,204,21,0.45)] shine-sweep">
+              Submit Screenshot & Generate Order ID
+            </button>
+          </form>
+
+          <div id="latest-order-slip" class="hidden bg-yellow-400/15 border border-yellow-400/45 rounded-2xl p-3.5 space-y-1 text-xs">
+            <p class="font-extrabold text-yellow-300">✓ Deposit Order Submitted</p>
+            <p class="text-yellow-100">Order ID: <strong id="slip-order-id" class="font-mono text-yellow-300"></strong></p>
+            <p class="text-yellow-100">Date & Time: <strong id="slip-order-time" class="font-mono"></strong></p>
+            <p class="text-yellow-100">Amount: <strong id="slip-order-amount" class="font-mono text-yellow-300"></strong></p>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-team" class="hidden space-y-4">
+        <div class="shining-frame rounded-3xl p-[2px]">
+          <div class="shining-frame-inner p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-full bg-yellow-400/20 border border-yellow-400/45 text-[10px] font-extrabold text-yellow-300 uppercase">
+                ♛ Sovereign Invite Vault
+              </span>
+              <span class="font-mono text-xs font-extrabold text-yellow-200">
+                <span id="team-active-count">0</span> / 3 Invites
+              </span>
+            </div>
+
+            <h2 class="text-base font-extrabold text-white leading-snug">
+              Bring 3 Depositing Friends & Unlock <span class="gold-text">30-Day VIP 6–9 ($500–$5,000)</span> + Bonus Spins!
+            </h2>
+            <p class="text-xs text-yellow-100/80">
+              Every friend who joins with your <strong>7-Digit ID</strong> and deposits gives you:
+              <strong class="text-yellow-300">12% Instant Rebate</strong> + <strong class="text-amber-300">+1 Extra Golden Spin</strong> + progress toward <strong class="text-yellow-200">VIP 6–9 Unlock</strong>!
+            </p>
+
+            <div class="bg-black/60 border border-yellow-400/35 rounded-2xl p-3 space-y-2">
+              <p class="text-[10px] text-yellow-200/70 uppercase font-bold">Your Invite Link & 7-Digit Code</p>
+              <p id="my-invite-link" class="font-mono text-[11px] text-yellow-300 break-all bg-black/50 p-2 rounded-lg"></p>
+              <div class="flex gap-2">
+                <button type="button" onclick="copyInviteLink()" class="flex-1 py-2.5 rounded-xl gold-gradient text-black font-extrabold text-xs shine-sweep">
+                  Copy Invite Link
+                </button>
+                <button type="button" onclick="shareInviteLink()" class="flex-1 py-2.5 rounded-xl emerald-gradient text-black font-extrabold text-xs shine-sweep">
+                  Share Now ✦
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="billionaire-glass rounded-2xl p-4 space-y-2.5">
+          <h3 class="text-xs font-extrabold uppercase tracking-wider text-yellow-300">✦ Invite Milestone Surprises</h3>
+          <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="bg-black/50 border border-yellow-400/20 rounded-xl p-2.5">
+              <p class="text-lg gold-text font-extrabold">I</p>
+              <p class="font-bold text-white text-[11px] mt-1">1st Invite</p>
+              <p class="text-[10px] text-yellow-300">+12% & +1 Spin</p>
+            </div>
+            <div class="bg-black/50 border border-yellow-400/20 rounded-xl p-2.5">
+              <p class="text-lg gold-text font-extrabold">II</p>
+              <p class="font-bold text-white text-[11px] mt-1">2nd Invite</p>
+              <p class="text-[10px] text-amber-300">+12% & +1 Spin</p>
+            </div>
+            <div class="bg-black/50 border border-yellow-400/45 rounded-xl p-2.5">
+              <p class="text-lg gold-text font-extrabold">III</p>
+              <p class="font-bold text-yellow-200 text-[11px] mt-1">3rd Invite</p>
+              <p class="text-[10px] text-yellow-300">VIP 6–9 UNLOCKED</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-account" class="hidden space-y-4">
+        <div class="billionaire-glass rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-[10px] text-yellow-200/70 uppercase font-bold">Unique 7-Digit Trader ID</p>
+              <p id="profile-uid-display" class="font-mono text-2xl font-extrabold gold-text">0000000</p>
+            </div>
+            <button onclick="logoutUser()" class="px-3 py-1.5 rounded-xl bg-red-500/15 border border-red-500/35 text-xs font-bold text-red-300">Log Out</button>
+          </div>
+          <div class="pt-2 border-t border-yellow-400/20 text-xs text-yellow-100/85 space-y-1">
+            <p>Name: <strong id="profile-name-display" class="text-white"></strong></p>
+            <p>Mobile: <strong id="profile-phone-display" class="font-mono text-yellow-300"></strong></p>
+            <p>Official Channel: <a href="https://t.me/AurexVaultOfficial" target="_blank" class="font-mono text-yellow-300 underline">@AurexVaultOfficial</a></p>
+            <p>Official Support: <a href="https://t.me/AurexVaultSupport" target="_blank" class="font-mono text-yellow-300 underline">@AurexVaultSupport</a></p>
+            <p>Minimum Withdrawal: <strong class="font-mono text-yellow-300">$10.00 USD</strong></p>
+          </div>
+          <button onclick="openSupportModal()" class="w-full py-3 rounded-xl gold-gradient text-black font-extrabold text-xs uppercase shine-sweep">
+            💬 Open Photo / Video Live Support
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <button onclick="openSupportModal()" class="fixed sm:absolute bottom-20 right-4 z-40 px-3.5 py-2.5 rounded-full gold-gradient text-black font-extrabold text-xs shadow-[0_10px_28px_rgba(250,204,21,0.6)] flex items-center gap-1.5 shine-sweep">
+      <span>💬</span>
+      <span>Live Chat</span>
+    </button>
+
+    <nav class="sticky bottom-0 z-30 bg-black/65 backdrop-blur-xl border-t border-yellow-400/25 px-2 py-2 grid grid-cols-5 gap-1">
+      <button onclick="switchTab('home')" id="nav-home" class="nav-item flex flex-col items-center py-1 text-yellow-300">
+        <span class="text-sm">✦</span>
+        <span class="text-[10px] font-bold mt-0.5">Terminal</span>
+      </button>
+      <button onclick="switchTab('vip')" id="nav-vip" class="nav-item flex flex-col items-center py-1 text-yellow-100/60">
+        <span class="text-sm">♛</span>
+        <span class="text-[10px] font-semibold mt-0.5">9 VIPs</span>
+      </button>
+      <button onclick="switchTab('deposit')" id="nav-deposit" class="nav-item flex flex-col items-center py-1 text-yellow-300">
+        <div class="w-8 h-8 -mt-3 rounded-xl gold-gradient text-black flex items-center justify-center font-extrabold shadow shine-sweep">+</div>
+        <span class="text-[10px] font-bold mt-0.5">Deposit</span>
+      </button>
+      <button onclick="switchTab('team')" id="nav-team" class="nav-item flex flex-col items-center py-1 text-yellow-100/60">
+        <span class="text-sm">❖</span>
+        <span class="text-[10px] font-semibold mt-0.5">Invite (3)</span>
+      </button>
+      <button onclick="switchTab('account')" id="nav-account" class="nav-item flex flex-col items-center py-1 text-yellow-100/60">
+        <span class="text-sm">◈</span>
+        <span class="text-[10px] font-semibold mt-0.5">My ID</span>
+      </button>
+    </nav>
+
+    <div id="withdraw-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="w-full max-w-[390px] billionaire-glass rounded-3xl p-5 border border-yellow-400/45 space-y-4 relative">
+        <button onclick="closeWithdrawModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 text-yellow-200 flex items-center justify-center">✕</button>
+        <div>
+          <h3 class="text-base font-extrabold text-white">Withdraw USDT (Min $10.00)</h3>
+          <p class="text-[11px] text-yellow-100/80">Available Balance: <span id="withdraw-avail-balance" class="font-mono text-yellow-300 font-bold">$0.00</span></p>
+        </div>
+        <form onsubmit="handleWithdrawSubmit(event)" class="space-y-3">
+          <input id="withdraw-address" type="text" required placeholder="Destination USDT (TRC20) Address" class="w-full bg-black/60 border border-yellow-400/25 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
+          <input id="withdraw-amount" type="number" min="10" step="0.01" required placeholder="Minimum $10.00 USD" class="w-full bg-black/60 border border-yellow-400/25 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white outline-none" />
+          <button type="submit" class="w-full py-3 rounded-xl gold-gradient text-black font-extrabold text-xs uppercase shine-sweep">Submit Payout Request</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="support-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3">
+      <div class="w-full max-w-[410px] billionaire-glass rounded-3xl p-4 border border-yellow-400/45 flex flex-col h-[560px] relative">
+        <div class="flex items-center justify-between pb-2.5 border-b border-yellow-400/20">
+          <div>
+            <h3 class="text-sm font-extrabold text-white">💬 AUREX Live Support</h3>
+            <p class="text-[10px] text-yellow-300 font-semibold">
+              <a href="https://t.me/AurexVaultSupport" target="_blank" class="underline">@AurexVaultSupport</a> • Channel: <a href="https://t.me/AurexVaultOfficial" target="_blank" class="underline">@AurexVaultOfficial</a>
+            </p>
+          </div>
+          <button onclick="closeSupportModal()" class="w-8 h-8 rounded-full bg-white/10 text-yellow-200 flex items-center justify-center">✕</button>
+        </div>
+
+        <div id="support-chat-box" class="flex-1 overflow-y-auto py-3 space-y-2.5 text-xs"></div>
+
+        <div id="user-media-preview-bar" class="hidden bg-black/65 border border-yellow-400/35 rounded-xl p-2 mb-2 flex items-center justify-between gap-2">
+          <span id="user-media-label" class="text-[11px] text-yellow-300 font-mono truncate">Media attached</span>
+          <button type="button" onclick="clearUserMedia()" class="text-xs text-red-300 font-bold px-2">✕</button>
+        </div>
+
+        <form onsubmit="sendSupportMessage(event)" class="pt-2 border-t border-yellow-400/20 space-y-2">
+          <div class="flex items-center gap-1.5">
+            <label class="px-2.5 py-2 rounded-xl bg-yellow-400/15 border border-yellow-400/30 hover:bg-yellow-400/25 text-xs cursor-pointer" title="Send Photo">
+              📷
+              <input type="file" accept="image/*" class="hidden" onchange="handleSupportMediaSelect(event, 'image')" />
+            </label>
+            <label class="px-2.5 py-2 rounded-xl bg-yellow-400/15 border border-yellow-400/30 hover:bg-yellow-400/25 text-xs cursor-pointer" title="Send Video">
+              🎥
+              <input type="file" accept="video/*" class="hidden" onchange="handleSupportMediaSelect(event, 'video')" />
+            </label>
+            <input id="support-msg-input" type="text" placeholder="Type message..." class="flex-1 bg-black/60 border border-yellow-400/25 focus:border-yellow-300 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+            <button type="submit" class="px-4 py-2 rounded-xl gold-gradient text-black font-extrabold text-xs">Send</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
   <script>
-    const FALLBACK_PLANS = [
-      { level: 1, name: 'VIP 1', amount: 10, days: 20, daily_return: 0.85, min_invites: 0, unlocked: true },
-      { level: 2, name: 'VIP 2', amount: 25, days: 20, daily_return: 2.25, min_invites: 0, unlocked: true },
-      { level: 3, name: 'VIP 3', amount: 50, days: 20, daily_return: 4.75, min_invites: 0, unlocked: true },
-      { level: 4, name: 'VIP 4', amount: 100, days: 20, daily_return: 10.0, min_invites: 0, unlocked: true },
-      { level: 5, name: 'VIP 5', amount: 250, days: 25, daily_return: 26.5, min_invites: 0, unlocked: true },
-      { level: 6, name: 'VIP 6', amount: 500, days: 30, daily_return: 58.0, min_invites: 3, unlocked: false },
-      { level: 7, name: 'VIP 7', amount: 1000, days: 30, daily_return: 122.0, min_invites: 3, unlocked: false },
-      { level: 8, name: 'VIP 8', amount: 2500, days: 30, daily_return: 320.0, min_invites: 3, unlocked: false },
-      { level: 9, name: 'VIP 9', amount: 5000, days: 30, daily_return: 680.0, min_invites: 3, unlocked: false }
+    const TELEGRAM_CHANNEL_URL = 'https://t.me/AurexVaultOfficial';
+    const TELEGRAM_SUPPORT_URL = 'https://t.me/AurexVaultSupport';
+    const SPIN_REWARD_POOL = [0.20, 0.30, 0.50, 0.70];
+
+    const VIP_PLANS = [
+      { level: 1, name: 'VIP 1 • Micro Scalper', price: 10, days: 20, daily: 0.85, requiresInvites: 0 },
+      { level: 2, name: 'VIP 2 • Bronze Node', price: 25, days: 20, daily: 2.25, requiresInvites: 0 },
+      { level: 3, name: 'VIP 3 • Silver Pulse', price: 50, days: 20, daily: 4.75, requiresInvites: 0 },
+      { level: 4, name: 'VIP 4 • Gold Matrix', price: 100, days: 20, daily: 10.00, requiresInvites: 0 },
+      { level: 5, name: 'VIP 5 • Platinum Pro', price: 250, days: 25, daily: 26.50, requiresInvites: 0 },
+      { level: 6, name: 'VIP 6 • Diamond Syndicate', price: 500, days: 30, daily: 58.00, requiresInvites: 3 },
+      { level: 7, name: 'VIP 7 • Emerald Whale', price: 1000, days: 30, daily: 122.00, requiresInvites: 3 },
+      { level: 8, name: 'VIP 8 • Sovereign Vault', price: 2500, days: 30, daily: 320.00, requiresInvites: 3 },
+      { level: 9, name: 'VIP 9 • Imperial Apex', price: 5000, days: 30, daily: 680.00, requiresInvites: 3 }
     ];
 
-    let authToken = localStorage.getItem('aurex_token') || '';
-    let currentUser = null;
-    let vipPlans = [...FALLBACK_PLANS];
-    let subscriptions = [];
-    let orders = [];
-    let wallets = { TRC20: '', BEP20: '' };
-    let telegramLinks = { channel: 'https://t.me/AurexVaultOfficial', support: 'https://t.me/AurexVaultSupport' };
+    const state = {
+      loggedIn: false,
+      authToken: localStorage.getItem('aurex_token') || '',
+      userUid: '0000000',
+      fullName: '',
+      countryCode: 'PK',
+      countryFlag: '🇵🇰',
+      dialCode: '+92',
+      phone: '',
+      refCode: '0000000',
+      activeInvites: 0,
+      spinsLeft: 2,
+      hasDeposited: false,
+      pendingSpinReward: 0,
+      channelRewardClaimed: false,
+      balance: 0,
+      todayYield: 0,
+      teamRebate: 0,
+      vipLevel: 0,
+      planDaysLeft: 0,
+      selectedNetwork: 'TRC20',
+      networks: {
+        TRC20: 'TER4vxuCgwKT4cymyC2NRZgVYnvWn6dFC9',
+        BEP20: '0xe37ab67b88eadcb56c05fe80ebde4ea5786962aa'
+      },
+      orders: []
+    };
+
     let depositProofBase64 = '';
-    let activeAppTab = 'tiers';
-    let audioCtx = null;
+    let userSupportMedia = { type: 'none', data: '', name: '' };
+    let lastSupportCount = 0;
+    let sharedAudioCtx = null;
 
-    // Click Sound Engine
-    function playClickSound(freq = 660, duration = 0.055, type = 'triangle', volume = 0.07) {
+    function playChimeSound(freq = 720, duration = 0.06, type = 'triangle', vol = 0.065) {
       try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextClass) return;
-        if (!audioCtx) audioCtx = new AudioContextClass();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!sharedAudioCtx) sharedAudioCtx = new AudioCtx();
+        if (sharedAudioCtx.state === 'suspended') sharedAudioCtx.resume();
+        const ctx = sharedAudioCtx;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
         osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0008, audioCtx.currentTime + duration);
-
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(vol, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0008, ctx.currentTime + duration);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(ctx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + duration + 0.01);
-      } catch (_) {}
+        osc.stop(ctx.currentTime + duration + 0.01);
+      } catch (e) {}
     }
 
-    // Play click sound on every button/interactive element click
+    // Har button / tab / link click par sound
     document.addEventListener('click', (e) => {
-      const target = e.target.closest('button, a, select, input[type="checkbox"], input[type="radio"]');
-      if (target) {
-        playClickSound(680, 0.045, 'sine', 0.055);
+      const btn = e.target.closest('button, a, select, [role="tab"]');
+      if (btn) {
+        playChimeSound(680, 0.045, 'triangle', 0.055);
       }
     }, true);
 
-    function showToast(msg, isError = false) {
-      const banner = document.getElementById('toast-banner');
-      const text = document.getElementById('toast-text');
-      text.textContent = msg;
-      banner.className = `fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-[92%] px-4 py-3 rounded-2xl border text-xs font-semibold shadow-2xl ${
-        isError
-          ? 'border-red-500/60 bg-red-950/95 text-red-200'
-          : 'border-emerald-400/60 bg-emerald-950/95 text-emerald-200'
-      }`;
-      banner.classList.remove('hidden');
-      clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => banner.classList.add('hidden'), 3400);
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const el = document.createElement('div');
+      el.className = `billionaire-glass ${type === 'success' ? 'border-yellow-300/60 text-yellow-200' : 'border-amber-400/50 text-amber-200'} px-4 py-2.5 rounded-2xl text-xs font-bold shadow-2xl`;
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 3600);
     }
 
-    function authHeaders() {
-      return {
-        'Content-Type': 'application/json',
-        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
-      };
+    function formatUSD(v) {
+      return '$' + (Number(v) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    function switchAuthTab(tab) {
-      playClickSound(760, 0.05, 'triangle', 0.06);
-      const isReg = tab === 'register';
-      document.getElementById('register-form').classList.toggle('hidden', !isReg);
-      document.getElementById('login-form').classList.toggle('hidden', isReg);
-      document.getElementById('tab-register').className = `py-2.5 rounded-xl text-xs font-extrabold uppercase ${isReg ? 'gold-btn' : 'text-gray-300 hover:text-white'}`;
-      document.getElementById('tab-login').className = `py-2.5 rounded-xl text-xs font-extrabold uppercase ${!isReg ? 'gold-btn' : 'text-gray-300 hover:text-white'}`;
-    }
+    function toggleAuthMode(mode) {
+      const regForm = document.getElementById('register-form');
+      const logForm = document.getElementById('login-form');
+      const btnReg = document.getElementById('tab-btn-register');
+      const btnLog = document.getElementById('tab-btn-login');
 
-    async function handleRegister(e) {
-      e.preventDefault();
-      const selectEl = document.getElementById('reg-dial');
-      const opt = selectEl.options[selectEl.selectedIndex];
-      const payload = {
-        fullName: document.getElementById('reg-name').value.trim(),
-        dialCode: selectEl.value,
-        countryCode: opt?.dataset?.code || 'PK',
-        countryFlag: opt?.dataset?.flag || '🇵🇰',
-        phone: document.getElementById('reg-phone').value.trim(),
-        password: document.getElementById('reg-password').value,
-        inviteCode: document.getElementById('reg-ref').value.trim()
-      };
-
-      try {
-        const res = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          playClickSound(260, 0.14, 'sawtooth', 0.08);
-          return showToast(data.error || 'Failed to register account.', true);
-        }
-        authToken = data.token;
-        localStorage.setItem('aurex_token', authToken);
-        playClickSound(920, 0.11, 'triangle', 0.08);
-        showToast(`Account created! UID #${data.user.user_uid}`);
-        await refreshProfile();
-      } catch (err) {
-        showToast('Network error while creating account.', true);
+      if (mode === 'register') {
+        regForm.classList.remove('hidden');
+        logForm.classList.add('hidden');
+        btnReg.className = 'py-2 rounded-lg gold-gradient text-black font-extrabold text-xs uppercase shine-sweep';
+        btnLog.className = 'py-2 rounded-lg text-yellow-100/70 font-bold text-xs uppercase';
+      } else {
+        regForm.classList.add('hidden');
+        logForm.classList.remove('hidden');
+        btnLog.className = 'py-2 rounded-lg gold-gradient text-black font-extrabold text-xs uppercase shine-sweep';
+        btnReg.className = 'py-2 rounded-lg text-yellow-100/70 font-bold text-xs uppercase';
       }
     }
 
-    async function handleLogin(e) {
-      e.preventDefault();
-      const payload = {
-        dialCode: document.getElementById('login-dial').value,
-        phone: document.getElementById('login-phone').value.trim(),
-        password: document.getElementById('login-password').value
-      };
-
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          playClickSound(260, 0.14, 'sawtooth', 0.08);
-          return showToast(data.error || 'Invalid credentials.', true);
-        }
-        authToken = data.token;
-        localStorage.setItem('aurex_token', authToken);
-        playClickSound(920, 0.11, 'triangle', 0.08);
-        showToast(`Welcome back, ${data.user.full_name}!`);
-        await refreshProfile();
-      } catch (err) {
-        showToast('Network error while signing in.', true);
+    function applyServerSnapshot(data) {
+      if (data.token) {
+        state.authToken = data.token;
+        localStorage.setItem('aurex_token', data.token);
       }
+      if (data.user) {
+        state.loggedIn = true;
+        state.userUid = data.user.user_uid || data.user.ref_code || '0000000';
+        state.fullName = data.user.full_name || 'Member';
+        state.countryCode = data.user.country_code || 'PK';
+        state.countryFlag = data.user.country_flag || '🇵🇰';
+        state.dialCode = data.user.dial_code || state.dialCode || '+92';
+        state.phone = data.user.phone || state.phone;
+        state.refCode = data.user.ref_code || state.userUid;
+        state.activeInvites = Number(data.user.active_invites || 0);
+        state.spinsLeft = Number(data.user.spins_left ?? 2);
+        state.hasDeposited = Boolean(data.user.has_deposited || data.user.first_deposit_done);
+        state.pendingSpinReward = Number(data.user.pending_spin_reward || 0);
+        state.channelRewardClaimed = Boolean(data.user.channel_reward_claimed);
+        state.balance = Number(data.user.balance || 0);
+        state.todayYield = Number(data.user.today_yield || 0);
+        state.teamRebate = Number(data.user.team_rebate || 0);
+        state.vipLevel = Number(data.user.vip_level || 0);
+        state.planDaysLeft = Number(data.user.plan_days_left || 0);
+        localStorage.setItem('aurex_user_session', JSON.stringify({ dialCode: state.dialCode, phone: state.phone }));
+      }
+      if (data.wallets) {
+        state.networks = {
+          TRC20: data.wallets.TRC20 || state.networks.TRC20,
+          BEP20: data.wallets.BEP20 || state.networks.BEP20
+        };
+      }
+      if (data.networks && !data.wallets) state.networks = data.networks;
+      if (Array.isArray(data.orders)) {
+        state.orders = data.orders;
+        if (!state.hasDeposited) {
+          state.hasDeposited = state.orders.some(o => (o.order_type === 'Deposit' || o.type === 'deposit') && (o.status === 'Approved' || o.status === 'approved'));
+        }
+      }
+      enterDashboardUI();
+    }
+
+    function enterDashboardUI() {
+      document.getElementById('auth-gate-screen').classList.add('hidden');
+      document.getElementById('main-app-shell').classList.remove('hidden');
+      updateUI();
     }
 
     function logoutUser() {
-      playClickSound(420, 0.09, 'sine', 0.07);
+      localStorage.removeItem('aurex_user_session');
       localStorage.removeItem('aurex_token');
-      authToken = '';
-      currentUser = null;
-      document.getElementById('dashboard-screen').classList.add('hidden');
-      document.getElementById('auth-screen').classList.remove('hidden');
+      location.reload();
     }
 
-    async function refreshProfile() {
-      if (!authToken) return;
+    async function submitRegister(e) {
+      e.preventDefault();
+      const [countryCode, countryFlag, dialCode] = document.getElementById('reg-country').value.split('|');
+      const fullName = document.getElementById('reg-name').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const password = document.getElementById('reg-pass').value.trim();
+      const inviteCode = document.getElementById('reg-invite').value.trim();
+
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName, countryCode, countryFlag, dialCode, phone, password, inviteCode })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Registration failed', 'info');
+        return;
+      }
+      playChimeSound(880, 0.12, 'triangle', 0.08);
+      applyServerSnapshot(data);
+      showToast(`Welcome ${fullName}! Vault active.`);
+    }
+
+    async function submitLogin(e) {
+      e.preventDefault();
+      const [, , dialCode] = document.getElementById('log-country').value.split('|');
+      const phone = document.getElementById('log-phone').value.trim();
+      const password = document.getElementById('log-pass').value.trim();
+
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dialCode, phone, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Login failed', 'info');
+        return;
+      }
+      playChimeSound(820, 0.12, 'triangle', 0.08);
+      applyServerSnapshot(data);
+      showToast('Vault unlocked!');
+    }
+
+    async function syncSessionWithServer() {
       try {
-        const res = await fetch('/api/user/profile', {
-          headers: { Authorization: `Bearer ${authToken}` }
+        if (state.authToken) {
+          const profRes = await fetch('/api/user/profile', {
+            headers: { Authorization: `Bearer ${state.authToken}` }
+          });
+          if (profRes.ok) {
+            const profData = await profRes.json();
+            applyServerSnapshot(profData);
+            return;
+          }
+        }
+        if (!state.dialCode || !state.phone) return;
+        const res = await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dialCode: state.dialCode, phone: state.phone })
         });
+        if (!res.ok) return;
+        const data = await res.json();
+        applyServerSnapshot(data);
+      } catch (err) {}
+    }
+
+    function updateUI() {
+      try {
+        document.getElementById('header-uid').textContent = state.userUid;
+        document.getElementById('header-balance').textContent = formatUSD(state.balance);
+        document.getElementById('hero-balance').textContent = formatUSD(state.balance);
+        document.getElementById('today-yield').textContent = '+' + formatUSD(state.todayYield);
+        document.getElementById('team-rebate').textContent = formatUSD(state.teamRebate);
+        document.getElementById('withdraw-avail-balance').textContent = formatUSD(state.balance);
+
+        const pendingBanner = document.getElementById('pending-spin-banner');
+        if (state.pendingSpinReward > 0) {
+          pendingBanner.classList.remove('hidden');
+          document.getElementById('pending-spin-amount').textContent = formatUSD(state.pendingSpinReward);
+        } else {
+          pendingBanner.classList.add('hidden');
+        }
+
+        const channelBtn = document.getElementById('claim-channel-reward-btn');
+        if (state.channelRewardClaimed) {
+          channelBtn.textContent = 'Claimed ✓';
+          channelBtn.disabled = true;
+        } else {
+          channelBtn.textContent = 'Claim $0.50';
+          channelBtn.disabled = false;
+        }
+
+        const spinHint = document.getElementById('spin-status-hint');
+        if (!state.hasDeposited) {
+          spinHint.textContent = '🔒 Deposit required to spin • Reward requires active VIP plan';
+        } else if (state.vipLevel <= 0) {
+          spinHint.textContent = '⚠️ Pehle apna VIP plan active karein — Reward sirf Active Plan par balance mein aayega';
+        } else {
+          spinHint.textContent = '✓ Unlocked: Depositor & Active Plan verified (Max $1.00 per spin)';
+        }
+
+        document.getElementById('header-user-label').textContent = `${state.fullName} • ${state.countryFlag} ${state.dialCode} ${state.phone}`;
+        document.getElementById('hero-vip-badge').textContent = state.vipLevel > 0 ? `VIP ${state.vipLevel} ACTIVE` : 'NO VIP ACTIVE';
+        document.getElementById('hero-plan-days').textContent = state.vipLevel > 0 ? `${state.planDaysLeft} Days Left` : 'Min Withdraw: $10.00';
+        document.getElementById('hero-active-invites').textContent = `${state.activeInvites} / 3`;
+        document.getElementById('front-invites-count').textContent = state.activeInvites;
+        document.getElementById('team-active-count').textContent = state.activeInvites;
+        document.getElementById('spin-count-badge').textContent = state.spinsLeft;
+
+        const inviteUrl = `${window.location.origin}/?ref=${state.userUid}`;
+        document.getElementById('my-invite-link').textContent = `${inviteUrl} (Code: ${state.userUid})`;
+
+        document.getElementById('profile-uid-display').textContent = state.userUid;
+        document.getElementById('profile-name-display').textContent = state.fullName;
+        document.getElementById('profile-phone-display').textContent = `${state.countryFlag} ${state.dialCode} ${state.phone}`;
+        document.getElementById('deposit-address-text').textContent = state.networks[state.selectedNetwork] || '';
+
+        renderVipCards('front-vip-tiers-list');
+        renderVipCards('full-vip-tiers-list');
+        renderOrders();
+      } catch (err) {
+        console.error('updateUI error:', err);
+      }
+    }
+
+    async function claimChannelJoinReward() {
+      if (state.channelRewardClaimed) {
+        showToast('Channel join reward already claimed!', 'info');
+        return;
+      }
+      const tgHandle = document.getElementById('tg-username-input').value.trim();
+      if (!tgHandle) {
+        showToast('Enter your Telegram @username first!', 'info');
+        return;
+      }
+      const res = await fetch('/api/rewards/channel-join', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {})
+        },
+        body: JSON.stringify({ dialCode: state.dialCode, phone: state.phone, telegramUsername: tgHandle })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        playChimeSound(880, 0.12, 'triangle', 0.08);
+        applyServerSnapshot(data);
+        showToast('+$0.50 Channel Join Reward credited!');
+        return;
+      }
+      state.channelRewardClaimed = true;
+      state.balance = Number((state.balance + 0.50).toFixed(2));
+      playChimeSound(880, 0.12, 'triangle', 0.08);
+      updateUI();
+      showToast('+$0.50 Channel Join Reward credited!');
+    }
+
+    function renderVipCards(targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      try {
+        el.innerHTML = VIP_PLANS.map(plan => {
+          const isCurrent = Number(state.vipLevel) === Number(plan.level);
+          const isLocked = Number(plan.requiresInvites) > 0 && Number(state.activeInvites) < Number(plan.requiresInvites);
+          const totalEst = (Number(plan.daily) * Number(plan.days)).toFixed(2);
+
+          return `
+            <div class="billionaire-glass rounded-2xl p-3.5 ${isLocked ? 'border-amber-500/45' : 'border-yellow-400/35'} space-y-2 shine-sweep">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <h3 class="text-xs font-extrabold text-white">${plan.name}</h3>
+                    <span class="px-2 py-0.5 rounded bg-yellow-400/20 text-yellow-200 font-mono text-[10px] font-bold">${plan.days} Days</span>
+                  </div>
+                  <p class="text-[11px] font-mono text-yellow-300 font-bold mt-0.5">
+                    Daily: +${formatUSD(plan.daily)} • Cycle Est: $${totalEst}
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="font-mono font-extrabold text-sm gold-text">${formatUSD(plan.price)}</p>
+                  <p class="text-[9px] ${isLocked ? 'text-amber-300' : 'text-yellow-200'}">${isLocked ? '🔒 3 Invites Req' : '✦ Open'}</p>
+                </div>
+              </div>
+              ${
+                isCurrent
+                  ? `<div class="w-full py-2 rounded-xl bg-yellow-400/20 border border-yellow-400/45 text-center text-[11px] font-extrabold text-yellow-200">✓ Active (${plan.days} Days)</div>`
+                  : isLocked
+                  ? `<button type="button" onclick="switchTab('team')" class="w-full py-2 rounded-xl bg-amber-500/20 border border-amber-400/45 text-[11px] font-bold text-amber-200">
+                       🔒 Invite ${3 - state.activeInvites} More Depositing Friends to Unlock
+                     </button>`
+                  : `<button type="button" onclick="activatePlan(${plan.level})" class="w-full py-2 rounded-xl gold-gradient text-black font-extrabold text-[11px] uppercase shine-sweep">
+                       Activate ${plan.name} (${formatUSD(plan.price)})
+                     </button>`
+              }
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('renderVipCards error:', err);
+        el.innerHTML = `<div class="billionaire-glass rounded-2xl p-3.5 text-xs text-yellow-200">VIP plans ready. Tap refresh if needed.</div>`;
+      }
+    }
+
+    async function activatePlan(level) {
+      const plan = VIP_PLANS.find(p => Number(p.level) === Number(level));
+      if (!plan) return;
+
+      try {
+        let res = await fetch('/api/plans/activate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {})
+          },
+          body: JSON.stringify({ dialCode: state.dialCode, phone: state.phone, level: Number(level), vip_level: Number(level) })
+        });
+
+        if (res.status === 404) {
+          res = await fetch('/api/vip/activate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {})
+            },
+            body: JSON.stringify({ vip_level: Number(level), level: Number(level) })
+          });
+        }
+
+        const data = await res.json();
         if (!res.ok) {
-          if (res.status === 401) logoutUser();
+          playChimeSound(250, 0.14, 'sawtooth', 0.08);
+          showToast(data.error || `Insufficient balance for ${plan.name} (${formatUSD(plan.price)})`, 'info');
+          if (data.error && data.error.toLowerCase().includes('deposit')) switchTab('deposit');
           return;
         }
-        const data = await res.json();
-        currentUser = data.user;
-        vipPlans = Array.isArray(data.vip_plans) && data.vip_plans.length ? data.vip_plans : FALLBACK_PLANS;
-        subscriptions = Array.isArray(data.subscriptions) ? data.subscriptions : [];
-        orders = Array.isArray(data.orders) ? data.orders : [];
-        wallets = data.wallets || { TRC20: '', BEP20: '' };
-        if (data.telegram) {
-          telegramLinks = {
-            channel: data.telegram.channel || 'https://t.me/AurexVaultOfficial',
-            support: data.telegram.support || 'https://t.me/AurexVaultSupport'
-          };
-        }
 
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('dashboard-screen').classList.remove('hidden');
-        renderDashboard();
+        playChimeSound(920, 0.12, 'triangle', 0.08);
+        if (data.user) {
+          applyServerSnapshot(data);
+        } else {
+          state.balance = Math.max(0, Number((state.balance - plan.price).toFixed(2)));
+          state.vipLevel = Math.max(state.vipLevel, plan.level);
+          state.planDaysLeft = plan.days;
+          updateUI();
+        }
+        const activePlanObj = data.plan || plan;
+        showToast(`Activated ${activePlanObj.name} for ${activePlanObj.days} Days!`);
       } catch (err) {
-        showToast('Failed to sync profile.', true);
+        playChimeSound(250, 0.14, 'sawtooth', 0.08);
+        showToast('Error activating VIP plan.', 'info');
       }
     }
 
-    function openAppTab(tabName) {
-      playClickSound(780, 0.05, 'triangle', 0.06);
-      const validTabs = ['tiers', 'wallet', 'spin', 'invite', 'support'];
-      activeAppTab = validTabs.includes(tabName) ? tabName : 'tiers';
-
-      for (const t of validTabs) {
-        const viewEl = document.getElementById(`view-${t}`);
-        const navEl = document.getElementById(`nav-${t}`);
-        if (viewEl) viewEl.classList.toggle('hidden', t !== activeAppTab);
-        if (navEl) {
-          navEl.className = `nav-btn py-2 rounded-xl text-[11px] uppercase ${
-            t === activeAppTab ? 'font-extrabold gold-btn' : 'font-bold text-gray-300 hover:text-white'
-          }`;
-        }
+    async function claimDailyYield() {
+      const res = await fetch('/api/rewards/claim', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {})
+        },
+        body: JSON.stringify({ dialCode: state.dialCode, phone: state.phone })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Activate a VIP plan first!', 'info');
+        return;
       }
-
-      if (activeAppTab === 'support') {
-        loadSupportMessages();
-      }
-      renderActiveTab();
+      playChimeSound(850, 0.12, 'triangle', 0.08);
+      applyServerSnapshot(data);
+      showToast(`Harvested +${formatUSD(data.claimedAmount)}!`);
     }
 
-    function renderDashboard() {
-      if (!currentUser) return;
+    function pickCappedSpinReward() {
+      const idx = Math.floor(Math.random() * SPIN_REWARD_POOL.length);
+      return Math.min(0.70, SPIN_REWARD_POOL[idx]);
+    }
 
-      document.getElementById('hdr-uid').textContent = `ID: ${currentUser.user_uid}`;
-      document.getElementById('hdr-user-meta').textContent =
-        `● ${currentUser.full_name} • ${currentUser.country_code || 'PK'} ${currentUser.phone}`;
-      document.getElementById('hdr-balance').textContent = `$${Number(currentUser.balance || 0).toFixed(2)}`;
+    async function playLuckySpin() {
+      if (!state.hasDeposited) {
+        showToast('Lucky Spin sirf depositors ke liye hai — pehle deposit karein!', 'info');
+        switchTab('deposit');
+        return;
+      }
+      if (state.spinsLeft <= 0) {
+        showToast('Invite friends to get more spins!', 'info');
+        switchTab('team');
+        return;
+      }
 
-      document.getElementById('tiers-current-vip').textContent = `VIP ${currentUser.vip_level || 0}`;
-      document.getElementById('tiers-invites').textContent = String(currentUser.active_invites || 0);
+      const btn = document.getElementById('spin-now-btn');
+      btn.disabled = true;
+      btn.textContent = 'SPINNING...';
 
-      document.getElementById('spin-left-count').textContent = String(currentUser.spins_left || 0);
-      document.getElementById('spin-held-amount').textContent = `$${Number(currentUser.pending_spin_reward || 0).toFixed(2)}`;
+      const res = await fetch('/api/spin/play', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {})
+        },
+        body: JSON.stringify({ dialCode: state.dialCode, phone: state.phone })
+      });
+      const data = await res.json();
+      btn.disabled = false;
+      btn.textContent = 'SPIN NOW';
 
-      document.getElementById('tg-channel-link').href = telegramLinks.channel;
-      document.getElementById('tg-support-link').href = telegramLinks.support;
+      if (!res.ok) {
+        showToast(data.error || 'Spin failed', 'info');
+        return;
+      }
 
-      const claimBtn = document.getElementById('tg-claim-btn');
-      const tgInput = document.getElementById('tg-username-input');
-      if (Number(currentUser.channel_reward_claimed || 0) === 1) {
-        claimBtn.disabled = true;
-        claimBtn.textContent = 'Claimed ✓';
-        claimBtn.className = 'px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-bold text-xs uppercase';
-        if (currentUser.telegram_username) {
-          tgInput.value = currentUser.telegram_username;
-          tgInput.disabled = true;
-        }
+      const reward = Math.min(0.70, Number(data.reward || pickCappedSpinReward()));
+      playChimeSound(990, 0.14, 'triangle', 0.09);
+      applyServerSnapshot(data);
+
+      if (state.vipLevel <= 0) {
+        state.pendingSpinReward = Number((state.pendingSpinReward + reward).toFixed(2));
+        updateUI();
+        showToast(`Won +${formatUSD(reward)} — Pehle apna VIP plan active karein!`, 'info');
       } else {
-        claimBtn.disabled = false;
-        claimBtn.textContent = 'Claim $0.50';
-        claimBtn.className = 'px-4 py-2 rounded-xl bg-cyan-400 text-black font-extrabold text-xs uppercase';
-        tgInput.disabled = false;
-      }
-
-      document.getElementById('invite-code-display').textContent = currentUser.ref_code || currentUser.user_uid;
-      document.getElementById('invite-active-count').textContent = String(currentUser.active_invites || 0);
-      document.getElementById('invite-rebate-total').textContent = `$${Number(currentUser.team_rebate || 0).toFixed(2)}`;
-
-      updateDepositWalletDisplay();
-      renderActiveTab();
-    }
-
-    function renderActiveTab() {
-      try {
-        if (activeAppTab === 'tiers') {
-          renderTiersList();
-          renderActiveSubscriptions();
-        } else if (activeAppTab === 'wallet') {
-          renderOrdersHistory();
-        }
-      } catch (err) {
-        console.error('Render error:', err);
-        renderTiersList();
+        showToast(`✦ Won +${formatUSD(reward)} added to balance!`);
       }
     }
 
-    function renderTiersList() {
-      const listEl = document.getElementById('tiers-list');
-      if (!listEl) return;
-      const invites = Number(currentUser?.active_invites || 0);
-      const balance = Number(currentUser?.balance || 0);
-
-      listEl.innerHTML = vipPlans.map((plan) => {
-        const unlocked = typeof plan.unlocked === 'boolean' ? plan.unlocked : invites >= Number(plan.min_invites || 0);
-        const canAfford = balance >= Number(plan.amount || 0);
-        const totalEst = (Number(plan.daily_return || 0) * Number(plan.days || 0)).toFixed(2);
-
+    function renderOrders() {
+      const el = document.getElementById('home-orders-list');
+      if (!el) return;
+      if (!state.orders.length) {
+        el.innerHTML = `<p class="text-xs text-yellow-100/70">No orders yet. Deposit $10+ with screenshot to begin.</p>`;
+        return;
+      }
+      el.innerHTML = state.orders.map(o => {
+        const statusLower = String(o.status || '').toLowerCase();
+        const orderType = o.order_type || (o.type ? String(o.type).toUpperCase() : 'Order');
+        const badge = statusLower === 'approved'
+          ? 'bg-yellow-400/20 text-yellow-300 border-yellow-400/45'
+          : statusLower === 'rejected'
+          ? 'bg-red-500/20 text-red-300 border-red-500/40'
+          : 'bg-amber-400/20 text-amber-200 border-amber-400/40';
+        const sign = (statusLower === 'withdraw' || orderType === 'Withdraw' || o.network === 'PLAN') ? '-' : '+';
         return `
-          <div class="vault-card rounded-2xl p-4 flex items-center justify-between gap-3">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-extrabold text-amber-300">${plan.name}</span>
-                <span class="px-2 py-0.5 rounded bg-white/10 text-[10px] mono text-gray-200">${plan.days} Days</span>
-                ${!unlocked ? `<span class="px-2 py-0.5 rounded bg-red-500/20 text-red-300 text-[10px] mono">Need ${plan.min_invites} Invites</span>` : ''}
-              </div>
-              <p class="text-xs text-gray-300 mono">
-                Cost: <strong class="text-white">$${Number(plan.amount).toFixed(2)}</strong> • Daily: <strong class="text-emerald-400">+$${Number(plan.daily_return).toFixed(2)}</strong> • Est: <strong class="text-amber-200">$${totalEst}</strong>
-              </p>
+          <div class="bg-black/45 border border-yellow-400/20 rounded-xl p-2.5 space-y-1 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-mono font-bold text-yellow-300 text-[11px]">${o.order_id || o.order_code || ''}</span>
+              <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badge}">${o.status}</span>
             </div>
-            <button
-              type="button"
-              onclick="activateVipPlan(${Number(plan.level)})"
-              ${!unlocked ? 'disabled' : ''}
-              class="px-4 py-2.5 rounded-xl text-xs font-extrabold uppercase shrink-0 ${
-                !unlocked
-                  ? 'bg-white/10 text-gray-500 cursor-not-allowed'
-                  : canAfford
-                  ? 'gold-btn shadow'
-                  : 'bg-amber-400/20 text-amber-200 border border-amber-400/40'
-              }">
-              Activate
-            </button>
+            <div class="flex items-center justify-between">
+              <span class="font-semibold text-white">${orderType} (${o.network || 'USDT'})</span>
+              <span class="font-mono font-bold ${sign === '-' ? 'text-yellow-100/70' : 'text-yellow-300'}">${sign}${formatUSD(o.amount)}</span>
+            </div>
+            <p class="font-mono text-[10px] text-yellow-100/60">🕒 ${o.created_at || ''}</p>
           </div>
         `;
       }).join('');
     }
 
-    function renderActiveSubscriptions() {
-      const box = document.getElementById('active-subs-list');
-      if (!box) return;
-      if (!subscriptions.length) {
-        box.innerHTML = `<p class="text-gray-500">No VIP plans activated yet. Top up wallet and click Activate above.</p>`;
-        return;
-      }
-      box.innerHTML = subscriptions.map((s) => `
-        <div class="bg-black/45 border border-emerald-500/25 rounded-xl p-2.5 flex items-center justify-between">
-          <div>
-            <span class="font-bold text-emerald-300">VIP ${s.vip_level}</span>
-            <span class="text-gray-400 mono ml-2">+$${Number(s.daily_return).toFixed(2)}/day • ${s.days}d</span>
-          </div>
-          <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 text-[10px] mono uppercase">${s.status}</span>
-        </div>
-      `).join('');
-    }
-
-    async function activateVipPlan(level) {
-      playClickSound(860, 0.08, 'triangle', 0.08);
+    function switchTab(tabName) {
       try {
-        const res = await fetch('/api/vip/activate', {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ vip_level: level })
+        const tabs = ['home', 'vip', 'deposit', 'team', 'account'];
+        if (!tabs.includes(tabName)) tabName = 'home';
+        tabs.forEach(t => {
+          const sec = document.getElementById(`tab-${t}`);
+          if (sec) sec.classList.toggle('hidden', t !== tabName);
+          const nav = document.getElementById(`nav-${t}`);
+          if (nav && t !== 'deposit') {
+            nav.classList.remove('text-yellow-300', 'text-yellow-100/60');
+            nav.classList.add(t === tabName ? 'text-yellow-300' : 'text-yellow-100/60');
+          }
         });
-        const data = await res.json();
-        if (!res.ok) {
-          playClickSound(250, 0.14, 'sawtooth', 0.08);
-          return showToast(data.error || 'Could not activate VIP plan.', true);
+        if (tabName === 'vip') {
+          renderVipCards('full-vip-tiers-list');
+          renderVipCards('front-vip-tiers-list');
         }
-        playClickSound(980, 0.12, 'triangle', 0.08);
-        showToast(data.message || `VIP ${level} activated!`);
-        await refreshProfile();
+        if (tabName === 'deposit') {
+          renderRealQRCode(state.networks[state.selectedNetwork]);
+        }
       } catch (err) {
-        showToast('Error activating VIP plan.', true);
+        console.error('switchTab error:', err);
       }
     }
 
-    function updateDepositWalletDisplay() {
-      const net = document.getElementById('dep-network').value;
-      document.getElementById('dep-wallet-addr').textContent =
-        net === 'TRC20' ? (wallets.TRC20 || 'T9yD14Nj9j7xAB41GeiX9h2kQ8pL5mN2vR') : (wallets.BEP20 || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e');
+    function selectNetwork(net) {
+      state.selectedNetwork = net;
+      document.querySelectorAll('.net-btn').forEach(b => {
+        b.className = 'net-btn py-2.5 px-3 rounded-xl text-xs font-semibold border border-yellow-400/20 bg-black/40 text-yellow-100/75';
+      });
+      document.getElementById(`net-${net}`).className = 'net-btn py-2.5 px-3 rounded-xl text-xs font-extrabold border border-yellow-400 bg-yellow-400/20 text-yellow-300';
+      document.getElementById('network-label').textContent = `Receiving Wallet • ${net}`;
+      document.getElementById('deposit-address-text').textContent = state.networks[net];
+      renderRealQRCode(state.networks[net]);
     }
 
-    function copyDepositWallet() {
-      const addr = document.getElementById('dep-wallet-addr').textContent;
-      navigator.clipboard?.writeText(addr);
-      showToast('Wallet address copied!');
+    function renderRealQRCode(addr) {
+      const box = document.getElementById('real-qr-container');
+      if (!box || !addr) return;
+      box.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(box, { text: addr, width: 156, height: 156, colorDark: '#06070B', colorLight: '#FFFFFF' });
+      }
     }
 
-    function handleDepositProofPick(e) {
+    function copyDepositAddress() {
+      navigator.clipboard?.writeText(state.networks[state.selectedNetwork]);
+      showToast(`${state.selectedNetwork} address copied!`);
+    }
+
+    function copyInviteLink() {
+      const text = document.getElementById('my-invite-link').textContent;
+      navigator.clipboard?.writeText(text);
+      showToast('Invite link & ID copied!');
+    }
+
+    async function shareInviteLink() {
+      const text = document.getElementById('my-invite-link').textContent;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'AUREX VAULT PRO VIP', text });
+          return;
+        } catch (e) {}
+      }
+      copyInviteLink();
+    }
+
+    function previewDepositProof(e) {
       const file = e.target.files?.[0];
-      if (!file) {
-        depositProofBase64 = '';
-        return;
-      }
+      if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        depositProofBase64 = String(reader.result || '');
+        depositProofBase64 = reader.result;
+        const img = document.getElementById('deposit-proof-preview');
+        img.src = depositProofBase64;
+        img.classList.remove('hidden');
       };
       reader.readAsDataURL(file);
     }
 
-    async function submitDepositOrder() {
-      const amount = Number(document.getElementById('dep-amount').value);
-      const network = document.getElementById('dep-network').value;
-
-      try {
-        const res = await fetch('/api/orders/deposit', {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ amount, network, proof_data: depositProofBase64 })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          playClickSound(250, 0.14, 'sawtooth', 0.08);
-          return showToast(data.error || 'Deposit failed.', true);
-        }
-        document.getElementById('dep-amount').value = '';
-        document.getElementById('dep-proof-file').value = '';
-        depositProofBase64 = '';
-        playClickSound(900, 0.1, 'triangle', 0.08);
-        showToast(`Deposit order ${data.order.order_code} submitted!`);
-        await refreshProfile();
-      } catch (err) {
-        showToast('Error submitting deposit.', true);
-      }
-    }
-
-    async function submitWithdrawOrder() {
-      const amount = Number(document.getElementById('wd-amount').value);
-      const network = document.getElementById('wd-network').value;
-      const wallet_address = document.getElementById('wd-address').value.trim();
-
-      try {
-        const res = await fetch('/api/orders/withdraw', {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ amount, network, wallet_address })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          playClickSound(250, 0.14, 'sawtooth', 0.08);
-          return showToast(data.error || 'Withdrawal failed.', true);
-        }
-        document.getElementById('wd-amount').value = '';
-        document.getElementById('wd-address').value = '';
-        playClickSound(900, 0.1, 'triangle', 0.08);
-        showToast(`Withdrawal order ${data.order.order_code} placed!`);
-        await refreshProfile();
-      } catch (err) {
-        showToast('Error requesting withdrawal.', true);
-      }
-    }
-
-    function renderOrdersHistory() {
-      const box = document.getElementById('orders-history-list');
-      if (!box) return;
-      if (!orders.length) {
-        box.innerHTML = `<p class="text-gray-500">No orders yet.</p>`;
+    async function submitDepositOrder(e) {
+      e.preventDefault();
+      const amount = parseFloat(document.getElementById('deposit-amount-input').value);
+      if (!amount || amount < 10) {
+        showToast('Minimum deposit is $10.00!', 'info');
         return;
       }
-      box.innerHTML = orders.map((o) => `
-        <div class="bg-black/45 border border-white/10 rounded-xl p-2.5 flex items-center justify-between">
-          <div>
-            <span class="mono font-bold text-amber-300">${o.order_code}</span>
-            <span class="text-gray-300 ml-2 uppercase">${o.type} (${o.network})</span>
-          </div>
-          <div class="text-right mono">
-            <span class="font-bold text-emerald-400">$${Number(o.amount).toFixed(2)}</span>
-            <span class="ml-2 text-[10px] px-2 py-0.5 rounded bg-white/10 uppercase">${o.status}</span>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    async function playLuckySpin() {
-      playClickSound(840, 0.08, 'triangle', 0.08);
-      try {
-        const res = await fetch('/api/spin/play', {
-          method: 'POST',
-          headers: authHeaders()
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          playClickSound(250, 0.14, 'sawtooth', 0.08);
-          return showToast(data.error || 'Cannot spin right now.', true);
-        }
-        playClickSound(1040, 0.14, 'triangle', 0.09);
-        document.getElementById('spin-result-box').textContent = data.message || `Won $${Number(data.reward).toFixed(2)}!`;
-        showToast(data.message || `Won $${Number(data.reward).toFixed(2)}!`);
-        await refreshProfile();
-      } catch (err) {
-        showToast('Spin error.', true);
+      if (!depositProofBase64) {
+        showToast('Please upload a payment screenshot!', 'info');
+        return;
       }
-    }
 
-    async function claimChannelReward() {
-      const telegram_username = document.getElementById('tg-username-input').value.trim();
-      try {
-        const res = await fetch('/api/rewards/channel-join', {
-          method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ telegram_username })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          playClickSound(250, 0.14, 'sawtooth', 0.08);
-          return showToast(data.error || 'Could not claim reward.', true);
-        }
-        playClickSound(980, 0.12, 'triangle', 0.08);
-        showToast('+$0.50 channel reward credited to balance!');
-        await refreshProfile();
-      } catch (err) {
-        showToast('Error claiming channel reward.', true);
+      const res = await fetch('/api/orders/deposit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {})
+        },
+        body: JSON.stringify({
+          countryFlag: state.countryFlag,
+          dialCode: state.dialCode,
+          phone: state.phone,
+          network: state.selectedNetwork,
+          amount,
+          proofData: depositProofBase64,
+          proof_data: depositProofBase64
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Deposit failed', 'info');
+        return;
       }
+
+      playChimeSound(880, 0.12, 'triangle', 0.08);
+      applyServerSnapshot(data);
+      const ordId = data.orderId || data.order?.order_code || '';
+      const ordTime = data.createdAt || data.order?.created_at || new Date().toLocaleString();
+      document.getElementById('slip-order-id').textContent = ordId;
+      document.getElementById('slip-order-time').textContent = ordTime;
+      document.getElementById('slip-order-amount').textContent = `${formatUSD(amount)} (${state.selectedNetwork})`;
+      document.getElementById('latest-order-slip').classList.remove('hidden');
+
+      depositProofBase64 = '';
+      document.getElementById('deposit-amount-input').value = '';
+      document.getElementById('deposit-proof-file').value = '';
+      document.getElementById('deposit-proof-preview').classList.add('hidden');
+      showToast(`Order ${ordId} submitted!`);
     }
 
-    function copyInviteCode() {
-      const code = document.getElementById('invite-code-display').textContent;
-      navigator.clipboard?.writeText(code);
-      showToast(`Referral code ${code} copied!`);
+    function openWithdrawModal() { document.getElementById('withdraw-modal').classList.remove('hidden'); }
+    function closeWithdrawModal() { document.getElementById('withdraw-modal').classList.add('hidden'); }
+
+    async function handleWithdrawSubmit(e) {
+      e.preventDefault();
+      const address = document.getElementById('withdraw-address').value.trim();
+      const amount = parseFloat(document.getElementById('withdraw-amount').value);
+      if (amount < 10) {
+        showToast('Minimum withdrawal is $10.00!', 'info');
+        return;
+      }
+      const res = await fetch('/api/orders/withdraw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {})
+        },
+        body: JSON.stringify({
+          countryFlag: state.countryFlag,
+          dialCode: state.dialCode,
+          phone: state.phone,
+          address,
+          wallet_address: address,
+          amount
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Withdraw failed', 'info');
+        return;
+      }
+      playChimeSound(800, 0.12, 'triangle', 0.08);
+      applyServerSnapshot(data);
+      closeWithdrawModal();
+      showToast(`Payout Order ${data.orderId || data.order?.order_code || ''} submitted!`);
     }
 
-    async function loadSupportMessages() {
-      if (!authToken) return;
+    let supportPollTimer = null;
+    function openSupportModal() {
+      document.getElementById('support-modal').classList.remove('hidden');
+      loadSupportMessages(false);
+      supportPollTimer = setInterval(() => loadSupportMessages(true), 4000);
+    }
+    function closeSupportModal() {
+      document.getElementById('support-modal').classList.add('hidden');
+      if (supportPollTimer) clearInterval(supportPollTimer);
+    }
+
+    function handleSupportMediaSelect(e, type) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        userSupportMedia = { type, data: reader.result, name: file.name };
+        document.getElementById('user-media-label').textContent = `${type === 'video' ? '🎥' : '📷'} ${file.name}`;
+        document.getElementById('user-media-preview-bar').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearUserMedia() {
+      userSupportMedia = { type: 'none', data: '', name: '' };
+      document.getElementById('user-media-preview-bar').classList.add('hidden');
+    }
+
+    async function loadSupportMessages(playSoundOnNew = false) {
       try {
-        const res = await fetch('/api/support/messages', {
-          headers: { Authorization: `Bearer ${authToken}` }
+        const q = `?dialCode=${encodeURIComponent(state.dialCode)}&phone=${encodeURIComponent(state.phone)}`;
+        const res = await fetch('/api/support/messages' + q, {
+          headers: state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {}
         });
         if (!res.ok) return;
         const data = await res.json();
         const msgs = data.messages || [];
-        const box = document.getElementById('support-messages-box');
-        if (!msgs.length) {
-          box.innerHTML = `<p class="text-gray-500">No messages yet. Ask support anything.</p>`;
-          return;
+        if (playSoundOnNew && msgs.length > lastSupportCount) {
+          const last = msgs[msgs.length - 1];
+          if (last.sender === 'admin') playChimeSound(960, 0.12, 'sine', 0.08);
         }
-        box.innerHTML = msgs.map((m) => {
-          const isAdmin = m.sender === 'admin';
-          return `
-            <div class="p-2.5 rounded-xl ${isAdmin ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-100' : 'bg-white/5 border border-white/10 text-gray-200'}">
-              <p class="text-[10px] font-bold ${isAdmin ? 'text-emerald-400' : 'text-amber-300'}">${isAdmin ? '🛡️ Support' : 'You'}</p>
-              <p class="mt-0.5">${m.message_text || ''}</p>
+        lastSupportCount = msgs.length;
+        renderSupportChat(msgs);
+      } catch (err) {}
+    }
+
+    function renderSupportChat(messages) {
+      const box = document.getElementById('support-chat-box');
+      if (!box) return;
+      const intro = `<div class="bg-yellow-400/10 border border-yellow-400/25 rounded-2xl p-2.5 text-yellow-100">✦ Member <strong>#${state.userUid}</strong> — send text, photo, or video to support.</div>`;
+      const items = messages.map(m => {
+        const isUser = m.sender === 'user';
+        const bodyText = m.message || m.message_text || '';
+        let mediaHtml = '';
+        if (m.media_type === 'image' && m.media_data) {
+          mediaHtml = `<img src="${m.media_data}" class="mt-1.5 rounded-xl max-h-44 w-full object-contain border border-yellow-400/25" />`;
+        } else if (m.media_type === 'video' && m.media_data) {
+          mediaHtml = `<video src="${m.media_data}" controls class="mt-1.5 rounded-xl max-h-44 w-full border border-yellow-400/25"></video>`;
+        }
+        return `
+          <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'}">
+            <div class="${isUser ? 'bg-yellow-400/20 border border-yellow-400/45 text-white' : 'bg-black/60 border border-yellow-400/25 text-yellow-100'} rounded-2xl px-3 py-2 max-w-[85%]">
+              <p class="text-[10px] font-bold ${isUser ? 'text-yellow-300' : 'text-amber-300'}">${isUser ? 'You (#' + state.userUid + ')' : '♛ Support Desk'}</p>
+              ${bodyText ? `<p class="mt-0.5">${bodyText}</p>` : ''}
+              ${mediaHtml}
             </div>
-          `;
-        }).join('');
-        box.scrollTop = box.scrollHeight;
-      } catch (_) {}
+            <span class="text-[9px] text-yellow-100/50 mt-0.5 px-1">${m.created_at || ''}</span>
+          </div>
+        `;
+      }).join('');
+      box.innerHTML = intro + items;
+      box.scrollTop = box.scrollHeight;
     }
 
     async function sendSupportMessage(e) {
       e.preventDefault();
       const input = document.getElementById('support-msg-input');
-      const message_text = input.value.trim();
-      if (!message_text) return;
+      const message = input.value.trim();
+      if (!message && !userSupportMedia.data) return;
 
-      try {
-        const res = await fetch('/api/support/messages', {
+      const payload = {
+        countryFlag: state.countryFlag,
+        dialCode: state.dialCode,
+        phone: state.phone,
+        message,
+        message_text: message,
+        mediaType: userSupportMedia.type,
+        mediaData: userSupportMedia.data
+      };
+
+      input.value = '';
+      clearUserMedia();
+      playChimeSound(720, 0.07, 'triangle', 0.07);
+
+      let res = await fetch('/api/support/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {})
+        },
+        body: JSON.stringify(payload)
+      });
+      if (res.status === 404) {
+        res = await fetch('/api/support/messages', {
           method: 'POST',
-          headers: authHeaders(),
-          body: JSON.stringify({ message_text })
+          headers: {
+            'Content-Type': 'application/json',
+            ...(state.authToken ? { Authorization: `Bearer ${state.authToken}` } : {})
+          },
+          body: JSON.stringify(payload)
         });
-        if (res.ok) {
-          input.value = '';
-          await loadSupportMessages();
+      }
+      const data = await res.json();
+      if (res.ok) {
+        if (Array.isArray(data.messages)) {
+          lastSupportCount = data.messages.length;
+          renderSupportChat(data.messages);
+        } else {
+          await loadSupportMessages(false);
         }
-      } catch (_) {}
+      }
+    }
+
+    function startGlobalGoldenCandles() {
+      const canvas = document.getElementById('global-golden-candles');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const candles = Array.from({ length: 24 }, (_, idx) => ({
+        x: (idx / 24) * window.innerWidth + Math.random() * 28,
+        y: Math.random() * window.innerHeight,
+        w: 9 + Math.random() * 8,
+        bodyH: 22 + Math.random() * 44,
+        wickTop: 8 + Math.random() * 18,
+        wickBot: 8 + Math.random() * 18,
+        speedY: 0.45 + Math.random() * 0.95,
+        shinePhase: Math.random() * Math.PI * 2,
+        tilt: (Math.random() - 0.5) * 0.16
+      }));
+
+      const sparks = Array.from({ length: 42 }, () => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: 1 + Math.random() * 2.5,
+        vy: 0.3 + Math.random() * 0.8,
+        phase: Math.random() * Math.PI * 2
+      }));
+
+      let t = 0;
+      function render() {
+        t += 0.035;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const glow = ctx.createRadialGradient(
+          canvas.width * 0.5,
+          canvas.height * 0.28,
+          20,
+          canvas.width * 0.5,
+          canvas.height * 0.4,
+          Math.max(canvas.width, canvas.height) * 0.65
+        );
+        glow.addColorStop(0, 'rgba(250, 204, 21, 0.14)');
+        glow.addColorStop(0.55, 'rgba(217, 119, 6, 0.05)');
+        glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        candles.forEach(c => {
+          c.y -= c.speedY;
+          if (c.y < -100) {
+            c.y = canvas.height + 80;
+            c.x = Math.random() * canvas.width;
+          }
+          const pulse = 0.55 + 0.45 * Math.sin(t * 2.4 + c.shinePhase);
+
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.rotate(c.tilt);
+
+          ctx.shadowColor = `rgba(254, 240, 138, ${0.75 * pulse})`;
+          ctx.shadowBlur = 18 * pulse;
+
+          ctx.strokeStyle = `rgba(254, 249, 195, ${0.55 + 0.4 * pulse})`;
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(0, -c.bodyH * 0.5 - c.wickTop);
+          ctx.lineTo(0, c.bodyH * 0.5 + c.wickBot);
+          ctx.stroke();
+
+          const grad = ctx.createLinearGradient(-c.w / 2, -c.bodyH / 2, c.w / 2, c.bodyH / 2);
+          grad.addColorStop(0, `rgba(254, 249, 195, ${0.55 + 0.4 * pulse})`);
+          grad.addColorStop(0.5, `rgba(250, 204, 21, ${0.45 + 0.45 * pulse})`);
+          grad.addColorStop(1, `rgba(180, 83, 9, ${0.45 + 0.35 * pulse})`);
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.roundRect(-c.w / 2, -c.bodyH / 2, c.w, c.bodyH, 3);
+          ctx.fill();
+
+          ctx.fillStyle = `rgba(255, 255, 255, ${0.35 * pulse})`;
+          ctx.fillRect(-c.w * 0.22, -c.bodyH * 0.42, c.w * 0.22, c.bodyH * 0.84);
+
+          ctx.restore();
+        });
+
+        sparks.forEach(s => {
+          s.y -= s.vy;
+          if (s.y < -15) {
+            s.y = canvas.height + 15;
+            s.x = Math.random() * canvas.width;
+          }
+          const alpha = 0.25 + 0.75 * Math.abs(Math.sin(t * 2.1 + s.phase));
+          ctx.save();
+          ctx.translate(s.x, s.y);
+          ctx.rotate(Math.PI / 4);
+          ctx.fillStyle = `rgba(254, 240, 138, ${alpha})`;
+          ctx.shadowColor = 'rgba(250, 204, 21, 0.9)';
+          ctx.shadowBlur = 10;
+          ctx.fillRect(-s.r, -s.r, s.r * 2, s.r * 2);
+          ctx.restore();
+        });
+
+        requestAnimationFrame(render);
+      }
+      render();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      if (authToken) {
-        refreshProfile();
+      startGlobalGoldenCandles();
+
+      const params = new URLSearchParams(window.location.search);
+      const refParam = params.get('ref');
+      if (refParam) document.getElementById('reg-invite').value = refParam;
+
+      const saved = localStorage.getItem('aurex_user_session');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.dialCode && parsed.phone) {
+            state.dialCode = parsed.dialCode;
+            state.phone = parsed.phone;
+            syncSessionWithServer();
+          }
+        } catch (e) {}
+      } else if (state.authToken) {
+        syncSessionWithServer();
       }
+
+      setInterval(() => {
+        if (state.loggedIn) syncSessionWithServer();
+      }, 8000);
     });
   </script>
 </body>
