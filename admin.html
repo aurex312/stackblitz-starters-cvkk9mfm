@@ -1,4 +1,5 @@
 
+<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
@@ -38,7 +39,7 @@
         <h1 class="text-xl font-extrabold text-white">AUREX VAULT — Admin Command Center</h1>
       </div>
       <div class="flex items-center gap-2.5">
-        <button onclick="loadAdminData(); loadAdminSupport();" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-amber-400">↻ Refresh</button>
+        <button onclick="loadAdminData(); loadAdminSupport(false);" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-amber-400">↻ Refresh</button>
         <a href="/" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs font-semibold text-emerald-400">Customer App ↗</a>
         <button onclick="logoutAdmin()" class="px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400">Logout</button>
       </div>
@@ -63,20 +64,34 @@
       </div>
     </div>
 
+    <!-- Receiving USDT Wallets & Official Telegram Links -->
     <div class="panel-card rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">Receiving USDT Wallets</h2>
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">Receiving USDT Wallets & Telegram Links</h2>
         <span id="wallet-save-status" class="text-xs text-emerald-400"></span>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="flex gap-2">
-          <input id="wallet-trc20" type="text" placeholder="TRC20 Address" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
-          <button onclick="saveWallet('TRC20')" class="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs">Save TRC20</button>
+        <div>
+          <label class="text-[11px] text-gray-400 block mb-1">TRC20 Wallet</label>
+          <input id="wallet-trc20" type="text" placeholder="TRC20 Address" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
         </div>
-        <div class="flex gap-2">
-          <input id="wallet-bep20" type="text" placeholder="BEP20 Address" class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
-          <button onclick="saveWallet('BEP20')" class="px-4 py-2 rounded-xl bg-amber-400 text-black font-bold text-xs">Save BEP20</button>
+        <div>
+          <label class="text-[11px] text-gray-400 block mb-1">BEP20 Wallet</label>
+          <input id="wallet-bep20" type="text" placeholder="BEP20 Address" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
         </div>
+        <div>
+          <label class="text-[11px] text-gray-400 block mb-1">Official Telegram Channel</label>
+          <input id="tg-channel" type="text" placeholder="https://t.me/AurexVaultOfficial" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
+        </div>
+        <div>
+          <label class="text-[11px] text-gray-400 block mb-1">Official Telegram Support</label>
+          <input id="tg-support" type="text" placeholder="https://t.me/AurexVaultSupport" class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-xs mono text-white outline-none" />
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button onclick="saveSettings()" class="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs uppercase">
+          Save Wallets & Telegram Settings
+        </button>
       </div>
     </div>
 
@@ -101,13 +116,55 @@
       </table>
     </div>
 
-    <!-- Live Support Inbox with Photo + Video + Sound -->
+    <!-- Users & Spin/Channel Reward Status -->
+    <div class="panel-card rounded-2xl p-5 space-y-4 overflow-x-auto">
+      <h2 class="text-sm font-extrabold uppercase tracking-wider text-cyan-300">Users, VIP & Spin / Channel Reward Status</h2>
+      <table class="w-full text-left border-collapse text-xs">
+        <thead>
+          <tr class="border-b border-white/10 text-gray-400 uppercase text-[10px]">
+            <th class="py-3 px-2">UID</th>
+            <th class="py-3 px-2">Name & Phone</th>
+            <th class="py-3 px-2">Balance</th>
+            <th class="py-3 px-2">Depositor / VIP</th>
+            <th class="py-3 px-2">Spins / Held Spin</th>
+            <th class="py-3 px-2">Channel Reward</th>
+          </tr>
+        </thead>
+        <tbody id="admin-users-tbody" class="divide-y divide-white/5"></tbody>
+      </table>
+    </div>
+
+    <!-- Live Support Inbox with Threads + Photo + Video + Sound -->
     <div class="panel-card rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between">
         <h2 class="text-sm font-extrabold uppercase tracking-wider text-amber-400">💬 Customer Support Inbox (Text + Photo + Video)</h2>
         <span class="text-xs text-gray-400">Instant chime on new message</span>
       </div>
-      <div id="admin-support-list" class="space-y-3 max-h-[450px] overflow-y-auto"></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div id="admin-support-threads" class="space-y-2 max-h-[420px] overflow-y-auto pr-1"></div>
+        <div class="md:col-span-2 bg-black/40 border border-white/10 rounded-2xl p-3.5 flex flex-col h-[420px]">
+          <div id="admin-thread-header" class="text-xs font-bold text-amber-300 pb-2 border-b border-white/10">
+            Select a customer thread to reply
+          </div>
+          <div id="admin-thread-messages" class="flex-1 overflow-y-auto py-2.5 space-y-2 text-xs"></div>
+          <div id="admin-media-preview" class="hidden text-[11px] font-mono text-cyan-300 bg-cyan-500/15 px-2.5 py-1 rounded mb-2 flex items-center justify-between">
+            <span id="admin-media-label"></span>
+            <button type="button" onclick="clearAdminMedia()" class="text-red-300 font-bold">✕</button>
+          </div>
+          <form onsubmit="sendAdminReply(event)" class="pt-2 border-t border-white/10 flex items-center gap-2">
+            <label class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 cursor-pointer text-xs" title="Attach Photo">
+              📷
+              <input type="file" accept="image/*" class="hidden" onchange="handleAdminMediaPick(event, 'image')" />
+            </label>
+            <label class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 cursor-pointer text-xs" title="Attach Video">
+              🎥
+              <input type="file" accept="video/*" class="hidden" onchange="handleAdminMediaPick(event, 'video')" />
+            </label>
+            <input id="admin-reply-input" type="text" placeholder="Type reply..." class="flex-1 bg-black/65 border border-white/15 rounded-lg px-3 py-1.5 text-xs text-white outline-none" />
+            <button type="submit" class="px-3.5 py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs">Send</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -122,8 +179,10 @@
 
   <script>
     let adminSecret = localStorage.getItem('aurex_admin_secret') || '';
-    let lastAdminMsgCount = 0;
-    const adminMediaDrafts = {};
+    let activeThreadUserId = null;
+    let activeThreadLabel = '';
+    let lastThreadTotalMsgs = 0;
+    let adminMediaDraft = { type: null, data: null, name: '' };
 
     function playAdminChime(freq = 880) {
       try {
@@ -172,20 +231,22 @@
     async function loadAdminData() {
       if (!adminSecret) return false;
       try {
-        const res = await fetch('/api/admin/dashboard', {
+        const res = await fetch('/api/admin/overview', {
           headers: { 'x-admin-secret': adminSecret }
         });
         if (!res.ok) return false;
         const data = await res.json();
 
-        document.getElementById('wallet-trc20').value = data.networks?.TRC20 || '';
-        document.getElementById('wallet-bep20').value = data.networks?.BEP20 || '';
+        document.getElementById('wallet-trc20').value = data.wallets?.TRC20 || '';
+        document.getElementById('wallet-bep20').value = data.wallets?.BEP20 || '';
+        document.getElementById('tg-channel').value = data.telegram?.channel || 'https://t.me/AurexVaultOfficial';
+        document.getElementById('tg-support').value = data.telegram?.support || 'https://t.me/AurexVaultSupport';
 
         const orders = data.orders || [];
         const users = data.users || [];
-        const pendingDeposits = orders.filter(o => o.order_type === 'Deposit' && o.status === 'Pending');
+        const pendingDeposits = orders.filter(o => o.type === 'deposit' && o.status === 'pending');
         const approvedVolume = orders
-          .filter(o => o.order_type === 'Deposit' && o.status === 'Approved')
+          .filter(o => o.type === 'deposit' && o.status === 'approved')
           .reduce((sum, o) => sum + Number(o.amount || 0), 0);
 
         document.getElementById('stat-pending-count').textContent = pendingDeposits.length;
@@ -193,148 +254,196 @@
         document.getElementById('stat-users-count').textContent = users.length;
         document.getElementById('stat-total-orders').textContent = orders.length;
 
+        const userMap = {};
+        users.forEach(u => { userMap[u.id] = u; });
+
         const tbody = document.getElementById('admin-orders-tbody');
         tbody.innerHTML = orders.map(o => {
-          const isPending = o.status === 'Pending';
-          const badge = o.status === 'Approved'
+          const isPending = o.status === 'pending';
+          const u = userMap[o.user_id] || {};
+          const badge = o.status === 'approved'
             ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-            : o.status === 'Rejected'
+            : o.status === 'rejected'
             ? 'bg-red-500/15 text-red-400 border-red-500/30'
             : 'bg-amber-500/15 text-amber-300 border-amber-500/30';
 
           const proofCell = o.proof_data
             ? `<button onclick="openProofModal('${o.proof_data}')" class="px-2 py-1 rounded bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-bold text-[10px]">View Screenshot</button>`
-            : `<span class="mono text-gray-400 truncate max-w-[140px] inline-block">${o.txid}</span>`;
+            : `<span class="mono text-gray-400 truncate max-w-[140px] inline-block">${o.wallet_address || '-'}</span>`;
 
           return `
             <tr class="hover:bg-white/[0.02]">
-              <td class="py-3 px-2 mono font-bold text-amber-400">${o.order_id}</td>
+              <td class="py-3 px-2 mono font-bold text-amber-400">${o.order_code}</td>
               <td class="py-3 px-2 mono font-bold text-cyan-300">#${o.user_uid || '0000000'}</td>
-              <td class="py-3 px-2 mono text-gray-300">${o.created_at}</td>
-              <td class="py-3 px-2 mono text-white">${o.country_flag} ${o.dial_code} ${o.phone}</td>
-              <td class="py-3 px-2 text-gray-300">${o.order_type} • <span class="mono text-amber-300">${o.network}</span></td>
+              <td class="py-3 px-2 mono text-gray-300">${new Date(o.created_at).toLocaleString()}</td>
+              <td class="py-3 px-2 mono text-white">${u.full_name || ''} (${u.phone || ''})</td>
+              <td class="py-3 px-2 text-gray-300">${String(o.type).toUpperCase()} • <span class="mono text-amber-300">${o.network || '-'}</span></td>
               <td class="py-3 px-2 mono font-bold text-emerald-400">$${Number(o.amount).toFixed(2)}</td>
               <td class="py-3 px-2">${proofCell}</td>
-              <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badge}">${o.status}</span></td>
+              <td class="py-3 px-2"><span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase ${badge}">${o.status}</span></td>
               <td class="py-3 px-2 text-right space-x-1.5">
                 ${
                   isPending
-                    ? `<button onclick="handleOrderAction('${o.order_id}', 'Approved')" class="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-bold text-[11px]">Approve</button>
-                       <button onclick="handleOrderAction('${o.order_id}', 'Rejected')" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/40 font-bold text-[11px]">Reject</button>`
+                    ? `<button onclick="handleOrderAction(${o.id}, 'approve')" class="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-bold text-[11px]">Approve</button>
+                       <button onclick="handleOrderAction(${o.id}, 'reject')" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 border border-red-500/40 font-bold text-[11px]">Reject</button>`
                     : `<span class="text-gray-500 text-[11px]">Processed</span>`
                 }
               </td>
             </tr>
           `;
         }).join('');
+
+        const usersTbody = document.getElementById('admin-users-tbody');
+        usersTbody.innerHTML = users.map(u => `
+          <tr class="hover:bg-white/[0.02]">
+            <td class="py-2.5 px-2 mono font-bold text-cyan-300">#${u.user_uid}</td>
+            <td class="py-2.5 px-2 text-white">${u.full_name} <span class="mono text-gray-400">(${u.phone})</span></td>
+            <td class="py-2.5 px-2 mono font-bold text-emerald-400">$${Number(u.balance || 0).toFixed(2)}</td>
+            <td class="py-2.5 px-2 mono text-amber-300">
+              ${u.first_deposit_done ? 'Depositor' : 'Locked'} • VIP ${u.vip_level || 0} (${u.has_active_plan ? 'Active Plan' : 'No Active Plan'})
+            </td>
+            <td class="py-2.5 px-2 mono text-gray-200">
+              Spins: ${u.spins_left} • Held Spin: $${Number(u.pending_spin_reward || 0).toFixed(2)}
+            </td>
+            <td class="py-2.5 px-2 mono text-xs">
+              ${u.channel_reward_claimed ? `<span class="text-emerald-400">Claimed ($0.50) ${u.telegram_username || ''}</span>` : `<span class="text-gray-500">Unclaimed</span>`}
+            </td>
+          </tr>
+        `).join('');
+
         return true;
       } catch (err) {
         return false;
       }
     }
 
-    function handleAdminMediaPick(e, msgId, type) {
+    function handleAdminMediaPick(e, type) {
       const file = e.target.files?.[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        adminMediaDrafts[msgId] = { type, data: reader.result, name: file.name };
-        const tag = document.getElementById(`admin-media-tag-${msgId}`);
-        if (tag) {
-          tag.textContent = `${type === 'video' ? '🎥' : '📷'} ${file.name}`;
-          tag.classList.remove('hidden');
-        }
+        adminMediaDraft = { type, data: reader.result, name: file.name };
+        document.getElementById('admin-media-label').textContent = `${type === 'video' ? '🎥' : '📷'} ${file.name}`;
+        document.getElementById('admin-media-preview').classList.remove('hidden');
       };
       reader.readAsDataURL(file);
+    }
+
+    function clearAdminMedia() {
+      adminMediaDraft = { type: null, data: null, name: '' };
+      document.getElementById('admin-media-preview').classList.add('hidden');
     }
 
     async function loadAdminSupport(playSoundOnNew = false) {
       if (!adminSecret) return;
       try {
-        const res = await fetch('/api/admin/support', {
+        const res = await fetch('/api/admin/support/threads', {
           headers: { 'x-admin-secret': adminSecret }
         });
         if (!res.ok) return;
         const data = await res.json();
-        const msgs = data.messages || [];
+        const threads = data.threads || [];
 
-        if (playSoundOnNew && msgs.length > lastAdminMsgCount) {
-          const newest = msgs[0];
-          if (newest && newest.sender === 'user') playAdminChime(940);
+        const totalLastId = threads.reduce((acc, t) => Math.max(acc, Number(t.last_msg_id || 0)), 0);
+        if (playSoundOnNew && totalLastId > lastThreadTotalMsgs) {
+          playAdminChime(940);
         }
-        lastAdminMsgCount = msgs.length;
+        lastThreadTotalMsgs = totalLastId;
 
-        const list = document.getElementById('admin-support-list');
-        if (!msgs.length) {
-          list.innerHTML = `<p class="text-xs text-gray-500">No support messages yet.</p>`;
+        const box = document.getElementById('admin-support-threads');
+        if (!threads.length) {
+          box.innerHTML = `<p class="text-xs text-gray-500">No support threads yet.</p>`;
           return;
         }
 
-        list.innerHTML = msgs.map(m => {
-          let mediaBlock = '';
-          if (m.media_type === 'image' && m.media_data) {
-            mediaBlock = `<img src="${m.media_data}" class="mt-2 rounded-xl max-h-48 object-contain border border-white/15 bg-black" />`;
-          } else if (m.media_type === 'video' && m.media_data) {
-            mediaBlock = `<video src="${m.media_data}" controls class="mt-2 rounded-xl max-h-48 border border-white/15 bg-black"></video>`;
-          }
+        if (!activeThreadUserId && threads[0]) {
+          selectAdminThread(threads[0].user_id, `#${threads[0].user_uid} • ${threads[0].full_name}`);
+        }
 
+        box.innerHTML = threads.map(t => {
+          const isSelected = Number(t.user_id) === Number(activeThreadUserId);
+          const label = `#${t.user_uid} • ${t.full_name}`;
           return `
-            <div class="bg-black/45 border border-white/10 rounded-xl p-3 space-y-2 text-xs">
-              <div class="flex items-center justify-between">
-                <span class="mono font-bold ${m.sender === 'admin' ? 'text-emerald-400' : 'text-amber-400'}">
-                  ${m.sender === 'admin' ? '🛡️ Admin → #' + (m.user_uid || m.user_key) : `${m.country_flag} ID #${m.user_uid || '0000000'} (${m.dial_code} ${m.phone})`}
-                </span>
-                <span class="mono text-[10px] text-gray-400">${m.created_at}</span>
+            <button type="button" onclick="selectAdminThread(${t.user_id}, '${label.replace(/'/g, "\\'")}')"
+              class="w-full text-left p-2.5 rounded-xl border ${isSelected ? 'bg-amber-400/15 border-amber-400/50' : 'bg-black/45 border-white/10 hover:bg-white/5'} space-y-1">
+              <div class="flex items-center justify-between text-xs">
+                <span class="mono font-bold text-cyan-300">#${t.user_uid}</span>
+                <span class="text-[10px] text-gray-400">${t.full_name}</span>
               </div>
-              ${m.message ? `<p class="text-gray-200">${m.message}</p>` : ''}
-              ${mediaBlock}
-              ${m.sender === 'user' ? `
-                <div class="space-y-1.5 pt-1">
-                  <span id="admin-media-tag-${m.id}" class="hidden inline-block text-[10px] font-mono text-cyan-300 bg-cyan-500/15 px-2 py-0.5 rounded"></span>
-                  <div class="flex items-center gap-2">
-                    <label class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 cursor-pointer text-xs" title="Attach Photo">
-                      📷
-                      <input type="file" accept="image/*" class="hidden" onchange="handleAdminMediaPick(event, ${m.id}, 'image')" />
-                    </label>
-                    <label class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 cursor-pointer text-xs" title="Attach Video">
-                      🎥
-                      <input type="file" accept="video/*" class="hidden" onchange="handleAdminMediaPick(event, ${m.id}, 'video')" />
-                    </label>
-                    <input id="reply-input-${m.id}" type="text" placeholder="Reply to #${m.user_uid || m.phone}..." class="flex-1 bg-black/65 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none" />
-                    <button onclick="sendAdminReply('${m.user_key}', ${m.id})" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs">Send</button>
-                  </div>
-                </div>
-              ` : ''}
-            </div>
+              <p class="text-[11px] text-gray-300 truncate">${t.last_message || ''}</p>
+            </button>
           `;
         }).join('');
+
+        if (activeThreadUserId) {
+          await loadThreadMessages(activeThreadUserId);
+        }
       } catch (err) {}
     }
 
-    async function sendAdminReply(userKey, msgId) {
-      const input = document.getElementById(`reply-input-${msgId}`);
-      const message = input?.value.trim() || '';
-      const draft = adminMediaDrafts[msgId] || { type: 'none', data: '' };
-      if (!message && !draft.data) return;
+    async function selectAdminThread(userId, label) {
+      activeThreadUserId = userId;
+      activeThreadLabel = label;
+      document.getElementById('admin-thread-header').textContent = `Chatting with ${label}`;
+      await loadThreadMessages(userId);
+    }
+
+    async function loadThreadMessages(userId) {
+      const res = await fetch(`/api/admin/support/messages/${userId}`, {
+        headers: { 'x-admin-secret': adminSecret }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const msgs = data.messages || [];
+      const container = document.getElementById('admin-thread-messages');
+
+      container.innerHTML = msgs.map(m => {
+        const isAdmin = m.sender === 'admin';
+        let mediaBlock = '';
+        if (m.media_type === 'image' && m.media_data) {
+          mediaBlock = `<img src="${m.media_data}" class="mt-1.5 rounded-xl max-h-44 object-contain border border-white/15 bg-black" />`;
+        } else if (m.media_type === 'video' && m.media_data) {
+          mediaBlock = `<video src="${m.media_data}" controls class="mt-1.5 rounded-xl max-h-44 border border-white/15 bg-black"></video>`;
+        }
+        return `
+          <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'}">
+            <div class="${isAdmin ? 'bg-emerald-500/15 border border-emerald-500/35 text-emerald-100' : 'bg-white/5 border border-white/10 text-gray-200'} rounded-2xl px-3 py-2 max-w-[85%]">
+              <p class="text-[10px] font-bold ${isAdmin ? 'text-emerald-400' : 'text-amber-400'}">${isAdmin ? '🛡️ Admin' : 'User #' + m.user_uid}</p>
+              ${m.message_text ? `<p class="mt-0.5">${m.message_text}</p>` : ''}
+              ${mediaBlock}
+            </div>
+            <span class="text-[9px] text-gray-500 mt-0.5 px-1">${new Date(m.created_at).toLocaleTimeString()}</span>
+          </div>
+        `;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function sendAdminReply(e) {
+      e.preventDefault();
+      if (!activeThreadUserId) return;
+      const input = document.getElementById('admin-reply-input');
+      const messageText = input.value.trim();
+      if (!messageText && !adminMediaDraft.data) return;
 
       playAdminChime(740);
-      const res = await fetch('/api/admin/support/reply', {
+      const res = await fetch('/api/admin/support/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-admin-secret': adminSecret
         },
         body: JSON.stringify({
-          userKey,
-          message,
-          mediaType: draft.type,
-          mediaData: draft.data
+          user_id: activeThreadUserId,
+          message_text: messageText,
+          media_type: adminMediaDraft.type,
+          media_data: adminMediaDraft.data
         })
       });
       if (res.ok) {
-        if (input) input.value = '';
-        delete adminMediaDrafts[msgId];
-        loadAdminSupport(false);
+        input.value = '';
+        clearAdminMedia();
+        await loadAdminSupport(false);
       }
     }
 
@@ -350,19 +459,23 @@
       if (res.ok) loadAdminData();
     }
 
-    async function saveWallet(network) {
-      const address = document.getElementById(network === 'TRC20' ? 'wallet-trc20' : 'wallet-bep20').value.trim();
-      const res = await fetch('/api/admin/wallets', {
+    async function saveSettings() {
+      const trc20_wallet = document.getElementById('wallet-trc20').value.trim();
+      const bep20_wallet = document.getElementById('wallet-bep20').value.trim();
+      const telegram_channel = document.getElementById('tg-channel').value.trim();
+      const telegram_support = document.getElementById('tg-support').value.trim();
+
+      const res = await fetch('/api/admin/settings/wallets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-admin-secret': adminSecret
         },
-        body: JSON.stringify({ network, address })
+        body: JSON.stringify({ trc20_wallet, bep20_wallet, telegram_channel, telegram_support })
       });
       if (res.ok) {
         const st = document.getElementById('wallet-save-status');
-        st.textContent = `✓ ${network} updated`;
+        st.textContent = '✓ Wallets & Telegram settings saved';
         setTimeout(() => (st.textContent = ''), 2500);
       }
     }

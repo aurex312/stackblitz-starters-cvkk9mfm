@@ -43,7 +43,9 @@ const VIP_PLANS = [
   { level: 9, name: 'VIP 9', amount: 5000, days: 30, daily_return: 680.0, min_invites: 3 }
 ];
 
-const SPIN_PRIZES = [0.15, 0.25, 0.5, 0.75, 1.0];
+// Strictly <= $1.00 rewards as configured
+const SPIN_PRIZES = [0.20, 0.30, 0.50, 0.70];
+const CHANNEL_JOIN_REWARD = 0.50;
 
 function normalizePhone(rawPhone) {
   return String(rawPhone || '').replace(/[^\d+]/g, '').trim();
@@ -96,6 +98,29 @@ function execSql(sql, params = []) {
   saveDb();
 }
 
+function ensureUserColumns() {
+  const cols = queryAll('PRAGMA table_info(users)').map((c) => c.name);
+  if (!cols.includes('pending_spin_reward')) {
+    db.run('ALTER TABLE users ADD COLUMN pending_spin_reward REAL NOT NULL DEFAULT 0');
+  }
+  if (!cols.includes('channel_reward_claimed')) {
+    db.run('ALTER TABLE users ADD COLUMN channel_reward_claimed INTEGER NOT NULL DEFAULT 0');
+  }
+  if (!cols.includes('telegram_username')) {
+    db.run('ALTER TABLE users ADD COLUMN telegram_username TEXT');
+  }
+}
+
+function hasActiveVipPlan(userId, nowIso = new Date().toISOString()) {
+  const row = queryOne(
+    `SELECT id FROM vip_subscriptions
+     WHERE user_id = ? AND status = 'active' AND expires_at > ?
+     ORDER BY id DESC LIMIT 1`,
+    [userId, nowIso]
+  );
+  return Boolean(row);
+}
+
 function generateUnique7DigitUid() {
   for (let i = 0; i < 1000; i++) {
     const uid = String(crypto.randomInt(1000000, 9999999));
@@ -137,11 +162,14 @@ function sanitizeUser(userRow) {
   return {
     ...safe,
     balance: Number(Number(safe.balance || 0).toFixed(2)),
+    pending_spin_reward: Number(Number(safe.pending_spin_reward || 0).toFixed(2)),
     team_rebate: Number(Number(safe.team_rebate || 0).toFixed(2)),
     vip_level: Number(safe.vip_level || 0),
     active_invites: Number(safe.active_invites || 0),
     spins_left: Number(safe.spins_left || 0),
-    first_deposit_done: Number(safe.first_deposit_done || 0)
+    first_deposit_done: Number(safe.first_deposit_done || 0),
+    channel_reward_claimed: Number(safe.channel_reward_claimed || 0),
+    has_active_plan: hasActiveVipPlan(safe.id)
   };
 }
 
@@ -195,11 +223,14 @@ async function initDatabase() {
       password_hash TEXT NOT NULL,
       referred_by_uid TEXT,
       balance REAL NOT NULL DEFAULT 0,
+      pending_spin_reward REAL NOT NULL DEFAULT 0,
       team_rebate REAL NOT NULL DEFAULT 0,
       vip_level INTEGER NOT NULL DEFAULT 0,
       active_invites INTEGER NOT NULL DEFAULT 0,
       spins_left INTEGER NOT NULL DEFAULT 2,
       first_deposit_done INTEGER NOT NULL DEFAULT 0,
+      channel_reward_claimed INTEGER NOT NULL DEFAULT 0,
+      telegram_username TEXT,
       created_at TEXT NOT NULL
     );
 
@@ -264,6 +295,8 @@ async function initDatabase() {
     );
   `);
 
+  ensureUserColumns();
+
   const existingUsers = queryAll('SELECT id, phone FROM users');
   for (const row of existingUsers) {
     const clean = normalizePhone(row.phone);
@@ -277,7 +310,9 @@ async function initDatabase() {
 
   const defaultSettings = {
     trc20_wallet: 'T9yD14Nj9j7xAB41GeiX9h2kQ8pL5mN2vR',
-    bep20_wallet: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'
+    bep20_wallet: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+    telegram_channel: 'https://t.me/AurexVaultOfficial',
+    telegram_support: 'https://t.me/AurexVaultSupport'
   };
   for (const [key, val] of Object.entries(defaultSettings)) {
     const existing = queryOne('SELECT key FROM settings WHERE key = ?', [key]);
@@ -330,8 +365,9 @@ app.post('/api/auth/register', (req, res) => {
     execSql(
       `INSERT INTO users (
         user_uid, ref_code, full_name, phone, password_hash, referred_by_uid,
-        balance, team_rebate, vip_level, active_invites, spins_left, first_deposit_done, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 2, 0, ?)`,
+        balance, pending_spin_reward, team_rebate, vip_level, active_invites,
+        spins_left, first_deposit_done, channel_reward_claimed, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 2, 0, 0, ?)`,
       [userUid, userUid, fullName, phone, passwordHash, referredByUid, nowIso]
     );
 
@@ -404,8 +440,45 @@ app.get('/api/user/profile', requireAuth, (req, res) => {
     wallets: {
       TRC20: getSetting('trc20_wallet', ''),
       BEP20: getSetting('bep20_wallet', '')
+    },
+    telegram: {
+      channel: getSetting('telegram_channel', 'https://t.me/AurexVaultOfficial'),
+      support: getSetting('telegram_support', 'https://t.me/AurexVaultSupport'),
+      join_reward: CHANNEL_JOIN_REWARD
     }
   });
+});
+
+// Telegram Channel Join Reward
+app.post('/api/rewards/channel-join', requireAuth, (req, res) => {
+  try {
+    const rawHandle = String(req.body.telegram_username || req.body.telegramUsername || '').trim();
+    const cleanHandle = rawHandle.replace(/^@+/, '');
+
+    if (!cleanHandle || cleanHandle.length < 3) {
+      return res.status(400).json({ error: 'Please enter a valid Telegram @username.' });
+    }
+
+    const user = queryOne('SELECT * FROM users WHERE id = ?', [req.user.id]);
+    if (Number(user.channel_reward_claimed || 0) === 1) {
+      return res.status(400).json({ error: 'Channel join reward has already been claimed.' });
+    }
+
+    const nextBalance = Number((Number(user.balance || 0) + CHANNEL_JOIN_REWARD).toFixed(2));
+    execSql(
+      'UPDATE users SET balance = ?, channel_reward_claimed = 1, telegram_username = ? WHERE id = ?',
+      [nextBalance, `@${cleanHandle}`, user.id]
+    );
+
+    const updatedUser = queryOne('SELECT * FROM users WHERE id = ?', [user.id]);
+    return res.json({
+      reward: CHANNEL_JOIN_REWARD,
+      user: sanitizeUser(updatedUser)
+    });
+  } catch (err) {
+    console.error('Channel join reward error:', err);
+    return res.status(500).json({ error: 'Failed to claim channel join reward.' });
+  }
 });
 
 // VIP Plans & Activation
@@ -443,13 +516,16 @@ app.post('/api/vip/activate', requireAuth, (req, res) => {
       });
     }
 
-    const newBalance = Number((Number(user.balance || 0) - plan.amount).toFixed(2));
+    const pendingReward = Number(Number(user.pending_spin_reward || 0).toFixed(2));
+    const newBalance = Number(
+      (Number(user.balance || 0) - plan.amount + pendingReward).toFixed(2)
+    );
     const newVipLevel = Math.max(Number(user.vip_level || 0), plan.level);
     const now = new Date();
     const createdAt = now.toISOString();
     const expiresAt = new Date(now.getTime() + plan.days * 24 * 60 * 60 * 1000).toISOString();
 
-    execSql('UPDATE users SET balance = ?, vip_level = ? WHERE id = ?', [
+    execSql('UPDATE users SET balance = ?, pending_spin_reward = 0, vip_level = ? WHERE id = ?', [
       newBalance,
       newVipLevel,
       user.id
@@ -465,6 +541,7 @@ app.post('/api/vip/activate', requireAuth, (req, res) => {
     const updatedUser = queryOne('SELECT * FROM users WHERE id = ?', [user.id]);
     return res.json({
       message: `${plan.name} activated successfully.`,
+      unlocked_spin_reward: pendingReward,
       user: sanitizeUser(updatedUser)
     });
   } catch (err) {
@@ -568,10 +645,17 @@ app.post('/api/orders/withdraw', requireAuth, (req, res) => {
   }
 });
 
-// Lucky Golden Spin (Max Reward $1.00)
+// Lucky Golden Spin: Depositors only, strictly <= $1.00, credited only with active VIP plan
 app.post('/api/spin/play', requireAuth, (req, res) => {
   try {
     const user = queryOne('SELECT * FROM users WHERE id = ?', [req.user.id]);
+
+    if (Number(user.first_deposit_done || 0) !== 1) {
+      return res.status(403).json({
+        error: 'Lucky Spin sirf depositors ke liye hai. Pehle apna deposit complete karein.'
+      });
+    }
+
     if (Number(user.spins_left || 0) <= 0) {
       return res.status(400).json({ error: 'No Lucky Spins remaining.' });
     }
@@ -579,14 +663,24 @@ app.post('/api/spin/play', requireAuth, (req, res) => {
     const idx = crypto.randomInt(0, SPIN_PRIZES.length);
     const reward = Math.min(1.0, Number(SPIN_PRIZES[idx].toFixed(2)));
     const newSpinsLeft = Math.max(0, Number(user.spins_left || 0) - 1);
-    const newBalance = Number((Number(user.balance || 0) + reward).toFixed(2));
     const nowIso = new Date().toISOString();
+    const activePlan = hasActiveVipPlan(user.id, nowIso);
 
-    execSql('UPDATE users SET spins_left = ?, balance = ? WHERE id = ?', [
-      newSpinsLeft,
-      newBalance,
-      user.id
-    ]);
+    if (activePlan) {
+      const newBalance = Number((Number(user.balance || 0) + reward).toFixed(2));
+      execSql('UPDATE users SET spins_left = ?, balance = ? WHERE id = ?', [
+        newSpinsLeft,
+        newBalance,
+        user.id
+      ]);
+    } else {
+      const nextPending = Number((Number(user.pending_spin_reward || 0) + reward).toFixed(2));
+      execSql('UPDATE users SET spins_left = ?, pending_spin_reward = ? WHERE id = ?', [
+        newSpinsLeft,
+        nextPending,
+        user.id
+      ]);
+    }
 
     execSql(
       'INSERT INTO spin_logs (user_id, user_uid, reward, created_at) VALUES (?, ?, ?, ?)',
@@ -596,6 +690,10 @@ app.post('/api/spin/play', requireAuth, (req, res) => {
     const updatedUser = queryOne('SELECT * FROM users WHERE id = ?', [user.id]);
     return res.json({
       reward,
+      plan_active: activePlan,
+      message: activePlan
+        ? `Won $${reward.toFixed(2)} credited to balance!`
+        : `Won $${reward.toFixed(2)}. Pehle apna VIP plan active karein — reward active plan ke sath unlock hoga.`,
       user: sanitizeUser(updatedUser)
     });
   } catch (err) {
@@ -661,18 +759,30 @@ app.get('/api/admin/overview', requireAdmin, (req, res) => {
     TRC20: getSetting('trc20_wallet', ''),
     BEP20: getSetting('bep20_wallet', '')
   };
-  return res.json({ users, orders, wallets });
+  const telegram = {
+    channel: getSetting('telegram_channel', 'https://t.me/AurexVaultOfficial'),
+    support: getSetting('telegram_support', 'https://t.me/AurexVaultSupport')
+  };
+  return res.json({ users, orders, wallets, telegram });
 });
 
 app.post('/api/admin/settings/wallets', requireAdmin, (req, res) => {
   const trc20 = String(req.body.trc20_wallet || '').trim();
   const bep20 = String(req.body.bep20_wallet || '').trim();
+  const tgChannel = String(req.body.telegram_channel || '').trim();
+  const tgSupport = String(req.body.telegram_support || '').trim();
   if (trc20) setSetting('trc20_wallet', trc20);
   if (bep20) setSetting('bep20_wallet', bep20);
+  if (tgChannel) setSetting('telegram_channel', tgChannel);
+  if (tgSupport) setSetting('telegram_support', tgSupport);
   return res.json({
     wallets: {
       TRC20: getSetting('trc20_wallet', ''),
       BEP20: getSetting('bep20_wallet', '')
+    },
+    telegram: {
+      channel: getSetting('telegram_channel', 'https://t.me/AurexVaultOfficial'),
+      support: getSetting('telegram_support', 'https://t.me/AurexVaultSupport')
     }
   });
 });
