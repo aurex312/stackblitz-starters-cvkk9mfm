@@ -38,8 +38,9 @@
         <h1 class="text-xl font-extrabold text-white">AUREX VAULT — Admin Command Center</h1>
         <p id="admin-24h-clock" class="text-[11px] mono text-amber-300 mt-0.5"></p>
       </div>
-      <div class="flex items-center gap-2.5">
+      <div class="flex flex-wrap items-center gap-2.5">
         <button onclick="loadAdminData(true); loadAdminSupport(false);" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-amber-400">↻ Refresh</button>
+        <button type="button" onclick="resetUsersData()" class="px-3.5 py-2 rounded-xl bg-amber-500/20 border border-amber-400/40 text-xs font-bold text-amber-300">🗑 Reset Users</button>
         <a href="/" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs font-semibold text-emerald-400">Customer App ↗</a>
         <button onclick="logoutAdmin()" class="px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400">Logout</button>
       </div>
@@ -270,6 +271,33 @@
     function openProofModal(src) {
       document.getElementById('proof-modal-img').src = src;
       document.getElementById('proof-modal').classList.remove('hidden');
+    }
+
+    async function resetUsersData() {
+      const confirmed = confirm(
+        'Are you sure you want to clear all user accounts, deposit/withdraw orders, and support chat history? VIP plans and wallet settings will stay safe.'
+      );
+      if (!confirmed) return;
+
+      const res = await fetch('/api/admin/reset-users-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': adminSecret
+        }
+      });
+
+      if (res.ok) {
+        activeThreadUserId = null;
+        activeThreadLabel = '';
+        lastThreadTotalMsgs = 0;
+        playAdminChime(700);
+        alert('User data, orders, and chat history cleared cleanly.');
+        await loadAdminData(true);
+        await loadAdminSupport(false);
+      } else {
+        alert('Failed to reset user data.');
+      }
     }
 
     async function loginAdmin(e) {
@@ -574,8 +602,13 @@
         lastThreadTotalMsgs = totalLastId;
 
         const box = document.getElementById('admin-support-threads');
+        const msgContainer = document.getElementById('admin-thread-messages');
+        const headerEl = document.getElementById('admin-thread-header');
+
         if (!threads.length) {
           box.innerHTML = `<p class="text-xs text-gray-500">No support threads yet.</p>`;
+          if (msgContainer) msgContainer.innerHTML = '';
+          if (headerEl) headerEl.textContent = 'Select a customer thread to reply';
           return;
         }
 
