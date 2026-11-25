@@ -160,7 +160,7 @@ function generateUniqueUid(store) {
 
 function detectPlanForDeposit(store, user, amount, explicitLevel = null) {
   const plans = store.vip_plans.slice().sort((a, b) => Number(a.level) - Number(b.level));
-  if (explicitLevel && Number(explicitLevel) > 0) {
+  if (explicitLevel !== null && explicitLevel !== undefined && Number(explicitLevel) > 0) {
     const exact = plans.find((p) => Number(p.level) === Number(explicitLevel));
     if (exact) return exact;
   }
@@ -174,10 +174,13 @@ function detectPlanForDeposit(store, user, amount, explicitLevel = null) {
   return null;
 }
 
-function activateSubscriptionForUser(store, user, plan, customAmount = null) {
+function activateSubscriptionForUser(store, user, plan, customAmount = null, customDays = null, customDaily = null) {
   const cost = customAmount !== null ? Number(customAmount) : Number(plan.amount || 0);
-  const days = Number(plan.days || 20);
-  const dailyReturn = Number(plan.daily_return || 0);
+  const days = customDays !== null && Number(customDays) > 0 ? Number(customDays) : Number(plan.days || 20);
+  const dailyReturn =
+    customDaily !== null && Number(customDaily) >= 0
+      ? Number(Number(customDaily).toFixed(2))
+      : Number(plan.daily_return || 0);
 
   user.vip_level = Math.max(Number(user.vip_level || 0), Number(plan.level));
   user.plan_days_left = days;
@@ -921,9 +924,23 @@ app.post('/api/admin/support/messages', requireAdmin, (req, res) => {
   return res.json({ ok: true });
 });
 
+// Order approve/reject ke waqt admin ka select/edit kiya gaya VIP level, days, aur daily return apply hota hai
 app.post('/api/admin/orders/:orderId/action', requireAdmin, (req, res) => {
   const orderId = Number(req.params.orderId);
   const action = String(req.body.action || '').toLowerCase();
+
+  const chosenVipLevel =
+    req.body.vip_level !== undefined && req.body.vip_level !== '' && req.body.vip_level !== null
+      ? Number(req.body.vip_level)
+      : null;
+  const chosenDays =
+    req.body.days !== undefined && req.body.days !== '' && req.body.days !== null
+      ? Number(req.body.days)
+      : null;
+  const chosenDailyReturn =
+    req.body.daily_return !== undefined && req.body.daily_return !== '' && req.body.daily_return !== null
+      ? Number(req.body.daily_return)
+      : null;
 
   const store = loadStore();
   settleDueVipProfits(store);
@@ -960,13 +977,25 @@ app.post('/api/admin/orders/:orderId/action', requireAdmin, (req, res) => {
           }
         }
 
-        const matchedPlan = detectPlanForDeposit(store, user, amount, order.selected_vip_level);
+        const effectiveLevel = chosenVipLevel !== null ? chosenVipLevel : order.selected_vip_level;
+        const matchedPlan = detectPlanForDeposit(store, user, amount, effectiveLevel);
+
         if (matchedPlan && Number(user.balance || 0) >= Number(matchedPlan.amount || 0)) {
-          user.balance = Number((Number(user.balance || 0) - Number(matchedPlan.amount || 0)).toFixed(2));
-          activateSubscriptionForUser(store, user, matchedPlan, Number(matchedPlan.amount || 0));
+          const planCost = Number(matchedPlan.amount || 0);
+          const finalDays =
+            chosenDays !== null && Number.isFinite(chosenDays) && chosenDays > 0
+              ? chosenDays
+              : Number(matchedPlan.days || 20);
+          const finalDaily =
+            chosenDailyReturn !== null && Number.isFinite(chosenDailyReturn) && chosenDailyReturn >= 0
+              ? Number(chosenDailyReturn.toFixed(2))
+              : Number(matchedPlan.daily_return || 0);
+
+          user.balance = Number((Number(user.balance || 0) - planCost).toFixed(2));
+          activateSubscriptionForUser(store, user, matchedPlan, planCost, finalDays, finalDaily);
           order.auto_vip_level = Number(matchedPlan.level);
-          order.auto_days = Number(matchedPlan.days);
-          order.auto_daily_return = Number(matchedPlan.daily_return);
+          order.auto_days = finalDays;
+          order.auto_daily_return = finalDaily;
         }
       }
     }
@@ -1004,33 +1033,6 @@ app.post('/api/admin/users/:userId/balance', requireAdmin, (req, res) => {
 
   saveStore(store);
   return res.json({ user: sanitizeUser(store, user) });
-});
-
-app.post('/api/admin/vip/plans/:level', requireAdmin, (req, res) => {
-  const level = Number(req.params.level);
-  const store = loadStore();
-  const idx = store.vip_plans.findIndex((p) => Number(p.level) === level);
-  if (idx === -1) return res.status(404).json({ error: 'VIP plan not found.' });
-
-  const target = store.vip_plans[idx];
-  if (req.body.name !== undefined && String(req.body.name).trim()) {
-    target.name = String(req.body.name).trim();
-  }
-  if (req.body.amount !== undefined && Number(req.body.amount) > 0) {
-    target.amount = Number(Number(req.body.amount).toFixed(2));
-  }
-  if (req.body.days !== undefined && Number(req.body.days) > 0) {
-    target.days = Number(req.body.days);
-  }
-  if (req.body.daily_return !== undefined && Number(req.body.daily_return) >= 0) {
-    target.daily_return = Number(Number(req.body.daily_return).toFixed(2));
-  }
-  if (req.body.min_invites !== undefined && Number(req.body.min_invites) >= 0) {
-    target.min_invites = Number(req.body.min_invites);
-  }
-
-  saveStore(store);
-  return res.json({ plans: store.vip_plans });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
