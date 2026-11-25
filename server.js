@@ -47,8 +47,18 @@ const VIP_PLANS = [
 const SPIN_PRIZES = [0.20, 0.30, 0.50, 0.70];
 const CHANNEL_JOIN_REWARD = 0.50;
 
-function normalizePhone(rawPhone) {
-  return String(rawPhone || '').replace(/[^\d+]/g, '').trim();
+function normalizePhone(rawPhone, dialCode = '') {
+  const cleanDial = String(dialCode || '').replace(/[^\d+]/g, '').trim();
+  const digitsOnly = String(rawPhone || '').replace(/\D/g, '').trim();
+  if (!digitsOnly) return '';
+  if (cleanDial) {
+    const dialDigits = cleanDial.replace(/\D/g, '');
+    const stripped = digitsOnly.startsWith(dialDigits)
+      ? digitsOnly.slice(dialDigits.length)
+      : digitsOnly.replace(/^0+/, '');
+    return `+${dialDigits}${stripped}`;
+  }
+  return String(rawPhone || '').startsWith('+') ? `+${digitsOnly}` : digitsOnly;
 }
 
 function hashPassword(password, salt = null) {
@@ -324,20 +334,23 @@ async function initDatabase() {
   saveDb();
 }
 
-// Auth Endpoints
+// Auth Endpoints (accepts both snake_case and camelCase payloads)
 app.post('/api/auth/register', (req, res) => {
   try {
-    const fullName = String(req.body.full_name || '').trim();
-    const phone = normalizePhone(req.body.phone);
-    const password = String(req.body.password || '');
-    const refCodeInput = String(req.body.ref_code || '').trim();
+    const body = req.body || {};
+    const fullName = String(body.full_name ?? body.fullName ?? '').trim();
+    const dialCode = String(body.dial_code ?? body.dialCode ?? '').trim();
+    const rawPhone = body.phone ?? body.mobile ?? '';
+    const phone = normalizePhone(rawPhone, dialCode);
+    const password = String(body.password ?? '');
+    const refCodeInput = String(body.ref_code ?? body.inviteCode ?? body.invite_code ?? '').trim();
 
     if (!fullName || !phone || !password) {
       return res.status(400).json({ error: 'Full name, phone number, and password are required.' });
     }
 
-    if (password.length < 8) {
-      return res.status(400).json({ error: 'Password must be at least 8 characters long.' });
+    if (password.length < 4) {
+      return res.status(400).json({ error: 'Password must be at least 4 characters long.' });
     }
 
     const existingPhone = queryOne('SELECT id, user_uid FROM users WHERE phone = ?', [phone]);
@@ -381,7 +394,12 @@ app.post('/api/auth/register', (req, res) => {
 
     return res.status(201).json({
       token,
-      user: sanitizeUser(createdUser)
+      user: sanitizeUser(createdUser),
+      orders: [],
+      wallets: {
+        TRC20: getSetting('trc20_wallet', ''),
+        BEP20: getSetting('bep20_wallet', '')
+      }
     });
   } catch (err) {
     if (String(err.message || '').includes('UNIQUE')) {
@@ -396,14 +414,22 @@ app.post('/api/auth/register', (req, res) => {
 
 app.post('/api/auth/login', (req, res) => {
   try {
-    const phone = normalizePhone(req.body.phone);
-    const password = String(req.body.password || '');
+    const body = req.body || {};
+    const dialCode = String(body.dial_code ?? body.dialCode ?? '').trim();
+    const rawPhone = body.phone ?? body.mobile ?? '';
+    const password = String(body.password ?? '');
 
-    if (!phone || !password) {
+    if (!String(rawPhone).trim() || !password) {
       return res.status(400).json({ error: 'Phone number and password are required.' });
     }
 
-    const user = queryOne('SELECT * FROM users WHERE phone = ?', [phone]);
+    const normalizedWithDial = normalizePhone(rawPhone, dialCode);
+    const normalizedDirect = normalizePhone(rawPhone);
+
+    const user =
+      queryOne('SELECT * FROM users WHERE phone = ?', [normalizedWithDial]) ||
+      queryOne('SELECT * FROM users WHERE phone = ?', [normalizedDirect]);
+
     if (!user || !verifyPassword(password, user.password_hash)) {
       return res.status(401).json({ error: 'Invalid phone number or password.' });
     }
@@ -412,9 +438,16 @@ app.post('/api/auth/login', (req, res) => {
     const nowIso = new Date().toISOString();
     execSql('INSERT INTO sessions (token, user_id, created_at) VALUES (?, ?, ?)', [token, user.id, nowIso]);
 
+    const orders = queryAll('SELECT * FROM orders WHERE user_id = ? ORDER BY id DESC', [user.id]);
+
     return res.json({
       token,
-      user: sanitizeUser(user)
+      user: sanitizeUser(user),
+      orders,
+      wallets: {
+        TRC20: getSetting('trc20_wallet', ''),
+        BEP20: getSetting('bep20_wallet', '')
+      }
     });
   } catch (err) {
     console.error('Login error:', err);
@@ -555,7 +588,7 @@ app.post('/api/orders/deposit', requireAuth, (req, res) => {
   try {
     const amount = Number(req.body.amount);
     const network = String(req.body.network || '').toUpperCase().trim();
-    const proofData = String(req.body.proof_data || '').trim();
+    const proofData = String(req.body.proof_data ?? req.body.proofData ?? '').trim();
 
     if (!Number.isFinite(amount) || amount < 10) {
       return res.status(400).json({ error: 'Minimum deposit amount is $10.00.' });
@@ -603,7 +636,7 @@ app.post('/api/orders/withdraw', requireAuth, (req, res) => {
   try {
     const amount = Number(req.body.amount);
     const network = String(req.body.network || 'TRC20').toUpperCase().trim();
-    const walletAddress = String(req.body.wallet_address || '').trim();
+    const walletAddress = String(req.body.wallet_address ?? req.body.address ?? '').trim();
 
     if (!Number.isFinite(amount) || amount < 10) {
       return res.status(400).json({ error: 'Minimum withdrawal amount is $10.00.' });
@@ -713,9 +746,11 @@ app.get('/api/support/messages', requireAuth, (req, res) => {
 
 app.post('/api/support/messages', requireAuth, (req, res) => {
   try {
-    const messageText = String(req.body.message_text || '').trim();
-    const mediaType = req.body.media_type ? String(req.body.media_type).trim() : null;
-    const mediaData = req.body.media_data ? String(req.body.media_data).trim() : null;
+    const messageText = String(req.body.message_text ?? req.body.message ?? '').trim();
+    const rawMediaType = req.body.media_type ?? req.body.mediaType ?? null;
+    const rawMediaData = req.body.media_data ?? req.body.mediaData ?? null;
+    const mediaType = rawMediaType && rawMediaType !== 'none' ? String(rawMediaType).trim() : null;
+    const mediaData = rawMediaData ? String(rawMediaData).trim() : null;
 
     if (!messageText && !mediaData) {
       return res.status(400).json({ error: 'Message text or media attachment is required.' });
@@ -917,9 +952,11 @@ app.get('/api/admin/support/messages/:userId', requireAdmin, (req, res) => {
 app.post('/api/admin/support/messages', requireAdmin, (req, res) => {
   try {
     const userId = Number(req.body.user_id);
-    const messageText = String(req.body.message_text || '').trim();
-    const mediaType = req.body.media_type ? String(req.body.media_type).trim() : null;
-    const mediaData = req.body.media_data ? String(req.body.media_data).trim() : null;
+    const messageText = String(req.body.message_text ?? req.body.message ?? '').trim();
+    const rawMediaType = req.body.media_type ?? req.body.mediaType ?? null;
+    const rawMediaData = req.body.media_data ?? req.body.mediaData ?? null;
+    const mediaType = rawMediaType && rawMediaType !== 'none' ? String(rawMediaType).trim() : null;
+    const mediaData = rawMediaData ? String(rawMediaData).trim() : null;
 
     const user = queryOne('SELECT id, user_uid FROM users WHERE id = ?', [userId]);
     if (!user) {
