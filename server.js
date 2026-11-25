@@ -49,15 +49,18 @@ function format24HourTimestamp(dateInput = new Date()) {
   return `${yyyy}-${mm}-${dd} ${hh}:${min}:${sec}`;
 }
 
-function createInitialStore() {
+function createInitialStore(existingPlans = null, existingWallets = null, existingTelegram = null) {
   return {
     nextUserId: 1,
     nextOrderId: 1,
     nextSubId: 1,
     nextMsgId: 1,
-    vip_plans: DEFAULT_VIP_PLANS.map((p) => ({ ...p })),
-    wallets: { ...DEFAULT_WALLETS },
-    telegram: { ...TELEGRAM_CONFIG },
+    vip_plans:
+      Array.isArray(existingPlans) && existingPlans.length
+        ? existingPlans.map((p) => ({ ...p }))
+        : DEFAULT_VIP_PLANS.map((p) => ({ ...p })),
+    wallets: { ...DEFAULT_WALLETS, ...(existingWallets || {}) },
+    telegram: { ...TELEGRAM_CONFIG, ...(existingTelegram || {}) },
     users: [],
     orders: [],
     vip_subscriptions: [],
@@ -155,7 +158,6 @@ function generateUniqueUid(store) {
   return uid;
 }
 
-// Deposit amount / selected VIP level ke hisab se automatic VIP plan detect karta hai
 function detectPlanForDeposit(store, user, amount, explicitLevel = null) {
   const plans = store.vip_plans.slice().sort((a, b) => Number(a.level) - Number(b.level));
   if (explicitLevel && Number(explicitLevel) > 0) {
@@ -207,7 +209,6 @@ function activateSubscriptionForUser(store, user, plan, customAmount = null) {
   });
 }
 
-// Har 24 ghante ke cycle par active VIP plans ka automatic daily profit credit
 function settleDueVipProfits(store) {
   const nowMs = Date.now();
   const oneDayMs = 24 * 60 * 60 * 1000;
@@ -796,6 +797,20 @@ app.post('/api/support/messages', (req, res) => {
 });
 
 // ================= ADMIN ROUTES =================
+
+app.post('/api/admin/reset-users-data', requireAdmin, (req, res) => {
+  const currentStore = loadStore();
+  const freshStore = createInitialStore(
+    currentStore.vip_plans,
+    currentStore.wallets,
+    currentStore.telegram
+  );
+  saveStore(freshStore);
+  return res.json({
+    ok: true,
+    message: 'User accounts, deposit orders, withdraw history, and support messages cleared cleanly.'
+  });
+});
 
 app.get('/api/admin/overview', requireAdmin, (req, res) => {
   const store = loadStore();
